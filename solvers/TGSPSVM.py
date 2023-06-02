@@ -7,17 +7,16 @@ from benchopt.stopping_criterion import SingleRunCriterion
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     from sklearn.model_selection import GridSearchCV
-    from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
     from moabb.paradigms import FilterBankLeftRightImagery, LeftRightImagery
-    from mne.decoding import CSP
-    from moabb.pipelines.utils import FilterBank
     from sklearn.pipeline import make_pipeline
-
+    from pyriemann.estimation import Covariances
+    from pyriemann.tangentspace import TangentSpace
+    from sklearn.svm import SVC
 # The benchmark solvers must be named `Solver` and
 # inherit from `BaseSolver` for `benchopt` to work properly.
 class Solver(BaseSolver):
 
-    name= 'FBCSPLDA'
+    name= 'TGSPSVM'
 
     
 
@@ -28,7 +27,11 @@ class Solver(BaseSolver):
         # passing the objective to the solver.
         # It is customizable for each benchmark.
         self.X, self.y = X, y
-        self.clf = make_pipeline(FilterBank(CSP(n_components=4)),LDA())
+        self.clf = make_pipeline(
+    Covariances("oas"), TangentSpace(metric="riemann"), SVC(kernel="linear")
+)
+
+
 
 
         # va chercher les meilleurs paramètres pour le modèle 

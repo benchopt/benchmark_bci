@@ -8,7 +8,7 @@ import pickle
 with safe_import_context() as import_ctx:
     import numpy as np
     import moabb
-    from moabb.datasets import BNCI2014001, Zhou2016
+    from moabb.datasets import Zhou2016
     from moabb.evaluations import CrossSessionEvaluation
     from moabb.paradigms import FilterBankLeftRightImagery, LeftRightImagery
     
@@ -34,12 +34,11 @@ class Dataset(BaseDataset):
         # API to pass data. It is customizable for each benchmark.
 
         
-        dataset = BNCI2014001()
+        dataset = Zhou2016()
         
-        filters = [[8, 24], [16, 32]]
-        paradigm = FilterBankLeftRightImagery(filters=filters)
+        paradigm = LeftRightImagery(fmin=8, fmax=35)
 
-        X, labels, meta = paradigm.get_data(dataset=dataset, subjects=[2])
+        X, labels, meta = paradigm.get_data(dataset=dataset, subjects=[1])
     
 
         # The dictionary defines the keyword arguments for `Objective.set_data`G

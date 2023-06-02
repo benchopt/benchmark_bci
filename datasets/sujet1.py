@@ -8,7 +8,7 @@ import pickle
 with safe_import_context() as import_ctx:
     import numpy as np
     import moabb
-    from moabb.datasets import BNCI2014001, Zhou2016
+    from moabb.datasets import BNCI2014001
     from moabb.evaluations import CrossSessionEvaluation
     from moabb.paradigms import LeftRightImagery
 
@@ -22,6 +22,7 @@ class Dataset(BaseDataset):
     # List of parameters to generate the datasets. The benchmark will consider
     # the cross product for each key in the dictionary.
     # Any parameters 'param' defined here is available as `self.param`.
+
     
 
    
