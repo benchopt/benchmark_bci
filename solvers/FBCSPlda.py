@@ -36,6 +36,8 @@ class Solver(BaseSolver):
     def run(self, n_iter):
         # This is the function that is called to evaluate the solver.
         # HERE: add prepro Filter
+
+
         self.clf.fit(self.X, self.y)
 
     def get_result(self):
