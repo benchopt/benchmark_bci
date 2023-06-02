@@ -3,5 +3,4 @@
 # name `benchmark_utils`, and code defined inside will be importable using
 # the usual import syntax
 
-def gradient_ols(X, y, w):
-    return X.T @ (X @ w - y)
+# on peut définir ici des fonctions 
