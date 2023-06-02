@@ -21,7 +21,7 @@ class Solver(BaseSolver):
     # the cross product for each key in the dictionary.
     # All parameters 'p' defined here are available as 'self.p'.
     parameters = {
-        'scale_step': [1, 1.99],
+        'scale_step': [1, 1.98],
     }
 
     def set_objective(self, X, y):
@@ -34,7 +34,7 @@ class Solver(BaseSolver):
 
     def run(self, n_iter):
         # This is the function that is called to evaluate the solver.
-        # It runs the algorithm for a given a number of iterations `n_iter`.
+        # It runs the algorithm for a given a number of iterations `n_iter` test.
 
         L = np.linalg.norm(self.X, ord=2) ** 2
         alpha = self.scale_step / L
@@ -43,6 +43,7 @@ class Solver(BaseSolver):
             w -= alpha * gradient_ols(self.X, self.y, w)
 
         self.w = w
+        
 
     def get_result(self):
         # Return the result from one optimization run.
