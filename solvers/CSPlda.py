@@ -29,8 +29,6 @@ class Solver(BaseSolver):
         self.X, self.y = X, y
         self.clf = make_pipeline(CSP(n_components=8), LDA())
 
-        # va chercher les meilleurs paramètres pour le modèle
-
     def run(self, n_iter):
         # This is the function that is called to evaluate the solver.
         self.clf.fit(self.X, self.y)
