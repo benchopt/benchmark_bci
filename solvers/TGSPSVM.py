@@ -1,28 +1,24 @@
 from benchopt import BaseSolver, safe_import_context
 
+
 # Protect the import with `safe_import_context()`. This allows:
 # - skipping import to speed up autocompletion in CLI.
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
-    import numpy as np
-
-    # import your reusable functions here
-    from benchmark_utils import gradient_ols
-
-
+    from sklearn.pipeline import make_pipeline
+    from pyriemann.estimation import Covariances
+    from pyriemann.tangentspace import TangentSpace
+    from sklearn.svm import SVC
+    from benchopt.stopping_criterion import SingleRunCriterion
 # The benchmark solvers must be named `Solver` and
 # inherit from `BaseSolver` for `benchopt` to work properly.
+
+
 class Solver(BaseSolver):
 
-    # Name to select the solver in the CLI and to display the results.
-    name = 'GD'
+    name = 'TGSPSVM'
 
-    # List of parameters for the solver. The benchmark will consider
-    # the cross product for each key in the dictionary.
-    # All parameters 'p' defined here are available as 'self.p'.
-    parameters = {
-        'scale_step': [1, 1.99],
-    }
+    stopping_criterion = SingleRunCriterion()
 
     def set_objective(self, X, y):
         # Define the information received by each solver from the objective.
@@ -31,22 +27,27 @@ class Solver(BaseSolver):
         # passing the objective to the solver.
         # It is customizable for each benchmark.
         self.X, self.y = X, y
+        self.clf = make_pipeline(Covariances("oas"),
+                                 TangentSpace(metric="riemann"),
+                                 SVC(kernel="linear")
+                                 )
+
+        # va chercher les meilleurs paramètres pour le modèle
 
     def run(self, n_iter):
         # This is the function that is called to evaluate the solver.
-        # It runs the algorithm for a given a number of iterations `n_iter`.
-
-        L = np.linalg.norm(self.X, ord=2) ** 2
-        alpha = self.scale_step / L
-        w = np.zeros(self.X.shape[1])
-        for _ in range(n_iter):
-            w -= alpha * gradient_ols(self.X, self.y, w)
-
-        self.w = w
+        # HERE: add prepro Filter
+        self.clf.fit(self.X, self.y)
 
     def get_result(self):
         # Return the result from one optimization run.
         # The outputs of this function are the arguments of `Objective.compute`
         # This defines the benchmark's API for solvers' results.
         # it is customizable for each benchmark.
-        return self.w
+        return self.clf
+
+    # .best_estimator_ renvoie le pipeline avec
+    # les meilleurs paramètres de Gridsearch
+
+    def warmup_solver(self):
+        pass
