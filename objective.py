@@ -19,12 +19,11 @@ class Objective(BaseObjective):
     # List of parameters for the objective. The benchmark will consider
     # the cross product for each key in the dictionary.
     # All parameters 'p' defined here are available as 'self.p'.
-    Leftrightimagery = LeftRightImagery(fmin=8, fmax=35)
-    Motorimagery = MotorImagery(n_classes=3)
+
     parameters = {
         'seed': [42],
-        'paradigm': [Leftrightimagery,
-                     Motorimagery],
+        'paradigm': [LeftRightImagery(fmin=8, fmax=35),
+                     MotorImagery(n_classes=3)],
         'cross_subject': [[1, 1], [2, 2], [1, 2], [2, 1]],
 
     }
