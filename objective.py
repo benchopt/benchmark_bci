@@ -5,6 +5,7 @@ from benchopt import BaseObjective, safe_import_context
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     from sklearn.dummy import DummyClassifier
+    from moabb.paradigms import LeftRightImagery, MotorImagery
     from sklearn.model_selection import train_test_split
 
 
@@ -15,33 +16,41 @@ class Objective(BaseObjective):
     # Name to select the objective in the CLI and to display the results.
     name = "BCI"
 
-    requirements = ["scikit-learn"]
-
     # List of parameters for the objective. The benchmark will consider
     # the cross product for each key in the dictionary.
     # All parameters 'p' defined here are available as 'self.p'.
-    # This means the OLS objective will have a parameter `self.whiten_y`.
+    Leftrightimagery = LeftRightImagery(fmin=8, fmax=35)
+    Motorimagery = MotorImagery(n_classes=3)
     parameters = {
         'seed': [42],
+        'paradigm': [Leftrightimagery,
+                     Motorimagery],
+        'cross_subject': [[1, 1], [2, 2], [1, 2], [2, 1]],
+
     }
 
     # Minimal version of benchopt required to run this benchmark.
-    # Bump it up if the benchmark depends on a new feature of benchopt.
+    # Bump it up if the benchmark depends on a new featuxre of benchopt.
     min_benchopt_version = "1.3.2"
 
-    def set_data(self, X, y):
+    def set_data(self, dataset):
         # The keyword arguments of this function are the keys of the dictionary
         # returned by `Dataset.get_data`. This defines the benchmark's
         # API to pass data. This is customizable for each benchmark.
+        X_0, y_0, _ = self.paradigm.get_data(dataset=dataset,
+                                             subjects=[self.cross_subject[0]])
+        X_1, y_1, _ = self.paradigm.get_data(dataset=dataset,
+                                             subjects=[self.cross_subject[1]])
 
-        X_train, X_test, y_train, y_test = train_test_split(X, y)
-        self.X_train, self.y_train = X_train, y_train
-        self.X_test, self.y_test = X_test, y_test
+        X_train_0, X_test_0, y_train_0, y_test_0 = train_test_split(X_0, y_0)
+        X_train_1, X_test_1, y_train_1, y_test_1 = train_test_split(X_1, y_1)
+        self.X_train, self.y_train = X_train_0, y_train_0
+        self.X_test, self.y_test = X_test_1, y_test_1
 
         # The dictionary defines the keyword arguments for `Objective.set_data`
         return dict(
-            X_train=X_train, y_train=y_train,
-            X_test=X_test, y_test=y_test
+            X_train=X_train_0, y_train=y_train_0,
+            X_test=X_test_1, y_test=y_test_1
         )
 
     def compute(self, model):
