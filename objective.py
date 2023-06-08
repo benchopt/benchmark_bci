@@ -35,7 +35,7 @@ class Objective(BaseObjective):
     # data corresponding to these sessions
 
     # Minimal version of benchopt required to run this benchmark.
-    # Bump it up if the benchmark depends on a new featuxre of benchopt.
+    # Bump it up if the benchmark depends on a new feature of benchopt.
     min_benchopt_version = "1.3.2"
 
     def set_data(self, dataset, paradigm):
