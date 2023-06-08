@@ -18,6 +18,8 @@ class Solver(BaseSolver):
 
     name = 'TGSPSVM'
 
+    requirements = ['pyriemann']
+    install_cmd = 'conda'
     stopping_criterion = SingleRunCriterion()
 
     def set_objective(self, X, y):

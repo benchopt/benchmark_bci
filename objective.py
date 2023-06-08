@@ -5,7 +5,6 @@ from benchopt import BaseObjective, safe_import_context
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     from sklearn.dummy import DummyClassifier
-    from moabb.paradigms import LeftRightImagery, MotorImagery
     from sklearn.model_selection import train_test_split
 
 
@@ -20,37 +19,48 @@ class Objective(BaseObjective):
     # the cross product for each key in the dictionary.
     # All parameters 'p' defined here are available as 'self.p'.
 
+    requirements = ['pip:moabb', 'scikit-learn']
+    intall_cmd = 'conda'
+
     parameters = {
         'seed': [42],
-        'paradigm': [LeftRightImagery(fmin=8, fmax=35),
-                     MotorImagery(n_classes=3)],
-        'cross_subject': [[1, 1], [2, 2], [1, 2], [2, 1]],
+        'subject_train': [1, 2],
+        'subject_test': [1, 2],
+        'session': [1, 2],
 
     }
+
+    # 'session_train': [1, 2],
+    # 'session_test': [1, 2], we want to add theses parameters and to get the
+    # data corresponding to these sessions
 
     # Minimal version of benchopt required to run this benchmark.
     # Bump it up if the benchmark depends on a new featuxre of benchopt.
     min_benchopt_version = "1.3.2"
 
-    def set_data(self, dataset):
+    def set_data(self, dataset, paradigm):
         # The keyword arguments of this function are the keys of the dictionary
         # returned by `Dataset.get_data`. This defines the benchmark's
         # API to pass data. This is customizable for each benchmark.
-        X_0, y_0, _ = self.paradigm.get_data(dataset=dataset,
-                                             subjects=[self.cross_subject[0]])
-        X_1, y_1, _ = self.paradigm.get_data(dataset=dataset,
-                                             subjects=[self.cross_subject[1]])
 
-        X_train_0, X_test_0, y_train_0, y_test_0 = train_test_split(X_0, y_0)
-        X_train_1, X_test_1, y_train_1, y_test_1 = train_test_split(X_1, y_1)
+        X_0, y_0, _ = paradigm.get_data(dataset=dataset,
+                                        subjects=[self.subject_train])
+
+        X_1, y_1, _ = paradigm.get_data(dataset=dataset,
+                                        subjects=[self.subject_test])
+
+        X_train_0, X_test_0, y_train_0, y_test_0 = train_test_split(X_0,
+                                                                    y_0)
+        X_train_1, X_test_1, y_train_1, y_test_1 = train_test_split(X_1,
+                                                                    y_1)
         self.X_train, self.y_train = X_train_0, y_train_0
         self.X_test, self.y_test = X_test_1, y_test_1
 
-        # The dictionary defines the keyword arguments for `Objective.set_data`
-        return dict(
-            X_train=X_train_0, y_train=y_train_0,
-            X_test=X_test_1, y_test=y_test_1
-        )
+        # The dictionary defines the keyword arguments
+        # for `Objective.set_data`
+        return dict(X_train=X_train_0, y_train=y_train_0,
+                    X_test=X_test_1, y_test=y_test_1
+                    )
 
     def compute(self, model):
         # The arguments of this function are the outputs of the
@@ -61,7 +71,7 @@ class Objective(BaseObjective):
 
         # This method can return many metrics in a dictionary. One of these
         # metrics needs to be `value` for convergence detection purposes.
-        return dict(score_test=score_test, score_train=score_train)
+        return dict(value=score_test, score_train=score_train)
 
     def get_one_solution(self):
         # Return one solution. The return value should be an object compatible

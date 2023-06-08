@@ -6,6 +6,7 @@ from benchopt import BaseDataset, safe_import_context
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     from moabb.datasets import Zhou2016
+    from moabb.paradigms import MotorImagery
 
 # All datasets must be named `Dataset` and inherit from `BaseDataset`
 
@@ -13,7 +14,7 @@ with safe_import_context() as import_ctx:
 class Dataset(BaseDataset):
 
     # Name to select the dataset in the CLI and to display the results.
-    name = "Zhou"
+    name = "Zhou_M"
 
     # List of parameters to generate the datasets. The benchmark will consider
     # the cross product for each key in the dictionary.
@@ -26,5 +27,6 @@ class Dataset(BaseDataset):
         # API to pass data. It is customizable for each benchmark.
         dataset = Zhou2016()
 
+        paradigm = MotorImagery(n_classes=3)
         # The dictionary defines the keyword arguments for `Objective.set_data`
-        return dict(dataset=dataset)
+        return dict(dataset=dataset, paradigm=paradigm)

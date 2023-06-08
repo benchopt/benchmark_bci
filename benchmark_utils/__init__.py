@@ -4,3 +4,10 @@
 # the usual import syntax
 
 # on peut définir ici des fonctions
+# Faire une fonction qui sépare les jeux de session
+# if session=sessin_T add et sinon autre
+
+def split_session(dataset):
+    return None
+
+# return (X,y) session 1 et (X,y) session 2
