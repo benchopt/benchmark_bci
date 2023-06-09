@@ -29,11 +29,3 @@ class Dataset(BaseDataset):
         paradigm = LeftRightImagery(fmin=8, fmax=35)
         # The dictionary defines the keyword arguments for `Objective.set_data`
         return dict(dataset=dataset, paradigm=paradigm)
-
-
-# paradigm = LeftRightImagery(fmin=8, fmax=35)
-# dataset = BNCI2014001()
-# X, y, metadata = paradigm.get_data(dataset=dataset,subjects=[1])
-# print(X)
-# print(y)
-# print(metadata)

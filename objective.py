@@ -6,6 +6,7 @@ from benchopt import BaseObjective, safe_import_context
 with safe_import_context() as import_ctx:
     from sklearn.dummy import DummyClassifier
     from sklearn.model_selection import train_test_split
+    import numpy as np
 
 
 # The benchmark objective must be named `Objective` and
@@ -24,16 +25,15 @@ class Objective(BaseObjective):
 
     parameters = {
         'seed': [42],
-        'subject_train': [1, 2],
-        'subject_test': [1, 2],
+        'subject': [1, 2],
         'session': [1, 2],
-
+        'cross_subject': [[1, 2]],
+        'cross_session': [[1, 2]],
+        'evaluation_process': ['IntraSubject',
+                               'InterSubject',
+                               'InterSession'],
     }
-
-    # 'session_train': [1, 2],
-    # 'session_test': [1, 2], we want to add theses parameters and to get the
-    # data corresponding to these sessions
-
+    # we have here an issue with the cross product, to much run are generated
     # Minimal version of benchopt required to run this benchmark.
     # Bump it up if the benchmark depends on a new feature of benchopt.
     min_benchopt_version = "1.3.2"
@@ -42,25 +42,66 @@ class Objective(BaseObjective):
         # The keyword arguments of this function are the keys of the dictionary
         # returned by `Dataset.get_data`. This defines the benchmark's
         # API to pass data. This is customizable for each benchmark.
-
-        X_0, y_0, _ = paradigm.get_data(dataset=dataset,
-                                        subjects=[self.subject_train])
-
-        X_1, y_1, _ = paradigm.get_data(dataset=dataset,
-                                        subjects=[self.subject_test])
-
-        X_train_0, X_test_0, y_train_0, y_test_0 = train_test_split(X_0,
-                                                                    y_0)
-        X_train_1, X_test_1, y_train_1, y_test_1 = train_test_split(X_1,
-                                                                    y_1)
-        self.X_train, self.y_train = X_train_0, y_train_0
-        self.X_test, self.y_test = X_test_1, y_test_1
-
         # The dictionary defines the keyword arguments
         # for `Objective.set_data`
-        return dict(X_train=X_train_0, y_train=y_train_0,
-                    X_test=X_test_1, y_test=y_test_1
-                    )
+
+        if self.evaluation_process == 'IntraSubject':
+
+            X, y, _ = paradigm.get_data(dataset=dataset,
+                                        subjects=[self.subject])
+
+            X_train, X_test, y_train, y_test = train_test_split(X, y)
+            self.X_train, self.y_train = X_train, y_train
+            self.X_test, self.y_test = X_test, y_test
+
+            return dict(X_train=X_train, y_train=y_train,
+                        X_test=X_test, y_test=y_test
+                        )
+
+        elif self.evaluation_process == 'InterSubject':
+            X_0, y_0, _ = paradigm.get_data(dataset=dataset,
+                                            subjects=[self.cross_subject[0]])
+
+            X_1, y_1, _ = paradigm.get_data(dataset=dataset,
+                                            subjects=[self.cross_subject[1]])
+
+            X_train_0, X_test_0, y_train_0, y_test_0 = train_test_split(X_0,
+                                                                        y_0)
+            X_train_1, X_test_1, y_train_1, y_test_1 = train_test_split(X_1,
+                                                                        y_1)
+            self.X_train, self.y_train = X_train_0, y_train_0
+            self.X_test, self.y_test = X_test_1, y_test_1
+
+            return dict(X_train=X_train_0, y_train=y_train_0,
+                        X_test=X_test_1, y_test=y_test_1
+                        )
+
+        elif self.evaluation_process == 'InterSession':
+            X, y, metadata = paradigm.get_data(dataset=dataset,
+                                               subjects=[self.subject])
+
+            session_X = []
+            session_y = []
+
+            for session in np.unique(metadata.session):
+                ix = metadata.session == session
+                session_X.append(X[ix])
+                session_y.append(y[ix])
+
+            X_0 = session_X[self.cross_session[0]-1]
+            y_0 = session_y[self.cross_session[0]-1]
+            X_1 = session_X[self.cross_session[1]-1]
+            y_1 = session_y[self.cross_session[1]-1]
+
+            X_train_0, X_test_0, y_train_0, y_test_0 = train_test_split(X_0,
+                                                                        y_0)
+            X_train_1, X_test_1, y_train_1, y_test_1 = train_test_split(X_1,
+                                                                        y_1)
+            self.X_train, self.y_train = X_train_0, y_train_0
+            self.X_test, self.y_test = X_test_1, y_test_1
+            return dict(X_train=X_train_0, y_train=y_train_0,
+                        X_test=X_test_1, y_test=y_test_1
+                        )
 
     def compute(self, model):
         # The arguments of this function are the outputs of the
@@ -84,6 +125,7 @@ class Objective(BaseObjective):
         # for `Solver.set_objective`. This defines the
         # benchmark's API for passing the objective to the solver.
         # It is customizable for each benchmark.
+
         return dict(
             X=self.X_train,
             y=self.y_train,

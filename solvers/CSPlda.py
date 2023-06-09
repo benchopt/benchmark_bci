@@ -43,8 +43,5 @@ class Solver(BaseSolver):
         # it is customizable for each benchmark.
         return self.clf
 
-    # .best_estimator_ renvoie le pipeline avec les meilleurs paramètres
-    # de Gridsearch
-
     def warmup_solver(self):
         pass
