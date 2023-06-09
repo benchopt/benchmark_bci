@@ -24,15 +24,16 @@ class Objective(BaseObjective):
     intall_cmd = 'conda'
 
     parameters = {
-        'seed': [42],
-        'subject': [1, 2],
-        'session': [1, 2],
-        'cross_subject': [[1, 2]],
-        'cross_session': [[1, 2]],
-        'evaluation_process': ['IntraSubject',
-                               'InterSubject',
-                               'InterSession'],
+        'evaluation_process, subject, cross_subject, cross_session': [
+            ('IntraSubject', 1, None, None),
+            ('IntraSubject', 2, None, None),
+            ('InterSubject', None, [1, 2], None),
+            ('InterSubject', None, [2, 1], None),
+            ('InterSession', 1, None, [1, 2]),
+            ('InterSession', 2, None, [1, 2])
+        ],
     }
+
     # we have here an issue with the cross product, to much run are generated
     # Minimal version of benchopt required to run this benchmark.
     # Bump it up if the benchmark depends on a new feature of benchopt.
