@@ -20,8 +20,8 @@ class Solver(BaseSolver):
 
     stopping_criterion = SingleRunCriterion()
 
-    requirements = ['mne']
     install_cmd = 'conda'
+    requirements = ['mne']
 
     def set_objective(self, X, y):
         # Define the information received by each solver from the objective.

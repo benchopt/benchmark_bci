@@ -3,5 +3,5 @@
 # name `benchmark_utils`, and code defined inside will be importable using
 # the usual import syntax
 
-# maybe we need to define here a function that
-# get the data of a specific session
+def flatten(liste):
+    return [item for sub_list in liste for item in sub_list]

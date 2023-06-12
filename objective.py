@@ -7,6 +7,7 @@ with safe_import_context() as import_ctx:
     from sklearn.dummy import DummyClassifier
     from sklearn.model_selection import train_test_split
     import numpy as np
+    from benchmark_utils import flatten
 
 
 # The benchmark objective must be named `Objective` and
@@ -20,17 +21,16 @@ class Objective(BaseObjective):
     # the cross product for each key in the dictionary.
     # All parameters 'p' defined here are available as 'self.p'.
 
-    requirements = ['pip:moabb', 'scikit-learn']
     intall_cmd = 'conda'
+    requirements = ['pip:moabb', 'scikit-learn']
 
     parameters = {
-        'evaluation_process, subject, cross_subject, cross_session': [
-            ('IntraSubject', 1, None, None),
-            ('IntraSubject', 2, None, None),
-            ('InterSubject', None, [1, 2], None),
-            ('InterSubject', None, [2, 1], None),
-            ('InterSession', 1, None, [1, 2]),
-            ('InterSession', 2, None, [1, 2])
+        'evaluation_process, subject': [
+            ('intra_subject', 1),
+            ('intra_subject', 2),
+            ('inter_subject', None),
+            ('inter_session', 1),
+            ('inter_session', 2)
         ],
     }
 
@@ -46,7 +46,7 @@ class Objective(BaseObjective):
         # The dictionary defines the keyword arguments
         # for `Objective.set_data`
 
-        if self.evaluation_process == 'IntraSubject':
+        if self.evaluation_process == 'intra_subject':
 
             X, y, _ = paradigm.get_data(dataset=dataset,
                                         subjects=[self.subject])
@@ -59,25 +59,7 @@ class Objective(BaseObjective):
                         X_test=X_test, y_test=y_test
                         )
 
-        elif self.evaluation_process == 'InterSubject':
-            X_0, y_0, _ = paradigm.get_data(dataset=dataset,
-                                            subjects=[self.cross_subject[0]])
-
-            X_1, y_1, _ = paradigm.get_data(dataset=dataset,
-                                            subjects=[self.cross_subject[1]])
-
-            X_train_0, X_test_0, y_train_0, y_test_0 = train_test_split(X_0,
-                                                                        y_0)
-            X_train_1, X_test_1, y_train_1, y_test_1 = train_test_split(X_1,
-                                                                        y_1)
-            self.X_train, self.y_train = X_train_0, y_train_0
-            self.X_test, self.y_test = X_test_1, y_test_1
-
-            return dict(X_train=X_train_0, y_train=y_train_0,
-                        X_test=X_test_1, y_test=y_test_1
-                        )
-
-        elif self.evaluation_process == 'InterSession':
+        elif self.evaluation_process == 'inter_session':
             X, y, metadata = paradigm.get_data(dataset=dataset,
                                                subjects=[self.subject])
 
@@ -89,19 +71,35 @@ class Objective(BaseObjective):
                 session_X.append(X[ix])
                 session_y.append(y[ix])
 
-            X_0 = session_X[self.cross_session[0]-1]
-            y_0 = session_y[self.cross_session[0]-1]
-            X_1 = session_X[self.cross_session[1]-1]
-            y_1 = session_y[self.cross_session[1]-1]
+            n_session = len(session_X)
+            X_test = session_X[n_session-1]
+            X_train = np.array(flatten(session_X[:(n_session-1)]))
+            y_test = session_y[n_session-1]
+            y_train = np.array(flatten(session_y[:(n_session-1)]))
 
-            X_train_0, X_test_0, y_train_0, y_test_0 = train_test_split(X_0,
-                                                                        y_0)
-            X_train_1, X_test_1, y_train_1, y_test_1 = train_test_split(X_1,
-                                                                        y_1)
-            self.X_train, self.y_train = X_train_0, y_train_0
-            self.X_test, self.y_test = X_test_1, y_test_1
-            return dict(X_train=X_train_0, y_train=y_train_0,
-                        X_test=X_test_1, y_test=y_test_1
+            self.X_train, self.y_train = X_train, y_train
+            self.X_test, self.y_test = X_test, y_test
+            return dict(X_train=X_train, y_train=y_train,
+                        X_test=X_test, y_test=y_test
+                        )
+
+        elif self.evaluation_process == 'inter_subject':
+
+            subjects = dataset.subject_list
+            n_subjects = len(subjects)
+            subjects_train = subjects[:(n_subjects-1)]
+            subject_test = [subjects[n_subjects-1]]
+            X_train, y_train, _ = paradigm.get_data(dataset=dataset,
+                                                    subjects=subjects_train)
+
+            X_test, y_test, _ = paradigm.get_data(dataset=dataset,
+                                                  subjects=subject_test)
+
+            self.X_train, self.y_train = X_train,  y_train
+            self.X_test, self.y_test = X_test, y_test
+
+            return dict(X_train=X_train, y_train=y_train,
+                        X_test=X_test, y_test=y_test
                         )
 
     def compute(self, model):
