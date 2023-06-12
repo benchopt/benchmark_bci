@@ -5,3 +5,9 @@
 
 def flatten(liste):
     return [item for sub_list in liste for item in sub_list]
+
+
+def list_train_test(test, list):
+    list_test = [list[test]]
+    list_train = list[:test] + list[test+1:]
+    return list_test, list_train

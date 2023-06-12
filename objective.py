@@ -7,7 +7,8 @@ with safe_import_context() as import_ctx:
     from sklearn.dummy import DummyClassifier
     from sklearn.model_selection import train_test_split
     import numpy as np
-    from benchmark_utils import flatten
+    from benchmark_utils import flatten, list_train_test
+    from sklearn.metrics import balanced_accuracy_score as BAS
 
 
 # The benchmark objective must be named `Objective` and
@@ -25,16 +26,17 @@ class Objective(BaseObjective):
     requirements = ['pip:moabb', 'scikit-learn']
 
     parameters = {
-        'evaluation_process, subject': [
-            ('intra_subject', 1),
-            ('intra_subject', 2),
-            ('inter_subject', None),
-            ('inter_session', 1),
-            ('inter_session', 2)
+        'evaluation_process, subject, subject_test, session_test': [
+            ('intra_subject', 1, None, None),
+            ('intra_subject', 2, None, None),
+            ('inter_subject', None, 3, None),
+            ('inter_session', 1, None, 2),
+            ('inter_session', 2, None, 1)
         ],
     }
 
-    # we have here an issue with the cross product, to much run are generated
+    # The solvers will train on all the subject except subject_test.
+    # It will be the same for the sessions.
     # Minimal version of benchopt required to run this benchmark.
     # Bump it up if the benchmark depends on a new feature of benchopt.
     min_benchopt_version = "1.3.2"
@@ -55,9 +57,10 @@ class Objective(BaseObjective):
             self.X_train, self.y_train = X_train, y_train
             self.X_test, self.y_test = X_test, y_test
 
-            return dict(X_train=X_train, y_train=y_train,
-                        X_test=X_test, y_test=y_test
-                        )
+            return dict(
+                X_train=X_train, y_train=y_train,
+                X_test=X_test, y_test=y_test
+            )
 
         elif self.evaluation_process == 'inter_session':
             X, y, metadata = paradigm.get_data(dataset=dataset,
@@ -71,24 +74,25 @@ class Objective(BaseObjective):
                 session_X.append(X[ix])
                 session_y.append(y[ix])
 
-            n_session = len(session_X)
-            X_test = session_X[n_session-1]
-            X_train = np.array(flatten(session_X[:(n_session-1)]))
-            y_test = session_y[n_session-1]
-            y_train = np.array(flatten(session_y[:(n_session-1)]))
+            X_test = session_X[self.session_test-1]
+            _, X_train = list_train_test(self.session_test-1, session_X)
+            X_train = np.array(flatten(X_train))
+            y_test = session_y[self.session_test-1]
+            _, y_train = list_train_test(self.session_test-1, session_y)
+            y_train = np.array(flatten(y_train))
 
             self.X_train, self.y_train = X_train, y_train
             self.X_test, self.y_test = X_test, y_test
-            return dict(X_train=X_train, y_train=y_train,
-                        X_test=X_test, y_test=y_test
-                        )
+            return dict(
+                X_train=X_train, y_train=y_train,
+                X_test=X_test, y_test=y_test
+            )
 
         elif self.evaluation_process == 'inter_subject':
 
             subjects = dataset.subject_list
-            n_subjects = len(subjects)
-            subjects_train = subjects[:(n_subjects-1)]
-            subject_test = [subjects[n_subjects-1]]
+            subject_test, subjects_train = list_train_test(self.subject_test-1,
+                                                           subjects)
             X_train, y_train, _ = paradigm.get_data(dataset=dataset,
                                                     subjects=subjects_train)
 
@@ -98,9 +102,10 @@ class Objective(BaseObjective):
             self.X_train, self.y_train = X_train,  y_train
             self.X_test, self.y_test = X_test, y_test
 
-            return dict(X_train=X_train, y_train=y_train,
-                        X_test=X_test, y_test=y_test
-                        )
+            return dict(
+                X_train=X_train, y_train=y_train,
+                X_test=X_test, y_test=y_test
+            )
 
     def compute(self, model):
         # The arguments of this function are the outputs of the
@@ -108,10 +113,14 @@ class Objective(BaseObjective):
         # solvers' result. This is customizable for each benchmark.
         score_train = model.score(self.X_train, self.y_train)
         score_test = model.score(self.X_test, self.y_test)
+        bl_acc = BAS(self.y_test, model.predict(self.X_test))
 
         # This method can return many metrics in a dictionary. One of these
         # metrics needs to be `value` for convergence detection purposes.
-        return dict(value=score_test, score_train=score_train)
+        return dict(score_test=score_test,
+                    value=-score_test,
+                    score_train=score_train,
+                    balanced_accuracy=bl_acc)
 
     def get_one_solution(self):
         # Return one solution. The return value should be an object compatible
