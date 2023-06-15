@@ -6,13 +6,17 @@ from benchopt import BaseObjective, safe_import_context
 with safe_import_context() as import_ctx:
     from sklearn.dummy import DummyClassifier
     from sklearn.model_selection import train_test_split
-    import numpy as np
-    from benchmark_utils import flatten, list_train_test
+    from benchmark_utils import windows_data
     from sklearn.metrics import balanced_accuracy_score as BAS
+    from braindecode.datasets import MOABBDataset
+    import numpy as np
+    from skorch.helper import SliceDataset
 
 
 # The benchmark objective must be named `Objective` and
 # inherit from `BaseObjective` for `benchopt` to work properly.
+
+
 class Objective(BaseObjective):
 
     # Name to select the objective in the CLI and to display the results.
@@ -28,10 +32,6 @@ class Objective(BaseObjective):
     parameters = {
         'evaluation_process, subject, subject_test, session_test': [
             ('intra_subject', 1, None, None),
-            ('intra_subject', 2, None, None),
-            ('inter_subject', None, 3, None),
-            ('inter_session', 1, None, 2),
-            ('inter_session', 2, None, 1)
         ],
     }
 
@@ -41,70 +41,36 @@ class Objective(BaseObjective):
     # Bump it up if the benchmark depends on a new feature of benchopt.
     min_benchopt_version = "1.3.2"
 
-    def set_data(self, dataset, paradigm):
+    def set_data(self, dataset_name, paradigm_name):
         # The keyword arguments of this function are the keys of the dictionary
         # returned by `Dataset.get_data`. This defines the benchmark's
         # API to pass data. This is customizable for each benchmark.
         # The dictionary defines the keyword arguments
         # for `Objective.set_data`
 
+        self.n_channels = None
+        self.input_window_samples = None
+
         if self.evaluation_process == 'intra_subject':
 
-            X, y, _ = paradigm.get_data(dataset=dataset,
-                                        subjects=[self.subject])
-
+            dataset = MOABBDataset(dataset_name=dataset_name,
+                                   subject_ids=[self.subject])
+            windows_dataset = windows_data(dataset, paradigm_name)
+            n_channels = windows_dataset[0][0].shape[0]
+            input_window_samples = windows_dataset[0][0].shape[1]
+            X = SliceDataset(windows_dataset, idx=0)
+            y = np.array([y for y in SliceDataset(windows_dataset, idx=1)])
             X_train, X_test, y_train, y_test = train_test_split(X, y)
             self.X_train, self.y_train = X_train, y_train
             self.X_test, self.y_test = X_test, y_test
+            self.n_channels = n_channels
+            self.input_window_samples = input_window_samples
 
             return dict(
                 X_train=X_train, y_train=y_train,
-                X_test=X_test, y_test=y_test
-            )
-
-        elif self.evaluation_process == 'inter_session':
-            X, y, metadata = paradigm.get_data(dataset=dataset,
-                                               subjects=[self.subject])
-
-            session_X = []
-            session_y = []
-
-            for session in np.unique(metadata.session):
-                ix = metadata.session == session
-                session_X.append(X[ix])
-                session_y.append(y[ix])
-
-            X_test = session_X[self.session_test-1]
-            _, X_train = list_train_test(self.session_test-1, session_X)
-            X_train = np.array(flatten(X_train))
-            y_test = session_y[self.session_test-1]
-            _, y_train = list_train_test(self.session_test-1, session_y)
-            y_train = np.array(flatten(y_train))
-
-            self.X_train, self.y_train = X_train, y_train
-            self.X_test, self.y_test = X_test, y_test
-            return dict(
-                X_train=X_train, y_train=y_train,
-                X_test=X_test, y_test=y_test
-            )
-
-        elif self.evaluation_process == 'inter_subject':
-
-            subjects = dataset.subject_list
-            subject_test, subjects_train = list_train_test(self.subject_test-1,
-                                                           subjects)
-            X_train, y_train, _ = paradigm.get_data(dataset=dataset,
-                                                    subjects=subjects_train)
-
-            X_test, y_test, _ = paradigm.get_data(dataset=dataset,
-                                                  subjects=subject_test)
-
-            self.X_train, self.y_train = X_train,  y_train
-            self.X_test, self.y_test = X_test, y_test
-
-            return dict(
-                X_train=X_train, y_train=y_train,
-                X_test=X_test, y_test=y_test
+                X_test=X_test, y_test=y_test,
+                n_channels=n_channels,
+                input_window_samples=input_window_samples
             )
 
     def compute(self, model):
@@ -137,4 +103,6 @@ class Objective(BaseObjective):
         return dict(
             X=self.X_train,
             y=self.y_train,
+            n_channels=self.n_channels,
+            input_window_samples=self.input_window_samples,
         )

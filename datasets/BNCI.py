@@ -1,14 +1,9 @@
-from benchopt import BaseDataset, safe_import_context
+from benchopt import BaseDataset
 
 
 # Protect the import with `safe_import_context()`. This allows:
 # - skipping import to speed up autocompletion in CLI.
 # - getting requirements info when all dependencies are not installed.
-with safe_import_context() as import_ctx:
-    from moabb.datasets import BNCI2014001
-    from moabb.paradigms import LeftRightImagery, MotorImagery
-
-# All datasets must be named `Dataset` and inherit from `BaseDataset`
 
 
 class Dataset(BaseDataset):
@@ -26,14 +21,6 @@ class Dataset(BaseDataset):
         # The return arguments of this function are passed as keyword arguments
         # to `Objective.set_data`. This defines the benchmark's
         # API to pass data. It is customizable for each benchmark.
-        dataset = BNCI2014001()
-        if self.paradigm_name == 'LeftRightImagery':
-
-            paradigm = LeftRightImagery(fmin=8, fmax=35)
-            # The dictionary defines the keyword arguments
-            # for `Objective.set_data`
-            return dict(dataset=dataset, paradigm=paradigm)
-
-        else:
-            paradigm = MotorImagery(n_classes=3)
-            return dict(dataset=dataset, paradigm=paradigm)
+        dataset_name = "BNCI2014001"
+        return dict(dataset_name=dataset_name,
+                    paradigm_name=self.paradigm_name)
