@@ -10,6 +10,7 @@ with safe_import_context() as import_ctx:
     from pyriemann.tangentspace import TangentSpace
     from sklearn.svm import SVC
     from benchopt.stopping_criterion import SingleRunCriterion
+    from benchmark_utils import transformX_moabb
 # The benchmark solvers must be named `Solver` and
 # inherit from `BaseSolver` for `benchopt` to work properly.
 
@@ -23,23 +24,21 @@ class Solver(BaseSolver):
 
     stopping_criterion = SingleRunCriterion()
 
-    def set_objective(self, X, y):
+    def set_objective(self, X, y, n_channels, input_window_samples):
         # Define the information received by each solver from the objective.
         # The arguments of this function are the results of the
         # `Objective.get_objective`. This defines the benchmark's API for
         # passing the objective to the solver.
         # It is customizable for each benchmark.
-        self.X, self.y = X, y
+        X_transform = transformX_moabb(X)
+        self.X, self.y = X_transform, y
         self.clf = make_pipeline(Covariances("oas"),
                                  TangentSpace(metric="riemann"),
                                  SVC(kernel="linear")
                                  )
 
-        # va chercher les meilleurs paramètres pour le modèle
-
     def run(self, n_iter):
         # This is the function that is called to evaluate the solver.
-        # HERE: add prepro Filter
         self.clf.fit(self.X, self.y)
 
     def get_result(self):

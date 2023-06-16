@@ -5,11 +5,11 @@ from benchopt import BaseDataset, safe_import_context
 # - skipping import to speed up autocompletion in CLI.
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
-    from moabb.datasets import Zhou2016
-    from moabb.paradigms import LeftRightImagery, MotorImagery
+    from braindecode.datasets import MOABBDataset
+    from benchmark_utils import windows_data
+
 
 # All datasets must be named `Dataset` and inherit from `BaseDataset`
-
 
 class Dataset(BaseDataset):
 
@@ -26,14 +26,10 @@ class Dataset(BaseDataset):
         # The return arguments of this function are passed as keyword arguments
         # to `Objective.set_data`. This defines the benchmark's
         # API to pass data. It is customizable for each benchmark.
-        dataset = Zhou2016()
-        if self.paradigm_name == 'LeftRightImagery':
+        dataset_name = "Zhou2016"
+        data = MOABBDataset(dataset_name=dataset_name,
+                            subject_ids=None)
+        dataset = windows_data(data, self.paradigm_name)
 
-            paradigm = LeftRightImagery(fmin=8, fmax=35)
-            # The dictionary defines the keyword arguments
-            # for `Objective.set_data`
-            return dict(dataset=dataset, paradigm=paradigm)
-
-        else:
-            paradigm = MotorImagery(n_classes=3)
-            return dict(dataset=dataset, paradigm=paradigm)
+        return dict(dataset=dataset,
+                    paradigm_name=self.paradigm_name)

@@ -8,6 +8,7 @@ with safe_import_context() as import_ctx:
     from mne.decoding import CSP
     from sklearn.pipeline import make_pipeline
     from benchopt.stopping_criterion import SingleRunCriterion
+    from benchmark_utils import transformX_moabb
 
 
 # The benchmark solvers must be named `Solver` and
@@ -23,13 +24,14 @@ class Solver(BaseSolver):
     install_cmd = 'conda'
     requirements = ['mne']
 
-    def set_objective(self, X, y):
+    def set_objective(self, X, y, n_channels, input_window_samples):
         # Define the information received by each solver from the objective.
         # The arguments of this function are the results of the
         # `Objective.get_objective`. This defines the benchmark's API for
         # passing the objective to the solver.
         # It is customizable for each benchmark.
-        self.X, self.y = X, y
+        X_transform = transformX_moabb(X)
+        self.X, self.y = X_transform, y
         self.clf = make_pipeline(CSP(n_components=8), LDA())
 
     def run(self, n_iter):

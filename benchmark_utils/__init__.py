@@ -3,13 +3,20 @@
 # name `benchmark_utils`, and code defined inside will be importable using
 # the usual import syntax
 
-import numpy as np
-from braindecode.preprocessing import (
-    exponential_moving_standardize,
-    preprocess,
-    Preprocessor,
-)
-from braindecode.preprocessing import create_windows_from_events
+from benchopt import safe_import_context
+
+
+# Protect the import with `safe_import_context()`. This allows:
+# - skipping import to speed up autocompletion in CLI.
+# - getting requirements info when all dependencies are not installed.
+with safe_import_context() as import_ctx:
+    import numpy as np
+    from braindecode.preprocessing import (
+        exponential_moving_standardize,
+        preprocess,
+        Preprocessor,
+    )
+    from braindecode.preprocessing import create_windows_from_events
 
 
 def flatten(liste):
@@ -22,11 +29,34 @@ def list_train_test(test, list):
     return list_test, list_train
 
 
+def transformX_moabb(X):
+    X0 = []
+    for i in range(len(X)):
+        X0.append(X[i])
+    X0 = np.array(X0)
+    return X0
+
+
+def transformy_moabb(y):
+    y2 = []
+    for i in range(len(y)):
+        if y[i] == 'right_hand':
+            y2.append(2)
+        else:
+            y2.append(1)
+
+    y2 = np.array(y2)
+    return y2
+
+
 def windows_data(dataset, paradigm_name):
 
     # défintion du paradigm
-    # if paradigm_name == 'LeftRightImagery':
-    mapping = {'left_hand': 1, 'right_hand': 2}
+    if paradigm_name == 'LeftRightImagery':
+        mapping = {'left_hand': 1, 'right_hand': 2}
+
+    elif paradigm_name == 'MotorImagery':
+        mapping = {'left_hand': 1, 'right_hand': 2, 'tongue': 3}
 
     low_cut_hz = 4.0  # low cut frequency for filtering
     high_cut_hz = 38.0  # high cut frequency for filtering

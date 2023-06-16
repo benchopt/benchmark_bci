@@ -1,9 +1,12 @@
-from benchopt import BaseDataset
+from benchopt import BaseDataset, safe_import_context
 
 
 # Protect the import with `safe_import_context()`. This allows:
 # - skipping import to speed up autocompletion in CLI.
 # - getting requirements info when all dependencies are not installed.
+with safe_import_context() as import_ctx:
+    from braindecode.datasets import MOABBDataset
+    from benchmark_utils import windows_data
 
 
 class Dataset(BaseDataset):
@@ -22,5 +25,9 @@ class Dataset(BaseDataset):
         # to `Objective.set_data`. This defines the benchmark's
         # API to pass data. It is customizable for each benchmark.
         dataset_name = "BNCI2014001"
-        return dict(dataset_name=dataset_name,
+        data = MOABBDataset(dataset_name=dataset_name,
+                            subject_ids=None)
+        dataset = windows_data(data, self.paradigm_name)
+
+        return dict(dataset=dataset,
                     paradigm_name=self.paradigm_name)

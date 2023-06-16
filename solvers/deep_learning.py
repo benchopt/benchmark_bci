@@ -20,6 +20,9 @@ class Solver(BaseSolver):
 
     stopping_criterion = SingleRunCriterion()
 
+    install_cmd = 'conda'
+    requirements = ['braindecode']
+
     # here maybe we need to define for each solvers a other input named
     # metadata which would be a dictionarry where we could get n_channels
     # and input_window_samples
@@ -30,12 +33,13 @@ class Solver(BaseSolver):
         # `Objective.get_objective`. This defines the benchmark's API for
         # passing the objective to the solver.
         # It is customizable for each benchmark.
+        # here we want to define à function that get the data X,y from Moabb
+        # and convert it to data accessible for deep learning methodes
         lr = 0.0625 * 0.01
         weight_decay = 0
         batch_size = 64
         n_epochs = 4
         n_classes = 4
-        print("les valeurs: ", n_channels, n_classes, input_window_samples)
         model = ShallowFBCSPNet(n_channels,
                                 n_classes,
                                 input_window_samples=input_window_samples,
@@ -69,7 +73,7 @@ class Solver(BaseSolver):
     def run(self, n_iter):
         # This is the function that is called to evaluate the solver
         # .
-        self.clf.fit(self.X, y=self.y, epochs=40)
+        self.clf.fit(self.X, y=self.y, epochs=1)
 
     def get_result(self):
         # Return the result from one optimization run.
