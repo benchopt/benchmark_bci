@@ -9,25 +9,28 @@ with safe_import_context() as import_ctx:
     from skorch.callbacks import LRScheduler
     import torch
     from braindecode.models import ShallowFBCSPNet
+    from braindecode.augmentation import ChannelsDropout, AugmentedDataLoader
+    from numpy import linspace
 
 
 # The benchmark solvers must be named `Solver` and
 # inherit from `BaseSolver` for `benchopt` to work properly.
 
+
 class Solver(BaseSolver):
 
-    name = 'deep_learning'
+    name = 'ShallowFBCSPNet_augm_smooth'
 
     stopping_criterion = SingleRunCriterion()
 
     install_cmd = 'conda'
-    requirements = ['braindecode']
+    requirements = ['pip:torch', 'pip:braindecode']
 
     # here maybe we need to define for each solvers a other input named
     # metadata which would be a dictionarry where we could get n_channels
     # and input_window_samples
 
-    def set_objective(self, X, y, n_channels, input_window_samples):
+    def set_objective(self, X, y):
         # Define the information received by each solver from the objective.
         # The arguments of this function are the results of the
         # `Objective.get_objective`. This defines the benchmark's API for
@@ -40,6 +43,8 @@ class Solver(BaseSolver):
         batch_size = 64
         n_epochs = 4
         n_classes = 4
+        n_channels = X[0].shape[0]
+        input_window_samples = X[0].shape[1]
         model = ShallowFBCSPNet(n_channels,
                                 n_classes,
                                 input_window_samples=input_window_samples,
@@ -51,8 +56,15 @@ class Solver(BaseSolver):
         if cuda:
             torch.backends.cudnn.benchmark = True
 
+        seed = 20200220
+        transforms_spatial = [ChannelsDropout(probability=0.5,
+                              p_drop=prob,
+                              random_state=seed)
+                              for prob in linspace(0, 1, 2)]
         clf = EEGClassifier(
             model,
+            iterator_train=AugmentedDataLoader,
+            iterator_train__transforms=transforms_spatial,
             criterion=torch.nn.NLLLoss,
             optimizer=torch.optim.AdamW,
             train_split=None,

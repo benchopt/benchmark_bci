@@ -29,11 +29,10 @@ class Objective(BaseObjective):
 
     parameters = {
         'evaluation_process, subject, subject_test, session_test': [
-            ('inter_session', 1, None, 'session_T'),
-            ('inter_session', 2, None, 'session_E'),
             ('intra_subject', 1, None, None),
             ('intra_subject', 2, None, None),
-            ('inter_subject', None, 3, None),
+            ('intra_subject', 3, None, None),
+            ('intra_subject', 5, None, None),
 
         ],
     }
@@ -50,11 +49,7 @@ class Objective(BaseObjective):
         # The dictionary defines the keyword arguments
         # for `Objective.set_data`
 
-        n_channels = dataset[0][0].shape[0]
-        input_window_samples = dataset[0][0].shape[1]
         data_split_subject = dataset.split('subject')
-        self.n_channels = n_channels
-        self.input_window_samples = input_window_samples
 
         if self.evaluation_process == 'intra_subject':
 
@@ -70,8 +65,6 @@ class Objective(BaseObjective):
 
         elif self.evaluation_process == 'inter_subject':
 
-            n_channels = dataset[0][0].shape[0]
-            input_window_samples = dataset[0][0].shape[1]
             sujet_test = self.subject_test
             data_subject_test = data_split_subject[str(sujet_test)]
             n_subject = len(data_split_subject)
@@ -93,15 +86,13 @@ class Objective(BaseObjective):
 
         elif self.evaluation_process == 'inter_session':
 
-            n_channels = dataset[0][0].shape[0]
-            input_window_samples = dataset[0][0].shape[1]
             data_subject = data_split_subject[str(self.subject)]
             data_split_session = data_subject.split('session')
             session_test = self.session_test
             data_session_test = data_split_session[session_test]
             data_session_train = []
             for clé in data_split_session.items():
-                if clé != session_test:
+                if clé[0] != str(session_test):
                     data_session_train += data_split_session[clé[0]]
             X_test = SliceDataset(data_session_test, idx=0)
             y_test = np.array([y for y in SliceDataset(data_session_test,
@@ -116,9 +107,7 @@ class Objective(BaseObjective):
         return dict(
                 X_train=X_train, y_train=y_train,
                 X_test=X_test, y_test=y_test,
-                n_channels=n_channels,
-                input_window_samples=input_window_samples
-            )
+        )
 
     def compute(self, model):
         # The arguments of this function are the outputs of the
@@ -154,6 +143,5 @@ class Objective(BaseObjective):
         return dict(
             X=self.X_train,
             y=self.y_train,
-            n_channels=self.n_channels,
-            input_window_samples=self.input_window_samples,
+            
         )

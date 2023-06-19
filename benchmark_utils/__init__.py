@@ -37,18 +37,6 @@ def transformX_moabb(X):
     return X0
 
 
-def transformy_moabb(y):
-    y2 = []
-    for i in range(len(y)):
-        if y[i] == 'right_hand':
-            y2.append(2)
-        else:
-            y2.append(1)
-
-    y2 = np.array(y2)
-    return y2
-
-
 def windows_data(dataset, paradigm_name):
 
     # défintion du paradigm
@@ -94,6 +82,7 @@ def windows_data(dataset, paradigm_name):
     # Create windows using braindecode function for this.
     # It needs parameters to define how
     # trials should be used.
+
     windows_dataset = create_windows_from_events(
         dataset,
         trial_start_offset_samples=trial_start_offset_samples,
@@ -101,4 +90,7 @@ def windows_data(dataset, paradigm_name):
         preload=True, mapping=mapping
     )
 
+    # if we don't want to process the data we can return
+    # windows_dataset_bis =
+    # create_windows_from_events(dataset, mapping=mapping)
     return windows_dataset

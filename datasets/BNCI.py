@@ -13,8 +13,7 @@ class Dataset(BaseDataset):
 
     # Name to select the dataset in the CLI and to display the results.
     name = "BNCI"
-
-    parameters = {'paradigm_name': ('LeftRightImagery', 'MotorImagery')}
+    parameters = {'paradigm_name': ('MotorImagery', 'LeftRightImagery')}
     # List of parameters to generate the datasets. The benchmark will consider
     # the cross product for each key in the dictionary.
     # Any parameters 'param' defined here is available as `self.param`.
@@ -27,7 +26,10 @@ class Dataset(BaseDataset):
         dataset_name = "BNCI2014001"
         data = MOABBDataset(dataset_name=dataset_name,
                             subject_ids=None)
+
         dataset = windows_data(data, self.paradigm_name)
 
         return dict(dataset=dataset,
                     paradigm_name=self.paradigm_name)
+
+        # maybe we could process the data in Objective

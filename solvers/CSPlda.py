@@ -24,7 +24,7 @@ class Solver(BaseSolver):
     install_cmd = 'conda'
     requirements = ['mne']
 
-    def set_objective(self, X, y, n_channels, input_window_samples):
+    def set_objective(self, X, y):
         # Define the information received by each solver from the objective.
         # The arguments of this function are the results of the
         # `Objective.get_objective`. This defines the benchmark's API for
