@@ -1,0 +1,43 @@
+
+from braindecode.datasets import MOABBDataset
+from benchmark_utils import windows_data
+from skorch.helper import SliceDataset
+import numpy as np
+from benchmark_utils import transformX_moabb
+from braindecode.augmentation import ChannelsDropout
+import torch
+import matplotlib.pyplot as plt
+
+dataset_name = "BNCI2014001"
+data = MOABBDataset(dataset_name=dataset_name,
+                    subject_ids=None)
+
+dataset, _ = windows_data(data, 'LeftRightImagery')
+
+data_split_subject = dataset.split('subject')
+
+data = data_split_subject['1']
+X = SliceDataset(dataset, idx=0)
+y = np.array([y for y in SliceDataset(dataset, idx=1)])
+
+seed = 42
+sfreq = 250
+transform = ChannelsDropout(probability=0.5,
+                            p_drop=0.2,
+                            random_state=seed)
+
+X_tr, _ = transform.operation(torch.as_tensor(X).float(),
+                              None,
+                              p_drop=0.2)
+
+X_tr = X_tr.numpy()
+X_transform = transformX_moabb(X)
+X = X_transform + X_tr
+y = y+y
+X = transformX_moabb(X)
+
+plt.figure()
+plt.plot(X[0][0])
+plt.plot()
+plt.show()
+

@@ -12,7 +12,6 @@ with safe_import_context() as import_ctx:
     from braindecode.augmentation import ChannelsDropout, AugmentedDataLoader
     from numpy import linspace
 
-
 # The benchmark solvers must be named `Solver` and
 # inherit from `BaseSolver` for `benchopt` to work properly.
 
@@ -30,7 +29,7 @@ class Solver(BaseSolver):
     # metadata which would be a dictionarry where we could get n_channels
     # and input_window_samples
 
-    def set_objective(self, X, y):
+    def set_objective(self, X, y, sfreq):
         # Define the information received by each solver from the objective.
         # The arguments of this function are the results of the
         # `Objective.get_objective`. This defines the benchmark's API for

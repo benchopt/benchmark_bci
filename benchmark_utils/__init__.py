@@ -93,4 +93,4 @@ def windows_data(dataset, paradigm_name):
     # if we don't want to process the data we can return
     # windows_dataset_bis =
     # create_windows_from_events(dataset, mapping=mapping)
-    return windows_dataset
+    return (windows_dataset, sfreq)

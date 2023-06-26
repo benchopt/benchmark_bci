@@ -27,9 +27,10 @@ class Dataset(BaseDataset):
         data = MOABBDataset(dataset_name=dataset_name,
                             subject_ids=None)
 
-        dataset = windows_data(data, self.paradigm_name)
+        dataset, sfreq = windows_data(data, self.paradigm_name)
 
         return dict(dataset=dataset,
-                    paradigm_name=self.paradigm_name)
+                    paradigm_name=self.paradigm_name,
+                    sfreq=sfreq)
 
         # maybe we could process the data in Objective

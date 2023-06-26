@@ -30,7 +30,7 @@ class Solver(BaseSolver):
     # metadata which would be a dictionarry where we could get n_channels
     # and input_window_samples
 
-    def set_objective(self, X, y):
+    def set_objective(self, X, y, sfreq):
         # Define the information received by each solver from the objective.
         # The arguments of this function are the results of the
         # `Objective.get_objective`. This defines the benchmark's API for
@@ -58,7 +58,7 @@ class Solver(BaseSolver):
 
         # we need to get the folowing parameter either
         # with the inputs of set object or 'manually'
-        sfreq = 1000
+
         seed = 20200220
         transforms_time = [SmoothTimeMask(probability=0.5,
                            mask_len_samples=int(sfreq * second),

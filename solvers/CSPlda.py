@@ -9,29 +9,76 @@ with safe_import_context() as import_ctx:
     from sklearn.pipeline import make_pipeline
     from benchopt.stopping_criterion import SingleRunCriterion
     from benchmark_utils import transformX_moabb
+    import torch
+    from braindecode.augmentation import ChannelsDropout, SmoothTimeMask
 
 
 # The benchmark solvers must be named `Solver` and
 # inherit from `BaseSolver` for `benchopt` to work properly.
 
-
 class Solver(BaseSolver):
 
     name = 'CSPLDA'
+    parameters = {'augmentation': ('ChannelsDropout',
+                                   'SmoothTimeMask',
+                                   'IdentityTransform')}
 
     stopping_criterion = SingleRunCriterion()
 
     install_cmd = 'conda'
     requirements = ['mne']
 
-    def set_objective(self, X, y):
+    def set_objective(self, X, y, sfreq):
         # Define the information received by each solver from the objective.
         # The arguments of this function are the results of the
         # `Objective.get_objective`. This defines the benchmark's API for
         # passing the objective to the solver.
         # It is customizable for each benchmark.
-        X_transform = transformX_moabb(X)
-        self.X, self.y = X_transform, y
+
+        seed = 20200220
+        if self.augmentation == 'ChannelsDropout':
+
+            transform = ChannelsDropout(probability=0.5,
+                                        p_drop=0.2,
+                                        random_state=seed)
+
+            X_tr, _ = transform.operation(torch.as_tensor(X).float(),
+                                          None,
+                                          p_drop=0.2)
+
+            X_tr = X_tr.numpy()
+            X_transform = transformX_moabb(X)
+            X = X_transform + X_tr
+            y = y+y
+
+        elif self.augmentation == 'SmoothTimeMask':
+            second = 0.1
+
+            transform = SmoothTimeMask(probability=0.5,
+                                       mask_len_samples=int(sfreq * second),
+                                       random_state=seed)
+
+            X_torch = torch.as_tensor(X).float()
+            y_torch = torch.as_tensor(y).float()
+
+            param_augm = transform.get_augmentation_params(X_torch,
+                                                           y_torch)
+            X_tr, _ = transform.operation(
+                      X_torch,
+                      None,
+                      mask_len_samples=param_augm['mask_len_samples'],
+                      mask_start_per_sample=param_augm['mask_start_per_sample']
+                      )
+
+            X_tr = X_tr.numpy()
+            X_transform = transformX_moabb(X)
+            X = X_transform + X_tr
+            y = y+y
+
+        else:
+            X = transformX_moabb(X)
+
+        self.X, self.y = X, y
         self.clf = make_pipeline(CSP(n_components=8), LDA())
 
     def run(self, n_iter):
@@ -41,7 +88,7 @@ class Solver(BaseSolver):
     def get_result(self):
         # Return the result from one optimization run.
         # The outputs of this function are the arguments of `Objective.compute`
-        # This defines the benchmark's API for solvers' results.
+        # This defines the benchmark's APIafor solvers' results.
         # it is customizable for each benchmark.
         return self.clf
 

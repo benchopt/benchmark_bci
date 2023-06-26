@@ -10,13 +10,15 @@ with safe_import_context() as import_ctx:
     from pyriemann.classification import MDM
     from benchopt.stopping_criterion import SingleRunCriterion
     from benchmark_utils import transformX_moabb
+    import torch
+    from braindecode.augmentation import ChannelsDropout
 # The benchmark solvers must be named `Solver` and
 # inherit from `BaseSolver` for `benchopt` to work properly.
 
 
 class Solver(BaseSolver):
 
-    name = 'MDM'
+    name = 'MDM_augm'
 
     install_cmd = 'conda'
     requirements = ['pyriemann']
@@ -29,8 +31,20 @@ class Solver(BaseSolver):
         # `Objective.get_objective`. This defines the benchmark's API for
         # passing the objective to the solver.
         # It is customizable for each benchmark.
+        seed = 20200220
+        transform = ChannelsDropout(probability=0.5,
+                                    p_drop=0.2,
+                                    random_state=seed)
+
+        X_tr, _ = transform.operation(torch.as_tensor(X).float(),
+                                      None,
+                                      mask_start_per_sample=[0 for i in range(len(X))],
+                                     )
+        X_tr = X_tr.numpy()
         X_transform = transformX_moabb(X)
-        self.X, self.y = X_transform, y
+        X_augm = X_transform + X_tr
+        y_augm = y+y
+        self.X, self.y = X_augm, y_augm
         self.clf = make_pipeline(Covariances("oas"),
                                  MDM(metric="riemann")
                                  )

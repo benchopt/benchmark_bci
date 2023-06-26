@@ -29,7 +29,7 @@ class Solver(BaseSolver):
     # metadata which would be a dictionarry where we could get n_channels
     # and input_window_samples
 
-    def set_objective(self, X, y):
+    def set_objective(self, X, y, sfreq):
         # Define the information received by each solver from the objective.
         # The arguments of this function are the results of the
         # `Objective.get_objective`. This defines the benchmark's API for
@@ -78,7 +78,7 @@ class Solver(BaseSolver):
     def run(self, n_iter):
         # This is the function that is called to evaluate the solver
         # .
-        self.clf.fit(self.X, y=self.y, epochs=1)
+        self.clf.fit(self.X, y=self.y, epochs=5)
 
     def get_result(self):
         # Return the result from one optimization run.

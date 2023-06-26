@@ -6,7 +6,6 @@ from benchopt import BaseSolver, safe_import_context
 with safe_import_context() as import_ctx:
     from benchopt.stopping_criterion import SingleRunCriterion
     from sklearn.dummy import DummyClassifier
-    from sklearn.pipeline import make_pipeline
 
 
 # The benchmark solvers must be named `Solver` and
@@ -19,14 +18,14 @@ class Solver(BaseSolver):
 
     stopping_criterion = SingleRunCriterion()
 
-    def set_objective(self, X, y):
+    def set_objective(self, X, y, sfreq):
         # Define the information received by each solver from the objective.
         # The arguments of this function are the results of the
         # `Objective.get_objective`. This defines the benchmark's API for
         # passing the objective to the solver.
         # It is customizable for each benchmark.
         self.X, self.y = X, y
-        self.clf = make_pipeline(DummyClassifier())
+        self.clf = DummyClassifier()
 
     def run(self, n_iter):
         # This is the function that is called to evaluate the solver.
