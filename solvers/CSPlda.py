@@ -11,17 +11,24 @@ with safe_import_context() as import_ctx:
     from benchmark_utils import transformX_moabb
     import torch
     from braindecode.augmentation import ChannelsDropout, SmoothTimeMask
-
+    import numpy as np
 
 # The benchmark solvers must be named `Solver` and
 # inherit from `BaseSolver` for `benchopt` to work properly.
 
+
 class Solver(BaseSolver):
 
     name = 'CSPLDA'
-    parameters = {'augmentation': ('ChannelsDropout',
-                                   'SmoothTimeMask',
-                                   'IdentityTransform')}
+    parameters = {'augmentation, n_augmentation': [
+        ('SmoothTimeMask', 2),
+        ('ChannelsDropout', 2),
+        ('ChannelsDropout', 3),
+        ('ChannelsDropout', 5),
+        ('SmoothTimeMask', 3),
+        ('SmoothTimeMask', 5),
+        ('IdentityTransform', None)
+                  ]}
 
     stopping_criterion = SingleRunCriterion()
 
@@ -36,20 +43,25 @@ class Solver(BaseSolver):
         # It is customizable for each benchmark.
 
         seed = 20200220
+
         if self.augmentation == 'ChannelsDropout':
 
             transform = ChannelsDropout(probability=0.5,
-                                        p_drop=0.2,
                                         random_state=seed)
 
-            X_tr, _ = transform.operation(torch.as_tensor(X).float(),
-                                          None,
-                                          p_drop=0.2)
+            X_augm = transformX_moabb(X)
+            y_augm = y
+            for i in range(self.n_augmentation):
 
-            X_tr = X_tr.numpy()
-            X_transform = transformX_moabb(X)
-            X = X_transform + X_tr
-            y = y+y
+                X_tr, _ = transform.operation(torch.as_tensor(X).float(),
+                                              None,
+                                              p_drop=0.2)
+
+                X_tr = X_tr.numpy()
+                X_augm = np.concatenate((X_augm, X_tr))
+                y_augm = np.concatenate((y_augm, y))
+            X = X_augm
+            y = y_augm
 
         elif self.augmentation == 'SmoothTimeMask':
             second = 0.1
@@ -60,20 +72,28 @@ class Solver(BaseSolver):
 
             X_torch = torch.as_tensor(X).float()
             y_torch = torch.as_tensor(y).float()
-
             param_augm = transform.get_augmentation_params(X_torch,
                                                            y_torch)
-            X_tr, _ = transform.operation(
-                      X_torch,
-                      None,
-                      mask_len_samples=param_augm['mask_len_samples'],
-                      mask_start_per_sample=param_augm['mask_start_per_sample']
-                      )
+            mls = param_augm['mask_len_samples']
+            msps = param_augm['mask_start_per_sample']
 
-            X_tr = X_tr.numpy()
-            X_transform = transformX_moabb(X)
-            X = X_transform + X_tr
-            y = y+y
+            X_augm = transformX_moabb(X)
+            y_augm = y
+
+            for i in range(self.n_augmentation):
+
+                X_tr, _ = transform.operation(
+                        X_torch,
+                        None,
+                        mask_len_samples=mls,
+                        mask_start_per_sample=msps
+                        )
+
+                X_tr = X_tr.numpy()
+                X_augm = np.concatenate((X_augm, X_tr))
+                y_augm = np.concatenate((y_augm, y))
+            X = X_augm
+            y = y_augm
 
         else:
             X = transformX_moabb(X)

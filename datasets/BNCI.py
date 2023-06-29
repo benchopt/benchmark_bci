@@ -32,5 +32,3 @@ class Dataset(BaseDataset):
         return dict(dataset=dataset,
                     paradigm_name=self.paradigm_name,
                     sfreq=sfreq)
-
-        # maybe we could process the data in Objective

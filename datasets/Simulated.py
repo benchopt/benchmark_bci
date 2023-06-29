@@ -26,7 +26,8 @@ class Dataset(BaseDataset):
         data = MOABBDataset(dataset_name=dataset_name,
                             subject_ids=None)
 
-        dataset = windows_data(data, 'LeftRightImagery')
-
+        dataset, sfreq = windows_data(data, 'LeftRightImagery')
+        
         return dict(dataset=dataset,
-                    paradigm_name='LeftRightImagery')
+                    paradigm_name='LeftRightImagery',
+                    sfreq=sfreq)

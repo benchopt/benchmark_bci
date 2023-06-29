@@ -1,0 +1,49 @@
+
+#%%
+from braindecode.datasets import MOABBDataset
+from benchmark_utils import windows_data
+from skorch.helper import SliceDataset
+import numpy as np
+from benchmark_utils import transformX_moabb
+from braindecode.augmentation import SmoothTimeMask
+import torch
+import matplotlib.pyplot as plt
+
+dataset_name = "BNCI2014001"
+data = MOABBDataset(dataset_name=dataset_name,
+                    subject_ids=None)
+
+dataset, _ = windows_data(data, 'LeftRightImagery')
+
+data_split_subject = dataset.split('subject')
+
+data = data_split_subject['1']
+X = SliceDataset(dataset, idx=0)
+y = np.array([y for y in SliceDataset(dataset, idx=1)])
+
+seed = 20200220
+second = 0.2
+sfreq = 250
+transform = SmoothTimeMask(probability=0.5,
+                           mask_len_samples=int(sfreq * second),
+                           random_state=seed)
+
+X_torch = torch.as_tensor(X).float()
+y_torch = torch.as_tensor(y).float()
+param_augm = transform.get_augmentation_params(X_torch,
+                                               y_torch)
+mls = param_augm['mask_len_samples']
+msps = param_augm['mask_start_per_sample']
+
+X_tr, _ = transform.operation(
+                        X_torch,
+                        None,
+                        mask_len_samples=mls,
+                        mask_start_per_sample=msps
+                        )
+
+X_tr = X_tr.numpy()
+
+
+
+# %%

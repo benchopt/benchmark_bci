@@ -19,10 +19,6 @@ with safe_import_context() as import_ctx:
     from braindecode.preprocessing import create_windows_from_events
 
 
-def flatten(liste):
-    return [item for sub_list in liste for item in sub_list]
-
-
 def list_train_test(test, list):
     list_test = [list[test]]
     list_train = list[:test] + list[test+1:]
@@ -44,7 +40,10 @@ def windows_data(dataset, paradigm_name):
         mapping = {'left_hand': 1, 'right_hand': 2}
 
     elif paradigm_name == 'MotorImagery':
-        mapping = {'left_hand': 1, 'right_hand': 2, 'tongue': 3}
+        mapping = {'left_hand': 1,
+                   'right_hand': 2,
+                   'feet': 4,
+                   'tongue': 3}
 
     low_cut_hz = 4.0  # low cut frequency for filtering
     high_cut_hz = 38.0  # high cut frequency for filtering

@@ -11,6 +11,7 @@ with safe_import_context() as import_ctx:
     from braindecode.models import ShallowFBCSPNet
     from braindecode.augmentation import SmoothTimeMask, AugmentedDataLoader
     from numpy import linspace
+    from braindecode.augmentation import ChannelsDropout, IdentityTransform
 
 
 # The benchmark solvers must be named `Solver` and
@@ -19,7 +20,10 @@ with safe_import_context() as import_ctx:
 
 class Solver(BaseSolver):
 
-    name = 'ShallowFBCSPNet_augm_channeldrop'
+    name = 'ShallowFBCSPNet'
+    parameters = {'augmentation': ('ChannelsDropout',
+                                   'SmoothTimeMask',
+                                   'IdentityTransform')}
 
     stopping_criterion = SingleRunCriterion()
 
@@ -60,15 +64,28 @@ class Solver(BaseSolver):
         # with the inputs of set object or 'manually'
 
         seed = 20200220
-        transforms_time = [SmoothTimeMask(probability=0.5,
-                           mask_len_samples=int(sfreq * second),
-                           random_state=seed)
-                           for second in linspace(0.1, 2, 2)]
+
+        if self.augmentation == 'SmoothTimeMask':
+
+            transforms = [SmoothTimeMask(probability=0.5,
+                          mask_len_samples=int(sfreq * second),
+                          random_state=seed)
+                          for second in linspace(0.1, 2, 2)]
+
+        elif self.augmentation == 'ChannelDropout':
+
+            transforms = [ChannelsDropout(probability=0.5,
+                          p_drop=prob,
+                          random_state=seed)
+                          for prob in linspace(0, 1, 2)]
+
+        else:
+            transforms = [IdentityTransform()]
 
         clf = EEGClassifier(
             model,
             iterator_train=AugmentedDataLoader,
-            iterator_train__transforms=transforms_time,
+            iterator_train__transforms=transforms,
             criterion=torch.nn.NLLLoss,
             optimizer=torch.optim.AdamW,
             train_split=None,
@@ -82,6 +99,7 @@ class Solver(BaseSolver):
             ],
             device=device,
         )
+
         self.clf = clf
 
         self.X, self.y = X, y
