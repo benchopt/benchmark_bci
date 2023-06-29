@@ -27,7 +27,7 @@ class Dataset(BaseDataset):
                             subject_ids=None)
 
         dataset, sfreq = windows_data(data, 'LeftRightImagery')
-        
+
         return dict(dataset=dataset,
                     paradigm_name='LeftRightImagery',
                     sfreq=sfreq)

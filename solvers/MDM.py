@@ -31,7 +31,7 @@ class Solver(BaseSolver):
                   ]}
 
     install_cmd = 'conda'
-    requirements = ['pyriemann']
+    requirements = ['pyriemann', 'pip:torch', 'pip:braindecode']
 
     stopping_criterion = SingleRunCriterion()
 

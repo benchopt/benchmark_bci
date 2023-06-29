@@ -33,7 +33,7 @@ class Solver(BaseSolver):
     stopping_criterion = SingleRunCriterion()
 
     install_cmd = 'conda'
-    requirements = ['mne']
+    requirements = ['mne', 'pip:torch', 'pip:braindecode']
 
     def set_objective(self, X, y, sfreq):
         # Define the information received by each solver from the objective.
