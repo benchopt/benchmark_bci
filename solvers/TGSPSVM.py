@@ -22,12 +22,8 @@ class Solver(BaseSolver):
 
     name = 'TGSPSVM'
     parameters = {'augmentation, n_augmentation': [
-        ('SmoothTimeMask', 2),
-        ('ChannelsDropout', 2),
-        ('ChannelsDropout', 3),
-        ('ChannelsDropout', 5),
         ('SmoothTimeMask', 3),
-        ('SmoothTimeMask', 5),
+        ('ChannelsDropout', 2),
         ('IdentityTransform', None)
                   ]}
 
