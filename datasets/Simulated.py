@@ -22,9 +22,12 @@ class Dataset(BaseDataset):
         # The return arguments of this function are passed as keyword arguments
         # to `Objective.set_data`. This defines the benchmark's
         # API to pass data. It is customizable for each benchmark.
-        dataset_name = "Zhou2016"
+
+        dataset_name = "FakeDataset"
         data = MOABBDataset(dataset_name=dataset_name,
-                            subject_ids=None)
+                            subject_ids=None,
+                            dataset_kwargs={"event_list": ["left_hand", "right_hand"],
+                                            "paradigm": "imagery"})
 
         dataset, sfreq = windows_data(data, 'LeftRightImagery')
 
