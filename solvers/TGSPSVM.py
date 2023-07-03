@@ -11,9 +11,7 @@ with safe_import_context() as import_ctx:
     from sklearn.svm import SVC
     from benchopt.stopping_criterion import SingleRunCriterion
     from benchmark_utils import transformX_moabb
-    import torch
-    from braindecode.augmentation import ChannelsDropout, SmoothTimeMask
-    import numpy as np
+    from benchmark_utils import smooth_timemask, channels_dropout
 # The benchmark solvers must be named `Solver` and
 # inherit from `BaseSolver` for `benchopt` to work properly.
 
@@ -38,61 +36,18 @@ class Solver(BaseSolver):
         # `Objective.get_objective`. This defines the benchmark's API for
         # passing the objective to the solver.
         # It is customizable for each benchmark.
-        seed = 20200220
-
         if self.augmentation == 'ChannelsDropout':
 
-            transform = ChannelsDropout(probability=0.5,
-                                        random_state=seed)
-
-            X_augm = transformX_moabb(X)
-            y_augm = y
-            for i in range(self.n_augmentation):
-
-                X_tr, _ = transform.operation(torch.as_tensor(X).float(),
-                                              None,
-                                              p_drop=0.2)
-
-                X_tr = X_tr.numpy()
-                X_augm = np.concatenate((X_augm, X_tr))
-                y_augm = np.concatenate((y_augm, y))
-            X = X_augm
-            y = y_augm
+            X, y = channels_dropout(X, y)
 
         elif self.augmentation == 'SmoothTimeMask':
-            second = 0.1
 
-            transform = SmoothTimeMask(probability=0.5,
-                                       mask_len_samples=int(sfreq * second),
-                                       random_state=seed)
-
-            X_torch = torch.as_tensor(X).float()
-            y_torch = torch.as_tensor(y).float()
-            param_augm = transform.get_augmentation_params(X_torch,
-                                                           y_torch)
-            mls = param_augm['mask_len_samples']
-            msps = param_augm['mask_start_per_sample']
-
-            X_augm = transformX_moabb(X)
-            y_augm = y
-
-            for i in range(self.n_augmentation):
-
-                X_tr, _ = transform.operation(
-                        X_torch,
-                        None,
-                        mask_len_samples=mls,
-                        mask_start_per_sample=msps
-                        )
-
-                X_tr = X_tr.numpy()
-                X_augm = np.concatenate((X_augm, X_tr))
-                y_augm = np.concatenate((y_augm, y))
-            X = X_augm
-            y = y_augm
+            X, y = smooth_timemask(X, y)
 
         else:
             X = transformX_moabb(X)
+
+        self.X, self.y = X, y
 
         self.X, self.y = X, y
         self.clf = make_pipeline(Covariances("oas"),
