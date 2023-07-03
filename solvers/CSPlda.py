@@ -16,22 +16,23 @@ with safe_import_context() as import_ctx:
 
 
 class Solver(BaseSolver):
-
-    name = 'CSPLDA'
-    parameters = {'augmentation, n_augmentation': [
-        ('SmoothTimeMask', 2),
-        ('ChannelsDropout', 2),
-        ('ChannelsDropout', 3),
-        ('ChannelsDropout', 5),
-        ('SmoothTimeMask', 3),
-        ('SmoothTimeMask', 5),
-        ('IdentityTransform', None)
-                  ]}
+    name = "CSPLDA"
+    parameters = {
+        "augmentation, n_augmentation": [
+            ("SmoothTimeMask", 2),
+            ("ChannelsDropout", 2),
+            ("ChannelsDropout", 3),
+            ("ChannelsDropout", 5),
+            ("SmoothTimeMask", 3),
+            ("SmoothTimeMask", 5),
+            ("IdentityTransform", None),
+        ]
+    }
 
     stopping_criterion = SingleRunCriterion()
 
-    install_cmd = 'conda'
-    requirements = ['mne', 'pip:torch', 'pip:braindecode']
+    install_cmd = "conda"
+    requirements = ["mne", "pip:torch", "pip:braindecode"]
 
     def set_objective(self, X, y, sfreq):
         # Define the information received by each solver from the objective.
@@ -40,13 +41,13 @@ class Solver(BaseSolver):
         # passing the objective to the solver.
         # It is customizable for each benchmark.
 
-        if self.augmentation == 'ChannelsDropout':
+        if self.augmentation == "ChannelsDropout":
+            X, y = channels_dropout(X, y, n_augmentation=self.n_augmentation)
 
-            X, y = channels_dropout(X, y)
-
-        elif self.augmentation == 'SmoothTimeMask':
-
-            X, y = smooth_timemask(X, y)
+        elif self.augmentation == "SmoothTimeMask":
+            X, y = smooth_timemask(
+                X, y, n_augmentation=self.n_augmentation, sfreq=sfreq
+            )
 
         else:
             X = transformX_moabb(X)
