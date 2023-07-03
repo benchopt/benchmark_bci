@@ -1,5 +1,3 @@
-
-
 from benchopt import safe_import_context
 
 
@@ -15,15 +13,13 @@ with safe_import_context() as import_ctx:
 
 def channels_dropout(X, y, n_augmentation):
     seed = 20200220
-    transform = ChannelsDropout(probability=0.5,
-                                random_state=seed)
+    transform = ChannelsDropout(probability=0.5, random_state=seed)
     X_augm = transformX_moabb(X)
     y_augm = y
     for i in range(n_augmentation):
-
-        X_tr, _ = transform.operation(torch.as_tensor(X).float(),
-                                      None,
-                                      p_drop=0.2)
+        X_tr, _ = transform.operation(
+            torch.as_tensor(X).float(), None, p_drop=0.2
+        )
 
         X_tr = X_tr.numpy()
         X_augm = np.concatenate((X_augm, X_tr))
@@ -36,28 +32,25 @@ def smooth_timemask(X, y, n_augmentation, sfreq):
     second = 0.1
     seed = 20200220
 
-    transform = SmoothTimeMask(probability=0.5,
-                               mask_len_samples=int(sfreq * second),
-                               random_state=seed)
+    transform = SmoothTimeMask(
+        probability=0.5,
+        mask_len_samples=int(sfreq * second),
+        random_state=seed,
+    )
 
     X_torch = torch.as_tensor(X).float()
     y_torch = torch.as_tensor(y).float()
-    param_augm = transform.get_augmentation_params(X_torch,
-                                                   y_torch)
-    mls = param_augm['mask_len_samples']
-    msps = param_augm['mask_start_per_sample']
+    param_augm = transform.get_augmentation_params(X_torch, y_torch)
+    mls = param_augm["mask_len_samples"]
+    msps = param_augm["mask_start_per_sample"]
 
     X_augm = transformX_moabb(X)
     y_augm = y
 
     for i in range(n_augmentation):
-
         X_tr, _ = transform.operation(
-                  X_torch,
-                  None,
-                  mask_len_samples=mls,
-                  mask_start_per_sample=msps
-                        )
+            X_torch, None, mask_len_samples=mls, mask_start_per_sample=msps
+        )
 
         X_tr = X_tr.numpy()
         X_augm = np.concatenate((X_augm, X_tr))

@@ -16,20 +16,21 @@ with safe_import_context() as import_ctx:
 
 
 class Solver(BaseSolver):
+    name = "MDM"
+    parameters = {
+        "augmentation, n_augmentation": [
+            ("SmoothTimeMask", 2),
+            ("ChannelsDropout", 2),
+            ("ChannelsDropout", 3),
+            ("ChannelsDropout", 5),
+            ("SmoothTimeMask", 3),
+            ("SmoothTimeMask", 5),
+            ("IdentityTransform", None),
+        ]
+    }
 
-    name = 'MDM'
-    parameters = {'augmentation, n_augmentation': [
-        ('SmoothTimeMask', 2),
-        ('ChannelsDropout', 2),
-        ('ChannelsDropout', 3),
-        ('ChannelsDropout', 5),
-        ('SmoothTimeMask', 3),
-        ('SmoothTimeMask', 5),
-        ('IdentityTransform', None)
-                  ]}
-
-    install_cmd = 'conda'
-    requirements = ['pyriemann', 'pip:torch', 'pip:braindecode']
+    install_cmd = "conda"
+    requirements = ["pyriemann", "pip:torch", "pip:braindecode"]
 
     stopping_criterion = SingleRunCriterion()
 
@@ -39,13 +40,13 @@ class Solver(BaseSolver):
         # `Objective.get_objective`. This defines the benchmark's API for
         # passing the objective to the solver.
         # It is customizable for each benchmark.
-        if self.augmentation == 'ChannelsDropout':
+        if self.augmentation == "ChannelsDropout":
+            X, y = channels_dropout(X, y, n_augmentation=self.n_augmentation)
 
-            X, y = channels_dropout(X, y)
-
-        elif self.augmentation == 'SmoothTimeMask':
-
-            X, y = smooth_timemask(X, y)
+        elif self.augmentation == "SmoothTimeMask":
+            X, y = smooth_timemask(
+                X, y, n_augmentation=self.n_augmentation, sfreq=sfreq
+            )
 
         else:
             X = transformX_moabb(X)
@@ -53,9 +54,7 @@ class Solver(BaseSolver):
         self.X, self.y = X, y
 
         self.X, self.y = X, y
-        self.clf = make_pipeline(Covariances("oas"),
-                                 MDM(metric="riemann")
-                                 )
+        self.clf = make_pipeline(Covariances("oas"), MDM(metric="riemann"))
 
     def run(self, n_iter):
         # This is the function that is called to evaluate the solver.
