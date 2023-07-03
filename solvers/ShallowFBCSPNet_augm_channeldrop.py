@@ -4,14 +4,19 @@ from benchopt import BaseSolver, safe_import_context
 # - skipping import to speed up autocompletion in CLI.
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
+    import torch
     from benchopt.stopping_criterion import SingleRunCriterion
     from braindecode import EEGClassifier
-    from skorch.callbacks import LRScheduler
-    import torch
+    from braindecode.augmentation import (
+        AugmentedDataLoader,
+        ChannelsDropout,
+        FTSurrogate,
+        IdentityTransform,
+        SmoothTimeMask,
+    )
     from braindecode.models import ShallowFBCSPNet
-    from braindecode.augmentation import SmoothTimeMask, AugmentedDataLoader
-    from numpy import linspace
-    from braindecode.augmentation import ChannelsDropout, IdentityTransform
+    from numpy import linspace, pi
+    from skorch.callbacks import LRScheduler
 
 
 # The benchmark solvers must be named `Solver` and
@@ -19,16 +24,19 @@ with safe_import_context() as import_ctx:
 
 
 class Solver(BaseSolver):
-
-    name = 'ShallowFBCSPNet'
-    parameters = {'augmentation': ('ChannelsDropout',
-                                   'SmoothTimeMask',
-                                   'IdentityTransform')}
+    name = "ShallowFBCSPNet"
+    parameters = {
+        "augmentation": (
+            "ChannelsDropout",
+            "SmoothTimeMask",
+            "IdentityTransform",
+        )
+    }
 
     stopping_criterion = SingleRunCriterion()
 
-    install_cmd = 'conda'
-    requirements = ['pip:torch', 'pip:braindecode']
+    install_cmd = "conda"
+    requirements = ["pip:torch", "pip:braindecode"]
 
     # here maybe we need to define for each solvers a other input named
     # metadata which would be a dictionarry where we could get n_channels
@@ -49,10 +57,12 @@ class Solver(BaseSolver):
         n_classes = 4
         n_channels = X[0].shape[0]
         input_window_samples = X[0].shape[1]
-        model = ShallowFBCSPNet(n_channels,
-                                n_classes,
-                                input_window_samples=input_window_samples,
-                                final_conv_length="auto",)
+        model = ShallowFBCSPNet(
+            n_channels,
+            n_classes,
+            input_window_samples=input_window_samples,
+            final_conv_length="auto",
+        )
 
         cuda = torch.cuda.is_available()
         # check if GPU is available, if True chooses to use it
@@ -65,20 +75,33 @@ class Solver(BaseSolver):
 
         seed = 20200220
 
-        if self.augmentation == 'SmoothTimeMask':
+        if self.augmentation == "SmoothTimeMask":
+            transforms = [
+                SmoothTimeMask(
+                    probability=0.5,
+                    mask_len_samples=int(sfreq * second),
+                    random_state=seed,
+                )
+                for second in linspace(0.1, 2, 10)
+            ]
 
-            transforms = [SmoothTimeMask(probability=0.5,
-                          mask_len_samples=int(sfreq * second),
-                          random_state=seed)
-                          for second in linspace(0.1, 2, 2)]
+        elif self.augmentation == "ChannelDropout":
+            transforms = [
+                ChannelsDropout(
+                    probability=0.5, p_drop=prob, random_state=seed
+                )
+                for prob in linspace(0.6, 1, 10)
+            ]
 
-        elif self.augmentation == 'ChannelDropout':
-
-            transforms = [ChannelsDropout(probability=0.5,
-                          p_drop=prob,
-                          random_state=seed)
-                          for prob in linspace(0, 1, 2)]
-
+        elif self.augmentation == "FTSurrogate":
+            transforms = [
+                FTSurrogate(
+                    probability=0.5,
+                    phase_noise_magnitude=prob,
+                    random_state=seed,
+                )
+                for prob in linspace(0, 2 * pi, 10)
+            ]
         else:
             transforms = [IdentityTransform()]
 
@@ -90,12 +113,15 @@ class Solver(BaseSolver):
             optimizer=torch.optim.AdamW,
             train_split=None,
             optimizer__lr=lr,
+            max_epochs=n_epochs,
             optimizer__weight_decay=weight_decay,
             batch_size=batch_size,
             callbacks=[
                 "accuracy",
-                ("lr_scheduler", LRScheduler("CosineAnnealingLR",
-                                             T_max=n_epochs - 1)),
+                (
+                    "lr_scheduler",
+                    LRScheduler("CosineAnnealingLR", T_max=n_epochs - 1),
+                ),
             ],
             device=device,
         )
@@ -107,7 +133,7 @@ class Solver(BaseSolver):
     def run(self, n_iter):
         # This is the function that is called to evaluate the solver
         # .
-        self.clf.fit(self.X, y=self.y, epochs=1)
+        self.clf.fit(self.X, y=self.y)
 
     def get_result(self):
         # Return the result from one optimization run.
