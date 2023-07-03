@@ -26,7 +26,8 @@ class Dataset(BaseDataset):
         dataset_name = "FakeDataset"
         data = MOABBDataset(dataset_name=dataset_name,
                             subject_ids=None,
-                            dataset_kwargs={"event_list": ["left_hand", "right_hand"],
+                            dataset_kwargs={"event_list": ["left_hand",
+                                                           "right_hand"],
                                             "paradigm": "imagery"})
 
         dataset, sfreq = windows_data(data, 'LeftRightImagery')

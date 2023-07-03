@@ -31,10 +31,10 @@ class Objective(BaseObjective):
         'evaluation_process, subject, subject_test, session_test': [
             ('intra_subject', 1, None, None),
             ('intra_subject', 2, None, None),
-            ('intra_subject', 3, None, None),
-            ('intra_subject', 4, None, None),
+            ('inter_subject', None, 2, None),
+            ('inter_session', 3, None, 'session_E')
 
-        ],
+             ],
     }
     # The solvers will train on all the subject except subject_test.
     # It will be the same for the sessions.
