@@ -8,20 +8,27 @@ with safe_import_context() as import_ctx:
     from sklearn.pipeline import make_pipeline
     from pyriemann.estimation import Covariances
     from pyriemann.classification import KNearestNeighbor
-    from benchopt.stopping_criterion import SingleRunCriterion
-    from benchmark_utils import transformX_moabb
+    from benchmark_utils import (
+        transformX_moabb,
+        smooth_timemask,
+        channels_dropout,
+    )
 # The benchmark solvers must be named `Solver` and
 # inherit from `BaseSolver` for `benchopt` to work properly.
 
 
 class Solver(BaseSolver):
+    name = "KN"
 
-    name = 'KN'
-
-    install_cmd = 'conda'
-    requirements = ['pyriemann']
-
-    stopping_criterion = SingleRunCriterion()
+    install_cmd = "conda"
+    requirements = ["pyriemann"]
+    parameters = {
+        "augmentation": [
+            ("SmoothTimeMask"),
+            ("ChannelsDropout"),
+            ("IdentityTransform"),
+        ]
+    }
 
     def set_objective(self, X, y, sfreq):
         # Define the information received by each solver from the objective.
@@ -31,14 +38,26 @@ class Solver(BaseSolver):
         # It is customizable for each benchmark.
         X_transform = transformX_moabb(X)
         self.X, self.y = X_transform, y
-        self.clf = make_pipeline(Covariances("oas"),
-                                 KNearestNeighbor(n_neighbors=7,
-                                                  metric="riemann")
-                                 )
+        self.clf = make_pipeline(
+            Covariances("oas"),
+            KNearestNeighbor(n_neighbors=7, metric="euclid"),
+        )
+        self.sfreq = sfreq
 
     def run(self, n_iter):
         # This is the function that is called to evaluate the solver.
-        self.clf.fit(self.X, self.y)
+        if self.augmentation == "ChannelsDropout":
+            X, y = channels_dropout(self.X, self.y, n_augmentation=n_iter)
+
+        elif self.augmentation == "SmoothTimeMask":
+            X, y = smooth_timemask(
+                self.X, self.y, n_augmentation=n_iter, sfreq=self.sfreq
+            )
+
+        self.clf.fit(X, y)
+
+    def get_next(self, n_iter):
+        return n_iter + 1
 
     def get_result(self):
         # Return the result from one optimization run.
