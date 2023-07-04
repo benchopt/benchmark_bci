@@ -16,7 +16,7 @@ with safe_import_context() as import_ctx:
 class Solver(BaseSolver):
     name = "CSPLDA"
     parameters = {
-        "augmentation, n_augmentation": [
+        "augmentation": [
             ("SmoothTimeMask"),
             ("ChannelsDropout"),
             ("IdentityTransform"),
