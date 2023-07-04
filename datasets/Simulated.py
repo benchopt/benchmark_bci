@@ -5,7 +5,6 @@ from benchopt import BaseDataset, safe_import_context
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     from braindecode.datasets import MOABBDataset
-
     from benchmark_utils import windows_data
 
 

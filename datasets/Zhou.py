@@ -13,7 +13,6 @@ with safe_import_context() as import_ctx:
 
 class Dataset(BaseDataset):
 
-    # Name to select the dataset in the CLI and to display the results.
     name = "Zhou"
 
     parameters = {'paradigm_name': ('LeftRightImagery', 'MotorImagery')}
@@ -30,8 +29,8 @@ class Dataset(BaseDataset):
         data = MOABBDataset(dataset_name=dataset_name,
                             subject_ids=None)
 
-        dataset, sfreq = windows_data(data, self.paradigm_name)
+        dataset, sfreq = windows_data(data, "LeftRightImagery")
 
         return dict(dataset=dataset,
-                    paradigm_name=self.paradigm_name,
+                    paradigm_name="LeftRightImagery",
                     sfreq=sfreq)
