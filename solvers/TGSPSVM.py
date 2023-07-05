@@ -6,13 +6,16 @@ from benchopt import BaseSolver, safe_import_context
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     from sklearn.pipeline import make_pipeline
+    from sklearn.svm import SVC
+
     from pyriemann.estimation import Covariances
     from pyriemann.tangentspace import TangentSpace
-    from sklearn.svm import SVC
+
+    from skorch.helper import to_numpy
+
     from benchopt.stopping_criterion import SingleRunCriterion
     from benchmark_utils.transformation import (channels_dropout,
                                                 smooth_timemask)
-    from benchmark_utils import transformX_moabb
 
 # The benchmark solvers must be named `Solver` and
 # inherit from `BaseSolver` for `benchopt` to work properly.
@@ -42,6 +45,7 @@ class Solver(BaseSolver):
         # It is customizable for each benchmark.
 
         self.X, self.y = X, y
+        self.sfreq = sfreq
         self.clf = make_pipeline(Covariances("oas"),
                                  TangentSpace(metric="riemann"),
                                  SVC(kernel="linear")
@@ -58,7 +62,7 @@ class Solver(BaseSolver):
             )
 
         else:
-            X = transformX_moabb(X)
+            X = to_numpy(self.X)
             y = self.y
 
         self.clf.fit(X, y)
