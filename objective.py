@@ -25,16 +25,15 @@ class Objective(BaseObjective):
     # All parameters 'p' defined here are available as 'self.p'.
 
     intall_cmd = 'conda'
-    requirements = ['pip:git+https://github.com/Neurotechx/moabb@develop#egg=moabb', 'scikit-learn']
+    requirements = ['pip:git+https://github.com/Neurotechx/moabb@develop#egg=moabb',
+                    'scikit-learn']
 
     parameters = {
         'evaluation_process, subject, subject_test, session_test': [
-            ('intra_subject', 1, None, None),
-            ('intra_subject', 2, None, None),
+            ('inter_subject', None, 1, None),
             ('inter_subject', None, 2, None),
-            ('inter_session', 3, None, 'session_E')
-
-             ],
+            ('inter_subject', None, 3, None),
+        ],
     }
     # The solvers will train on all the subject except subject_test.
     # It will be the same for the sessions.
