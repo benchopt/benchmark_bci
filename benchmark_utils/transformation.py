@@ -53,7 +53,7 @@ def channels_dropout(X, y, n_augmentation,
         X_augm = concatenate((X_augm, X_tr))
         y_augm = concatenate((y_augm, y))
 
-    return (X_augm, y_augm)
+    return X_augm, y_augm
 
 
 def smooth_timemask(X, y, n_augmentation, sfreq, seed=0,

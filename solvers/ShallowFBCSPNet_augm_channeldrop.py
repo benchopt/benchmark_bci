@@ -30,7 +30,7 @@ class Solver(BaseSolver):
             "ChannelsDropout",
             "SmoothTimeMask",
             "IdentityTransform",
-            "FTSurrogate"
+            "FTSurrogate",
         )
     }
 

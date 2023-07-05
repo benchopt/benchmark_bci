@@ -14,8 +14,10 @@ with safe_import_context() as import_ctx:
     from skorch.helper import to_numpy
 
     from benchopt.stopping_criterion import SingleRunCriterion
-    from benchmark_utils.transformation import (channels_dropout,
-                                                smooth_timemask)
+    from benchmark_utils.transformation import (
+        channels_dropout,
+        smooth_timemask,
+    )
 
 # The benchmark solvers must be named `Solver` and
 # inherit from `BaseSolver` for `benchopt` to work properly.
@@ -23,7 +25,7 @@ with safe_import_context() as import_ctx:
 
 class Solver(BaseSolver):
 
-    name = 'TGSPSVM'
+    name = "TGSPSVM"
     parameters = {
         "augmentation": [
             ("SmoothTimeMask"),
@@ -32,8 +34,8 @@ class Solver(BaseSolver):
         ]
     }
 
-    install_cmd = 'conda'
-    requirements = ['pyriemann', 'pip:torch', 'pip:braindecode']
+    install_cmd = "conda"
+    requirements = ["pyriemann", "pip:torch", "pip:braindecode"]
 
     stopping_criterion = SingleRunCriterion()
 
@@ -46,10 +48,11 @@ class Solver(BaseSolver):
 
         self.X, self.y = X, y
         self.sfreq = sfreq
-        self.clf = make_pipeline(Covariances("oas"),
-                                 TangentSpace(metric="riemann"),
-                                 SVC(kernel="linear")
-                                 )
+        self.clf = make_pipeline(
+            Covariances("oas"),
+            TangentSpace(metric="riemann"),
+            SVC(kernel="linear"),
+        )
 
     def run(self, n_iter):
         # This is the function that is called to evaluate the solver.
