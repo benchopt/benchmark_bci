@@ -74,7 +74,7 @@ def smooth_timemask(X, y, n_augmentation, sfreq, seed=0,
         random_state=seed,
     )
 
-    X_torch = as_tensor(X).float()
+    X_torch = as_tensor(np.array(X)).float()
     y_torch = as_tensor(y).float()
     param_augm = transform.get_augmentation_params(X_torch, y_torch)
     mls = param_augm["mask_len_samples"]
@@ -169,7 +169,7 @@ def split_classes(X, y):
 def cov_augm(X, y, estimator='cov'):
     list_classe = split_classes(X, y)
     X = to_numpy(X)
-    X = covariances(X)
+    X = covariances(X, estimator=estimator)
     X_augm = []
     y_augm = []
     for i in range(len(list_classe)):
