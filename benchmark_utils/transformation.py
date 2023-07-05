@@ -12,14 +12,39 @@ with safe_import_context() as import_ctx:
     from sklearn.base import BaseEstimator, TransformerMixin
 
 
-def channels_dropout(X, y, n_augmentation):
-    seed = 20200220
-    transform = ChannelsDropout(probability=0.5, random_state=seed)
+def channels_dropout(X, y, n_augmentation, seed=0, probability=0.5, p_drop=0.2):
+    """
+    Function to apply channels dropout to X raw data
+    and concatenate it to the original data.
+
+    ----------
+    X : array-like of shape (n_trials, n_channels, n_times)
+        The input trials.
+    y : array-like of shape (n_trials,)
+        The labels.
+    n_augmentation : int
+        Number of augmentation to apply and increase the size of the dataset.
+    seed : int
+        Random seed.
+    probability : float
+        Probability of applying the tranformation.
+    p_drop : float
+        Probability of dropout a channel.
+
+    Returns
+    -------
+    X_augm : array-like of shape (n_trials * n_augmentation, n_channels, n_times)
+        The augmented trials.
+    y_augm : array-like of shape (n_trials * n_augmentation,)
+        The labels.
+
+    """
+    transform = ChannelsDropout(probability=probability, random_state=seed)
     X_augm = transformX_moabb(X)
     y_augm = y
     for i in range(n_augmentation):
         X_tr, _ = transform.operation(
-            torch.as_tensor(X).float(), None, p_drop=0.2
+            torch.as_tensor(X).float(), None, p_drop=p_drop
         )
 
         X_tr = X_tr.numpy()
@@ -29,12 +54,14 @@ def channels_dropout(X, y, n_augmentation):
     return (X_augm, y_augm)
 
 
-def smooth_timemask(X, y, n_augmentation, sfreq):
-    second = 0.1
-    seed = 20200220
+def smooth_timemask(X, y, n_augmentation, sfreq, seed=0, probability=0.5, second=0.1):
+    """
+    Function to apply smooth time mask to X raw data
+    and concatenate it to the original data.
+    """
 
     transform = SmoothTimeMask(
-        probability=0.5,
+        probability=probability,
         mask_len_samples=int(sfreq * second),
         random_state=seed,
     )
