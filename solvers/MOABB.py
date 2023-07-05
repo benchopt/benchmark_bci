@@ -19,23 +19,20 @@ with safe_import_context() as import_ctx:
 class Solver(BaseSolver):
     name = "MOABBPipelines"
     parameters = {
-        "augmentation": [
-            ("SmoothTimeMask"),
-            ("IdentityTransform"),
-        ],
+        "augmentation": [("SmoothTimeMask"), ("IdentityTransform")],
         "pipeline": [
-            "AUG Tang SVM Grid",
+            "AUGTangSVMGrid",
             "MDM",
-            "Tangent Space SVM Grid",
-            "CSP + LDA",
+            "TangentSpaceSVMGrid",
+            "CSPLDA",
             "FgMDM",
-            "Log Variance LDA",
-            "DLCSPauto + shLDA",
-            "Log Variance SVM grid",
-            "CSP + SVM Grid",
-            "TS ElasticNet Grid",
-            "Tangent Space LR",
-            "TRCSP + LDA",
+            "LogVarianceLDA",
+            "DLCSPautoshLDA",
+            "LogVarianceSVMgrid",
+            "CSPSVMGrid",
+            "TSElasticNetGrid",
+            "TangentSpaceLR",
+            "TRCSPLDA",
         ],
     }
 
@@ -46,7 +43,7 @@ class Solver(BaseSolver):
         # passing the objective to the solver.
         # It is customizable for each benchmark.
         self.X, self.y = X, y
-
+        self.sfreq = sfreq
         self.clf = parser_pipelines()[self.pipeline]
 
     def run(self, n_iter):
