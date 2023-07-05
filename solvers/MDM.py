@@ -10,7 +10,7 @@ with safe_import_context() as import_ctx:
     from pyriemann.classification import MDM
     from benchmark_utils.transformation import (
         channels_dropout,
-        smooth_timemask,
+        smooth_timemask, Covariances_augm
     )
     from skorch.helper import to_numpy
 # The benchmark solvers must be named `Solver` and
@@ -22,8 +22,7 @@ class Solver(BaseSolver):
     parameters = {
         "augmentation": [
             ("SmoothTimeMask"),
-            ("ChannelsDropout"),
-            ("IdentityTransform"),
+            ("Barycenter")
         ]
     }
 
@@ -36,6 +35,8 @@ class Solver(BaseSolver):
         # `Objective.get_objective`. This defines the benchmark's API for
         # passing the objective to the solver.
         # It is customizable for each benchmark.
+        X = to_numpy(X)
+
         self.X, self.y = X, y
         self.clf = make_pipeline(Covariances("oas"), MDM(metric="riemann"))
         self.sfreq = sfreq
@@ -49,6 +50,12 @@ class Solver(BaseSolver):
             X, y = smooth_timemask(
                 self.X, self.y, n_augmentation=n_iter, sfreq=self.sfreq
             )
+            self.clf = make_pipeline(Covariances("oas"), MDM(metric="riemann"))
+        elif self.augmentation == 'Barycenter':
+            X = to_numpy(self.X)
+            y = self.y
+            self.clf = make_pipeline(Covariances_augm("cov"),
+                                     MDM(metric="riemann"))
         else:
             X = to_numpy(self.X)
             y = self.y

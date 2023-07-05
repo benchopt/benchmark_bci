@@ -31,10 +31,6 @@ class Objective(BaseObjective):
     parameters = {
         'evaluation_process, subject, subject_test, session_test': [
             ('intra_subject', 1, None, None),
-            ('intra_subject', 2, None, None),
-            ('inter_subject', None, 2, None),
-            ('inter_session', 3, None, 'session_E')
-
              ],
     }
     # The solvers will train on all the subject except subject_test.
@@ -143,6 +139,10 @@ class Objective(BaseObjective):
         # for `Solver.set_objective`. This defines the
         # benchmark's API for passing the objective to the solver.
         # It is customizable for each benchmark.
+
+        # note for de cross validation :
+        # faire un split ici en fonction des différentes seed
+        # et faire la commande -r de benchopt pour répeter
 
         return dict(
             X=self.X_train,

@@ -21,7 +21,6 @@ class Solver(BaseSolver):
     parameters = {
         "augmentation": [
             ("SmoothTimeMask"),
-            ("ChannelsDropout"),
             ("IdentityTransform"),
         ],
         "pipeline": [
