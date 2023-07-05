@@ -12,7 +12,8 @@ with safe_import_context() as import_ctx:
     from sklearn.base import BaseEstimator, TransformerMixin
 
 
-def channels_dropout(X, y, n_augmentation, seed=0, probability=0.5, p_drop=0.2):
+def channels_dropout(X, y, n_augmentation,
+                     seed=0, probability=0.5, p_drop=0.2):
     """
     Function to apply channels dropout to X raw data
     and concatenate it to the original data.
@@ -33,13 +34,15 @@ def channels_dropout(X, y, n_augmentation, seed=0, probability=0.5, p_drop=0.2):
 
     Returns
     -------
-    X_augm : array-like of shape (n_trials * n_augmentation, n_channels, n_times)
+    X_augm : array-like of shape (n_trials * n_augmentation,
+              n_channels, n_times)
         The augmented trials.
     y_augm : array-like of shape (n_trials * n_augmentation,)
         The labels.
 
     """
-    transform = ChannelsDropout(probability=probability, random_state=seed)
+    transform = ChannelsDropout(probability=probability,
+                                random_state=seed)
     X_augm = transformX_moabb(X)
     y_augm = y
     for i in range(n_augmentation):
@@ -54,7 +57,8 @@ def channels_dropout(X, y, n_augmentation, seed=0, probability=0.5, p_drop=0.2):
     return (X_augm, y_augm)
 
 
-def smooth_timemask(X, y, n_augmentation, sfreq, seed=0, probability=0.5, second=0.1):
+def smooth_timemask(X, y, n_augmentation, sfreq, seed=0,
+                    probability=0.5, second=0.1):
     """
     Function to apply smooth time mask to X raw data
     and concatenate it to the original data.
@@ -77,7 +81,8 @@ def smooth_timemask(X, y, n_augmentation, sfreq, seed=0, probability=0.5, second
 
     for i in range(n_augmentation):
         X_tr, _ = transform.operation(
-            X_torch, None, mask_len_samples=mls, mask_start_per_sample=msps
+            X_torch, None, mask_len_samples=mls,
+            mask_start_per_sample=msps
         )
 
         X_tr = X_tr.numpy()
