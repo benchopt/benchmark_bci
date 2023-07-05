@@ -93,9 +93,9 @@ class Objective(BaseObjective):
             session_test = self.session_test
             data_session_test = data_split_session[session_test]
             data_session_train = []
-            for clé in data_split_session.items():
-                if clé[0] != str(session_test):
-                    data_session_train += data_split_session[clé[0]]
+            for key in data_split_session.items():
+                if key[0] != str(session_test):
+                    data_session_train += data_split_session[key[0]]
             X_test = SliceDataset(data_session_test, idx=0)
             y_test = np.array([y for y in SliceDataset(data_session_test,
                                                        idx=1)])
