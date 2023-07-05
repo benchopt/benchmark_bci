@@ -1,4 +1,4 @@
-name: Log Variance LDA
+name: LogVarianceLDA
 
 paradigms:
   - LeftRightImagery
