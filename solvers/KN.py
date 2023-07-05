@@ -6,11 +6,12 @@ from benchopt import BaseSolver, safe_import_context
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     from sklearn.pipeline import make_pipeline
+    from skorch.helper import to_numpy
+
     from pyriemann.estimation import Covariances
     from pyriemann.classification import KNearestNeighbor
     from benchmark_utils.transformation import (channels_dropout,
                                                 smooth_timemask)
-    from benchmark_utils import transformX_moabb
 
 # The benchmark solvers must be named `Solver` and
 # inherit from `BaseSolver` for `benchopt` to work properly.
@@ -35,7 +36,7 @@ class Solver(BaseSolver):
         # `Objective.get_objective`. This defines the benchmark's API for
         # passing the objective to the solver.
         # It is customizable for each benchmark.
-        X_transform = transformX_moabb(X)
+        X_transform = to_numpy(X)
         self.X, self.y = X_transform, y
         self.clf = make_pipeline(
             Covariances("oas"),
@@ -52,9 +53,8 @@ class Solver(BaseSolver):
             X, y = smooth_timemask(
                 self.X, self.y, n_augmentation=n_iter, sfreq=self.sfreq
             )
-
         else:
-            X = transformX_moabb(X)
+            X = to_numpy(self.X)
             y = self.y
 
         self.clf.fit(X, y)

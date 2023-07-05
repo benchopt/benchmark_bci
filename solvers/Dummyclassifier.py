@@ -5,9 +5,10 @@ from benchopt import BaseSolver, safe_import_context
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     from sklearn.dummy import DummyClassifier
+    from skorch.helper import to_numpy
+
     from benchmark_utils.transformation import (channels_dropout,
                                                 smooth_timemask)
-    from benchmark_utils import transformX_moabb
 # The benchmark solvers must be named `Solver` and
 # inherit from `BaseSolver` for `benchopt` to work properly.
 
@@ -41,7 +42,7 @@ class Solver(BaseSolver):
                 self.X, self.y, n_augmentation=n_iter, sfreq=self.sfreq
             )
         else:
-            X = transformX_moabb(X)
+            X = to_numpy(self.X)
             y = self.y
 
         self.clf.fit(X, y)

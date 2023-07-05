@@ -10,8 +10,7 @@ with safe_import_context() as import_ctx:
     from pyriemann.classification import MDM
     from benchmark_utils.transformation import (channels_dropout,
                                                 smooth_timemask)
-    from benchmark_utils import transformX_moabb
-
+    from skorch.helper import to_numpy
 # The benchmark solvers must be named `Solver` and
 # inherit from `BaseSolver` for `benchopt` to work properly.
 
@@ -35,8 +34,6 @@ class Solver(BaseSolver):
         # `Objective.get_objective`. This defines the benchmark's API for
         # passing the objective to the solver.
         # It is customizable for each benchmark.
-        X = transformX_moabb(X)
-
         self.X, self.y = X, y
         self.clf = make_pipeline(Covariances("oas"), MDM(metric="riemann"))
         self.sfreq = sfreq
@@ -51,7 +48,7 @@ class Solver(BaseSolver):
                 self.X, self.y, n_augmentation=n_iter, sfreq=self.sfreq
             )
         else:
-            X = transformX_moabb(X)
+            X = to_numpy(self.X)
             y = self.y
 
         self.clf.fit(X, y)

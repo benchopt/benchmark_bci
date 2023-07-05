@@ -8,8 +8,7 @@ with safe_import_context() as import_ctx:
     from sklearn.model_selection import train_test_split
     from sklearn.metrics import balanced_accuracy_score as BAS
     import numpy as np
-    from skorch.helper import SliceDataset
-    from benchmark_utils import transformX_moabb
+    from skorch.helper import SliceDataset, to_numpy
 
 # The benchmark objective must be named `Objective` and
 # inherit from `BaseObjective` for `benchopt` to work properly.
@@ -119,8 +118,8 @@ class Objective(BaseObjective):
         # `Solver.get_result`. This defines the benchmark's API to pass
         # solvers' result. This is customizable for each benchmark.
         if not type(model) == 'braindecode.classifier.EEGClassifier':
-            self.X_train = transformX_moabb(self.X_train)
-            self.X_test = transformX_moabb(self.X_test)
+            self.X_train = to_numpy(self.X_train)
+            self.X_test = to_numpy(self.X_test)
 
         score_train = model.score(self.X_train, self.y_train)
         score_test = model.score(self.X_test, self.y_test)
