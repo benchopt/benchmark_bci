@@ -25,7 +25,7 @@ class Objective(BaseObjective):
     # All parameters 'p' defined here are available as 'self.p'.
 
     intall_cmd = 'conda'
-    requirements = ['pip:moabb', 'scikit-learn']
+    requirements = ['pip:git+https://github.com/Neurotechx/moabb@develop#egg=moabb', 'scikit-learn']
 
     parameters = {
         'evaluation_process, subject, subject_test, session_test': [
