@@ -9,8 +9,8 @@ with safe_import_context() as import_ctx:
 
     from numpy import concatenate
     from torch import as_tensor
-    from skorch.helper import to_numpy
     from sklearn.base import BaseEstimator, TransformerMixin
+    from skorch.helper import to_numpy
     from braindecode.augmentation import ChannelsDropout, SmoothTimeMask
     from pyriemann.utils.covariance import covariances
     from pyriemann.utils.mean import mean_covariance
@@ -114,6 +114,8 @@ class Covariances_augm(BaseEstimator, TransformerMixin):
     CospCovariances
     HankelCovariances
     """
+    install_cmd = "conda"
+    requirements = ["scikit-learn"]
 
     def __init__(self, estimator='cov'):
         """Init."""
