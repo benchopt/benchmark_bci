@@ -24,8 +24,10 @@ class Objective(BaseObjective):
     # the cross product for each key in the dictionary.
     # All parameters 'p' defined here are available as 'self.p'.
 
+    link = 'pip: git+https://github.com/Neurotechx/moabb@develop#egg=moabb'
     intall_cmd = 'conda'
-    requirements = ['pip:moabb', 'scikit-learn']
+    requirements = [str(link),
+                    'scikit-learn']
 
     parameters = {
         'evaluation_process, subject, subject_test, session_test': [

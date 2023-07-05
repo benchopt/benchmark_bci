@@ -10,8 +10,10 @@ with safe_import_context() as import_ctx:
     from pyriemann.tangentspace import TangentSpace
     from sklearn.svm import SVC
     from benchopt.stopping_criterion import SingleRunCriterion
+    from benchmark_utils.transformation import (channels_dropout,
+                                                smooth_timemask)
     from benchmark_utils import transformX_moabb
-    from benchmark_utils import smooth_timemask, channels_dropout
+
 # The benchmark solvers must be named `Solver` and
 # inherit from `BaseSolver` for `benchopt` to work properly.
 
@@ -19,11 +21,13 @@ with safe_import_context() as import_ctx:
 class Solver(BaseSolver):
 
     name = 'TGSPSVM'
-    parameters = {'augmentation, n_augmentation': [
-        ('SmoothTimeMask', 3),
-        ('ChannelsDropout', 2),
-        ('IdentityTransform', None)
-                  ]}
+    parameters = {
+        "augmentation": [
+            ("SmoothTimeMask"),
+            ("ChannelsDropout"),
+            ("IdentityTransform"),
+        ]
+    }
 
     install_cmd = 'conda'
     requirements = ['pyriemann', 'pip:torch', 'pip:braindecode']
@@ -36,18 +40,6 @@ class Solver(BaseSolver):
         # `Objective.get_objective`. This defines the benchmark's API for
         # passing the objective to the solver.
         # It is customizable for each benchmark.
-        if self.augmentation == 'ChannelsDropout':
-
-            X, y = channels_dropout(X, y)
-
-        elif self.augmentation == 'SmoothTimeMask':
-
-            X, y = smooth_timemask(X, y)
-
-        else:
-            X = transformX_moabb(X)
-
-        self.X, self.y = X, y
 
         self.X, self.y = X, y
         self.clf = make_pipeline(Covariances("oas"),
@@ -57,7 +49,19 @@ class Solver(BaseSolver):
 
     def run(self, n_iter):
         # This is the function that is called to evaluate the solver.
-        self.clf.fit(self.X, self.y)
+        if self.augmentation == "ChannelsDropout":
+            X, y = channels_dropout(self.X, self.y, n_augmentation=n_iter)
+
+        elif self.augmentation == "SmoothTimeMask":
+            X, y = smooth_timemask(
+                self.X, self.y, n_augmentation=n_iter, sfreq=self.sfreq
+            )
+
+        else:
+            X = transformX_moabb(X)
+            y = self.y
+
+        self.clf.fit(X, y)
 
     def get_result(self):
         # Return the result from one optimization run.
