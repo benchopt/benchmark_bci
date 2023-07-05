@@ -30,6 +30,7 @@ class Solver(BaseSolver):
         # It is customizable for each benchmark.
         self.X, self.y = X, y
         self.clf = DummyClassifier()
+        self.sfreq = sfreq
 
     def run(self, n_iter):
         # This is the function that is called to evaluate the solver.
@@ -41,7 +42,7 @@ class Solver(BaseSolver):
                 self.X, self.y, n_augmentation=n_iter, sfreq=self.sfreq
             )
         else:
-            X = transformX_moabb(X)
+            X = transformX_moabb(self.X)
             y = self.y
 
         self.clf.fit(X, y)

@@ -54,7 +54,7 @@ class Solver(BaseSolver):
             )
 
         else:
-            X = transformX_moabb(X)
+            X = transformX_moabb(self.X)
             y = self.y
 
         self.clf.fit(X, y)
