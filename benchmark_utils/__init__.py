@@ -38,8 +38,8 @@ def transformX_moabb(X):
         Transformed data.
     """
     X0 = []
-    for i in range(len(X)):
-        X0.append(X[i])
+    for Xi in X:
+        X0.append(Xi)
     X0 = np.array(X0)
     return X0
 

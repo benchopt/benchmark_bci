@@ -8,8 +8,10 @@ with safe_import_context() as import_ctx:
     from sklearn.pipeline import make_pipeline
     from pyriemann.estimation import Covariances
     from pyriemann.classification import MDM
+    from benchmark_utils.transformation import (channels_dropout,
+                                                smooth_timemask)
     from benchmark_utils import transformX_moabb
-    from benchmark_utils import channels_dropout, smooth_timemask
+
 # The benchmark solvers must be named `Solver` and
 # inherit from `BaseSolver` for `benchopt` to work properly.
 
@@ -48,6 +50,9 @@ class Solver(BaseSolver):
             X, y = smooth_timemask(
                 self.X, self.y, n_augmentation=n_iter, sfreq=self.sfreq
             )
+        else:
+            X = transformX_moabb(X)
+            y = self.y
 
         self.clf.fit(X, y)
 

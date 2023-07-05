@@ -24,16 +24,19 @@ class Objective(BaseObjective):
     # the cross product for each key in the dictionary.
     # All parameters 'p' defined here are available as 'self.p'.
 
+    link = 'pip: git+https://github.com/Neurotechx/moabb@develop#egg=moabb'
     intall_cmd = 'conda'
-    requirements = ['pip:git+https://github.com/Neurotechx/moabb@develop#egg=moabb',
+    requirements = [str(link),
                     'scikit-learn']
 
     parameters = {
         'evaluation_process, subject, subject_test, session_test': [
-            ('inter_subject', None, 1, None),
+            ('intra_subject', 1, None, None),
+            ('intra_subject', 2, None, None),
             ('inter_subject', None, 2, None),
-            ('inter_subject', None, 3, None),
-        ],
+            ('inter_session', 3, None, 'session_E')
+
+             ],
     }
     # The solvers will train on all the subject except subject_test.
     # It will be the same for the sessions.
@@ -90,9 +93,9 @@ class Objective(BaseObjective):
             session_test = self.session_test
             data_session_test = data_split_session[session_test]
             data_session_train = []
-            for clé in data_split_session.items():
-                if clé[0] != str(session_test):
-                    data_session_train += data_split_session[clé[0]]
+            for key in data_split_session.items():
+                if key[0] != str(session_test):
+                    data_session_train += data_split_session[key[0]]
             X_test = SliceDataset(data_session_test, idx=0)
             y_test = np.array([y for y in SliceDataset(data_session_test,
                                                        idx=1)])

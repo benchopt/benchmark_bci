@@ -9,6 +9,7 @@ with safe_import_context() as import_ctx:
     from braindecode.augmentation import ChannelsDropout, SmoothTimeMask
     import torch
     from benchmark_utils import transformX_moabb
+    from sklearn.base import BaseEstimator, TransformerMixin
 
 
 def channels_dropout(X, y, n_augmentation):
@@ -57,3 +58,27 @@ def smooth_timemask(X, y, n_augmentation, sfreq):
         y_augm = np.concatenate((y_augm, y))
 
     return (X_augm, y_augm)
+
+
+class StandardScaler(BaseEstimator, TransformerMixin):
+    """
+    Function to get augmented covariance matrices from
+    X raw data for riemaniann solvers
+
+    """
+
+    def __init__(self):
+        """Init."""
+
+    def fit(self, X, y):
+        return self
+
+    def transform(self, X):
+        X_fin = []
+
+        for i in np.arange(X.shape[0]):
+            X_p = StandardScaler().fit_transform(X[i])
+            X_fin.append(X_p)
+        X_fin = np.array(X_fin)
+
+        return X_fin
