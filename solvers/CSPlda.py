@@ -9,8 +9,10 @@ with safe_import_context() as import_ctx:
     from mne.decoding import CSP
     from skorch.helper import to_numpy
 
-    from benchmark_utils.transformation import (channels_dropout,
-                                                smooth_timemask)
+    from benchmark_utils.transformation import (
+        channels_dropout,
+        smooth_timemask,
+    )
 
 
 # The benchmark solvers must be named `Solver` and

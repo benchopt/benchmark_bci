@@ -10,9 +10,7 @@ with safe_import_context() as import_ctx:
         channels_dropout,
         smooth_timemask,
     )
-    from benchmark_utils.pipeline import (
-        parser_pipelines
-    )
+    from benchmark_utils.pipeline import parser_pipelines
 
 # The benchmark solvers must be named `Solver` and
 # inherit from `BaseSolver` for `benchopt` to work properly.

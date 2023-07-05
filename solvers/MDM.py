@@ -8,8 +8,10 @@ with safe_import_context() as import_ctx:
     from sklearn.pipeline import make_pipeline
     from pyriemann.estimation import Covariances
     from pyriemann.classification import MDM
-    from benchmark_utils.transformation import (channels_dropout,
-                                                smooth_timemask)
+    from benchmark_utils.transformation import (
+        channels_dropout,
+        smooth_timemask,
+    )
     from skorch.helper import to_numpy
 # The benchmark solvers must be named `Solver` and
 # inherit from `BaseSolver` for `benchopt` to work properly.

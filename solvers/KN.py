@@ -10,8 +10,10 @@ with safe_import_context() as import_ctx:
 
     from pyriemann.estimation import Covariances
     from pyriemann.classification import KNearestNeighbor
-    from benchmark_utils.transformation import (channels_dropout,
-                                                smooth_timemask)
+    from benchmark_utils.transformation import (
+        channels_dropout,
+        smooth_timemask,
+    )
 
 # The benchmark solvers must be named `Solver` and
 # inherit from `BaseSolver` for `benchopt` to work properly.
