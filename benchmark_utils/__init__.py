@@ -6,7 +6,6 @@
 from .transformation import smooth_timemask, channels_dropout
 from .dataset import windows_data, split_windows_train_test
 from .augmented_dataset import AugmentedBCISolver
-from .augmented_method import Covariances_augm
 
 __all__ = [
     "smooth_timemask",
@@ -14,5 +13,4 @@ __all__ = [
     "windows_data",
     "split_windows_train_test",
     "AugmentedBCISolver",
-    "Covariances_augm",
 ]
