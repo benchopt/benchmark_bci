@@ -31,7 +31,13 @@ class Solver(BaseSolver):
             "SmoothTimeMask",
             "IdentityTransform",
             "FTSurrogate",
-        )
+        ),
+        "lr": [0.0625 * 0.01],
+        "weight_decay": [0],
+        "batch_size": [64],
+        "n_epochs": [4],
+        "proba": [0.5],
+
     }
 
     stopping_criterion = SingleRunCriterion()
@@ -51,11 +57,11 @@ class Solver(BaseSolver):
         # It is customizable for each benchmark.
         # here we want to define à function that get the data X,y from Moabb
         # and convert it to data accessible for deep learning methodes
-        lr = 0.0625 * 0.01
-        weight_decay = 0
-        batch_size = 64
-        n_epochs = 4
-        n_classes = 4
+        lr = self.lr
+        weight_decay = self.weight_decay
+        batch_size = self.batch_size
+        n_epochs = self.n_epochs
+        n_classes = len(set(y))
         n_channels = X[0].shape[0]
         input_window_samples = X[0].shape[1]
         model = ShallowFBCSPNet(
@@ -79,7 +85,7 @@ class Solver(BaseSolver):
         if self.augmentation == "SmoothTimeMask":
             transforms = [
                 SmoothTimeMask(
-                    probability=0.5,
+                    probability=self.proba,
                     mask_len_samples=int(sfreq * second),
                     random_state=seed,
                 )
@@ -89,15 +95,15 @@ class Solver(BaseSolver):
         elif self.augmentation == "ChannelDropout":
             transforms = [
                 ChannelsDropout(
-                    probability=0.5, p_drop=prob, random_state=seed
+                    probability=self.proba, p_drop=prob, random_state=seed
                 )
-                for prob in linspace(0.6, 1, 10)
+                for prob in linspace(0, 1, 10)
             ]
 
         elif self.augmentation == "FTSurrogate":
             transforms = [
                 FTSurrogate(
-                    probability=0.5,
+                    probability=self.proba,
                     phase_noise_magnitude=prob,
                     random_state=seed,
                 )
@@ -121,7 +127,8 @@ class Solver(BaseSolver):
                 "accuracy",
                 (
                     "lr_scheduler",
-                    LRScheduler("CosineAnnealingLR", T_max=n_epochs - 1),
+                    LRScheduler("CosineAnnealingLR",
+                                T_max=n_epochs - 1),
                 ),
             ],
             device=device,
@@ -129,11 +136,11 @@ class Solver(BaseSolver):
 
         self.clf = clf
 
-        self.X, self.y = X, y
+        self.X = X
+        self.y = y
 
     def run(self, n_iter):
         # This is the function that is called to evaluate the solver
-        # .
         self.clf.fit(self.X, y=self.y)
 
     def get_result(self):
