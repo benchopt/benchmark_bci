@@ -1,4 +1,4 @@
-from benchopt import BaseSolver, safe_import_context
+from benchopt import safe_import_context
 
 # Protect the import with `safe_import_context()`. This allows:
 # - skipping import to speed up autocompletion in CLI.
@@ -9,9 +9,8 @@ with safe_import_context() as import_ctx:
     from mne.decoding import CSP
     from skorch.helper import to_numpy
 
-    from benchmark_utils.transformation import (
-        channels_dropout,
-        smooth_timemask,
+    from benchmark_utils.augmented_dataset import (
+        AugmentedBCISolver,
     )
 
 
@@ -19,18 +18,18 @@ with safe_import_context() as import_ctx:
 # inherit from `BaseSolver` for `benchopt` to work properly.
 
 
-class Solver(BaseSolver):
+class Solver(AugmentedBCISolver):
     name = "CSPLDA"
     parameters = {
         "augmentation": [
-            ("SmoothTimeMask"),
-            ("ChannelsDropout"),
-            ("IdentityTransform"),
+            "SmoothTimeMask",
+            "ChannelsDropout",
+            "IdentityTransform",
         ]
     }
 
     install_cmd = "conda"
-    requirements = ["mne", "pip:torch", "pip:braindecode"]
+    requirements = ["mne"]
 
     def set_objective(self, X, y, sfreq):
         # Define the information received by each solver from the objective.
@@ -39,34 +38,7 @@ class Solver(BaseSolver):
         # passing the objective to the solver.
         # It is customizable for each benchmark.
 
-        self.X, self.y = X, y
+        self.sfreq = X.datasets[0].raw.info["sfreq"]
+        self.X = to_numpy(X)
+        self.y = y
         self.clf = make_pipeline(CSP(n_components=8), LDA())
-        self.sfreq = sfreq
-
-    def run(self, n_iter):
-        # This is the function that is called to evaluate the solver.
-        if self.augmentation == "ChannelsDropout":
-            X, y = channels_dropout(self.X, self.y, n_augmentation=n_iter)
-
-        elif self.augmentation == "SmoothTimeMask":
-            X, y = smooth_timemask(
-                self.X, self.y, n_augmentation=n_iter, sfreq=self.sfreq
-            )
-        else:
-            X = to_numpy(self.X)
-            y = self.y
-
-        self.clf.fit(X, y)
-
-    def get_next(self, n_iter):
-        return n_iter + 1
-
-    def get_result(self):
-        # Return the result from one optimization run.
-        # The outputs of this function are the arguments of `Objective.compute`
-        # This defines the benchmark's API for solvers' results.
-        # it is customizable for each benchmark.
-        return self.clf
-
-    def warmup_solver(self):
-        pass
