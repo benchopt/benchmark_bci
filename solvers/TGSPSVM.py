@@ -17,7 +17,7 @@ with safe_import_context() as import_ctx:
         AugmentedBCISolver,
     )
 # The benchmark solvers must be named `Solver` and
-# inherit from `BaseSolver` for `benchopt` to work properly.
+# inherit from `AugmentedBCISolver` for `BCI benchmark` to work properly.
 
 
 class Solver(AugmentedBCISolver):
@@ -28,7 +28,10 @@ class Solver(AugmentedBCISolver):
             "SmoothTimeMask",
             "ChannelsDropout",
             "IdentityTransform",
-        ]
+        ],
+        "covariances_estimator": ["oas"],
+        "tangentspace_metric": ["riemann"],
+        "svm_kernel": ["linear"],
     }
 
     install_cmd = "conda"
@@ -45,7 +48,7 @@ class Solver(AugmentedBCISolver):
         self.X = to_numpy(X)
         self.y = y
         self.clf = make_pipeline(
-            Covariances("oas"),
-            TangentSpace(metric="riemann"),
-            SVC(kernel="linear"),
+            Covariances(estimator=self.covariances_estimator),
+            TangentSpace(metric=self.tangentspace_metric),
+            SVC(kernel=self.svm_kernel),
         )

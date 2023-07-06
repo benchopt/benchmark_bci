@@ -20,16 +20,18 @@ class Solver(AugmentedBCISolver):
         "pipeline": [
             "AUGTangSVMGrid",
             "MDM",
+            "MDMAug",
             "TangentSpaceSVMGrid",
-            "CSPLDA",
+            "COVCSPLDA",
             "FgMDM",
             "LogVarianceLDA",
             "DLCSPautoshLDA",
             "LogVarianceSVMgrid",
-            "CSPSVMGrid",
+            "COVCSPSVMGrid",
             "TSElasticNetGrid",
             "TangentSpaceLR",
             "TRCSPLDA",
+            "DUMMY",
         ],
     }
 

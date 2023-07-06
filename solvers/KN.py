@@ -24,7 +24,11 @@ class Solver(AugmentedBCISolver):
             "SmoothTimeMask"
             "ChannelsDropout",
             "IdentityTransform",
-        ]
+        ],
+        "covariances_estimator": ["oas"],
+        "KNN_cov_metric": ["euclid"],
+        "n_neighbors": [7],
+
     }
 
     def set_objective(self, X, y, sfreq):
@@ -38,6 +42,7 @@ class Solver(AugmentedBCISolver):
         self.y = y
 
         self.clf = make_pipeline(
-            Covariances("oas"),
-            KNearestNeighbor(n_neighbors=7, metric="euclid"),
+            Covariances(estimator=self.covariances_estimator),
+            KNearestNeighbor(n_neighbors=self.n_neighbors,
+                             metric=self.KNN_cov_metric),
         )

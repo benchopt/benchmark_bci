@@ -8,15 +8,9 @@ with safe_import_context() as import_ctx:
     from sklearn.pipeline import make_pipeline
     from pyriemann.estimation import Covariances
     from pyriemann.classification import MDM
-    from benchmark_utils.transformation import (
-        channels_dropout,
-        smooth_timemask,
-    )
+
     from benchmark_utils.augmented_dataset import (
         AugmentedBCISolver,
-    )
-    from benchmark_utils.augmented_method import (
-        Covariances_augm
     )
 
     from skorch.helper import to_numpy
@@ -30,7 +24,9 @@ class Solver(AugmentedBCISolver):
         "augmentation": [
             "SmoothTimeMask",
             "Barycenter"
-        ]
+        ],
+        "covariances_estimator": ["oas"],
+        "MDM_metric": ["riemann"],
     }
 
     install_cmd = "conda"
@@ -46,30 +42,5 @@ class Solver(AugmentedBCISolver):
         self.sfreq = sfreq
         self.X = to_numpy(X)
         self.y = y
-        self.clf = make_pipeline(Covariances("oas"), MDM(metric="riemann"))
-
-    def run(self, n_iter):
-        """
-        Here, we override the `run` method of the `AugmentedBCISolver` class.
-        to adding the Barycenter augmentation method implemented by Cristopher.
-        """
-
-        # This is the function that is called to evaluate the solver.
-        if self.augmentation == "ChannelsDropout":
-            X, y = channels_dropout(self.X, self.y, n_augmentation=n_iter)
-
-        elif self.augmentation == "SmoothTimeMask":
-            X, y = smooth_timemask(
-                self.X, self.y, n_augmentation=n_iter, sfreq=self.sfreq
-            )
-            self.clf = make_pipeline(Covariances("oas"), MDM(metric="riemann"))
-        elif self.augmentation == 'Barycenter':
-            X = to_numpy(self.X)
-            y = self.y
-            self.clf = make_pipeline(Covariances_augm("cov"),
-                                     MDM(metric="riemann"))
-        else:
-            X = to_numpy(self.X)
-            y = self.y
-
-        self.clf.fit(X, y)
+        self.clf = make_pipeline(Covariances(estimator=self.covariances_estimator),
+                                 MDM(metric=self.MDM_metric))
