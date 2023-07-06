@@ -1,9 +1,10 @@
 from benchopt import safe_import_context
-from sklearn.base import BaseEstimator, TransformerMixin
 
 with safe_import_context() as import_ctx:
     from numpy import array, concatenate, unique
     from numpy.random import choice
+    from sklearn.base import BaseEstimator, TransformerMixin
+
     from pyriemann.utils.covariance import covariances
     from pyriemann.utils.mean import mean_covariance
     from skorch.helper import to_numpy
