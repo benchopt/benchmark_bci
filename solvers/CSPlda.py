@@ -5,6 +5,7 @@ from benchopt import safe_import_context
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
+    from numpy import double
     from sklearn.pipeline import make_pipeline
     from mne.decoding import CSP
     from skorch.helper import to_numpy
@@ -25,7 +26,8 @@ class Solver(AugmentedBCISolver):
             "SmoothTimeMask",
             "ChannelsDropout",
             "IdentityTransform",
-        ]
+        ],
+        "n_components": [8],
     }
 
     install_cmd = "conda"
@@ -38,7 +40,8 @@ class Solver(AugmentedBCISolver):
         # passing the objective to the solver.
         # It is customizable for each benchmark.
 
-        self.sfreq = X.datasets[0].raw.info["sfreq"]
-        self.X = to_numpy(X)
+        self.sfreq = sfreq
+        self.X = to_numpy(X).astype(double)
         self.y = y
-        self.clf = make_pipeline(CSP(n_components=8), LDA())
+        self.clf = make_pipeline(CSP(n_components=self.n_components),
+                                 LDA())
