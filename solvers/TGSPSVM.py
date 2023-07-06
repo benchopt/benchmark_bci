@@ -41,7 +41,7 @@ class Solver(AugmentedBCISolver):
         # passing the objective to the solver.
         # It is customizable for each benchmark.
 
-        self.sfreq = X.datasets[0].raw.info["sfreq"]
+        self.sfreq = sfreq
         self.X = to_numpy(X)
         self.y = y
         self.clf = make_pipeline(

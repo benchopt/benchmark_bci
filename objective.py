@@ -41,7 +41,7 @@ class Objective(BaseObjective):
     # Bump it up if the benchmark depends on a new feature of benchopt.
     min_benchopt_version = "1.3.2"
 
-    def set_data(self, dataset, paradigm_name):
+    def set_data(self, dataset, paradigm_name, sfreq):
         # The keyword arguments of this function are the keys of the dictionary
         # returned by `Dataset.get_data`. This defines the benchmark's
         # API to pass data. This is customizable for each benchmark.
@@ -97,9 +97,12 @@ class Objective(BaseObjective):
             self.X_test = splitted_data['X_test']
             self.y_test = splitted_data['y_test']
 
+        self.sfreq = sfreq
+
         return dict(
             X_train=X_train, y_train=y_train,
             X_test=X_test, y_test=y_test,
+            sfreq=sfreq,
         )
 
     def compute(self, model):
@@ -136,5 +139,5 @@ class Objective(BaseObjective):
         return dict(
             X=self.X_train,
             y=self.y_train,
-            sfreq=self.sfreq
+            sfreq=self.sfreq,
         )
