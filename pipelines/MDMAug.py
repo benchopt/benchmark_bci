@@ -1,13 +1,12 @@
-from benchopt import safe_import_context
+from numpy import array, concatenate, unique
+from numpy.random import choice
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.pipeline import make_pipeline
 
-with safe_import_context() as import_ctx:
-    from numpy import array, concatenate, unique
-    from numpy.random import choice
-    from sklearn.base import BaseEstimator, TransformerMixin
-
-    from pyriemann.utils.covariance import covariances
-    from pyriemann.utils.mean import mean_covariance
-    from skorch.helper import to_numpy
+from pyriemann.utils.covariance import covariances
+from pyriemann.utils.mean import mean_covariance
+from pyriemann.classification import MDM
+from skorch.helper import to_numpy
 
 
 class Covariances_augm(BaseEstimator, TransformerMixin):
@@ -102,3 +101,15 @@ def cov_augm(X, y, estimator="cov"):
     X = concatenate((X, X_augm))
     y = concatenate((y, y_augm))
     return X, y
+
+
+pipe = make_pipeline(
+    Covariances_augm("oas"), MDM(metric="riemann")
+)
+
+# this is what will be loaded
+PIPELINE = {
+    "name": "MDMAug",
+    "paradigms": ["LeftRightImagery"],
+    "pipeline": pipe,
+}
