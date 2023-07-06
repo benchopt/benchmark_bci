@@ -3,11 +3,16 @@
 # name `benchmark_utils`, and code defined inside will be importable using
 # the usual import syntax
 
-from benchopt import safe_import_context
+from .transformation import smooth_timemask, channels_dropout
+from .dataset import windows_data, split_windows_train_test
+from .augmented_dataset import AugmentedBCISolver
+from .augmented_method import Covariances_augm
 
-# Protect the import with `safe_import_context()`. This allows:
-# - skipping import to speed up autocompletion in CLI.
-# - getting requirements info when all dependencies are not installed.
-with safe_import_context() as import_ctx:
-    from .transformation import smooth_timemask, channels_dropout # noqa F401
-    from .dataset import windows_data # noqa F401
+__all__ = [
+    "smooth_timemask",
+    "channels_dropout",
+    "windows_data",
+    "split_windows_train_test",
+    "AugmentedBCISolver",
+    "Covariances_augm",
+]
