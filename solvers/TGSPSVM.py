@@ -1,4 +1,4 @@
-from benchopt import BaseSolver, safe_import_context
+from benchopt import safe_import_context
 
 
 # Protect the import with `safe_import_context()`. This allows:
@@ -6,48 +6,49 @@ from benchopt import BaseSolver, safe_import_context
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     from sklearn.pipeline import make_pipeline
+    from sklearn.svm import SVC
+
     from pyriemann.estimation import Covariances
     from pyriemann.tangentspace import TangentSpace
-    from sklearn.svm import SVC
-    from benchopt.stopping_criterion import SingleRunCriterion
+
+    from skorch.helper import to_numpy
+
+    from benchmark_utils.augmented_dataset import (
+        AugmentedBCISolver,
+    )
 # The benchmark solvers must be named `Solver` and
-# inherit from `BaseSolver` for `benchopt` to work properly.
+# inherit from `AugmentedBCISolver` for `BCI benchmark` to work properly.
 
 
-class Solver(BaseSolver):
+class Solver(AugmentedBCISolver):
 
-    name = 'TGSPSVM'
+    name = "TGSPSVM"
+    parameters = {
+        "augmentation": [
+            "SmoothTimeMask",
+            "ChannelsDropout",
+            "IdentityTransform",
+        ],
+        "covariances_estimator": ["oas"],
+        "tangentspace_metric": ["riemann"],
+        "svm_kernel": ["linear"],
+    }
 
-    stopping_criterion = SingleRunCriterion()
+    install_cmd = "conda"
+    requirements = ["pyriemann"]
 
-    def set_objective(self, X, y):
+    def set_objective(self, X, y, sfreq):
         # Define the information received by each solver from the objective.
         # The arguments of this function are the results of the
         # `Objective.get_objective`. This defines the benchmark's API for
         # passing the objective to the solver.
         # It is customizable for each benchmark.
-        self.X, self.y = X, y
-        self.clf = make_pipeline(Covariances("oas"),
-                                 TangentSpace(metric="riemann"),
-                                 SVC(kernel="linear")
-                                 )
 
-        # va chercher les meilleurs paramètres pour le modèle
-
-    def run(self, n_iter):
-        # This is the function that is called to evaluate the solver.
-        # HERE: add prepro Filter
-        self.clf.fit(self.X, self.y)
-
-    def get_result(self):
-        # Return the result from one optimization run.
-        # The outputs of this function are the arguments of `Objective.compute`
-        # This defines the benchmark's API for solvers' results.
-        # it is customizable for each benchmark.
-        return self.clf
-
-    # .best_estimator_ renvoie le pipeline avec
-    # les meilleurs paramètres de Gridsearch
-
-    def warmup_solver(self):
-        pass
+        self.sfreq = sfreq
+        self.X = to_numpy(X)
+        self.y = y
+        self.clf = make_pipeline(
+            Covariances(estimator=self.covariances_estimator),
+            TangentSpace(metric=self.tangentspace_metric),
+            SVC(kernel=self.svm_kernel),
+        )
