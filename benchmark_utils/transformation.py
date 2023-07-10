@@ -6,7 +6,6 @@ from benchopt import safe_import_context
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     import numpy as np
-    import matplotlib.pyplot as plt
     from numpy import concatenate
     from torch import as_tensor
     from skorch.helper import to_numpy
@@ -88,8 +87,6 @@ def smooth_timemask(
             X_torch, None, mask_len_samples=mls, mask_start_per_sample=msps
         )
         X_tr = X_tr.numpy()
-        plt.plot(X_tr[0][0])
-        plt.show()
         X_augm = concatenate((X_augm, X_tr))
         y_augm = concatenate((y_augm, y))
 
