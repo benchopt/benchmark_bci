@@ -9,6 +9,7 @@ with safe_import_context() as import_ctx:
     from sklearn.dummy import DummyClassifier
     from sklearn.model_selection import train_test_split
     from sklearn.metrics import balanced_accuracy_score as BAS
+    from sklearn.metrics import accuracy_score
 
     from skorch.helper import SliceDataset, to_numpy
     from benchmark_utils.dataset import split_windows_train_test
@@ -113,8 +114,11 @@ class Objective(BaseObjective):
             self.X_train = to_numpy(self.X_train)
             self.X_test = to_numpy(self.X_test)
 
-        score_train = model.score(self.X_train, self.y_train)
-        score_test = model.score(self.X_test, self.y_test)
+        y_pred_train = model.predict(self.X_train)
+        y_pred_test = model.predict(self.X_test)
+
+        score_train = accuracy_score(self.X_train, y_pred_train)
+        score_test = accuracy_score(self.X_test, y_pred_test)
         bl_acc = BAS(self.y_test, model.predict(self.X_test))
 
         # This method can return many metrics in a dictionary. One of these
