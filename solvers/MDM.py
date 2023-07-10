@@ -12,6 +12,7 @@ with safe_import_context() as import_ctx:
     from benchmark_utils.augmented_dataset import (
         AugmentedBCISolver,
     )
+    from benchmark_utils.transformation import Covariances_augm
 
     from skorch.helper import to_numpy
 # The benchmark solvers must be named `Solver` and
@@ -42,6 +43,12 @@ class Solver(AugmentedBCISolver):
         self.sfreq = sfreq
         self.X = to_numpy(X)
         self.y = y
-        self.clf = make_pipeline(
-            Covariances(estimator=self.covariances_estimator),
-            MDM(metric=self.MDM_metric))
+        if self.augmentation == "barycenter":
+            self.clf = make_pipeline(
+                Covariances_augm(estimator=self.covariances_estimator),
+                MDM(metric=self.MDM_metric))
+
+        else:
+            self.clf = make_pipeline(
+                Covariances(estimator=self.covariances_estimator),
+                MDM(metric=self.MDM_metric))

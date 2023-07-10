@@ -117,9 +117,9 @@ class Objective(BaseObjective):
         y_pred_train = model.predict(self.X_train)
         y_pred_test = model.predict(self.X_test)
 
-        score_train = accuracy_score(self.X_train, y_pred_train)
-        score_test = accuracy_score(self.X_test, y_pred_test)
-        bl_acc = BAS(self.y_test, model.predict(self.X_test))
+        score_train = accuracy_score(self.y_train, y_pred_train)
+        score_test = accuracy_score(self.y_test, y_pred_test)
+        bl_acc = BAS(self.y_test, y_pred_test)
 
         # This method can return many metrics in a dictionary. One of these
         # metrics needs to be `value` for convergence detection purposes.
