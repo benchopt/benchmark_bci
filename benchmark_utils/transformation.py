@@ -152,9 +152,10 @@ class Covariances_augm(BaseEstimator, TransformerMixin):
         covmats : ndarray, shape (n_matrices, n_channels, n_channels)
             Covariance matrices.
         """
-        covmats_augm = self.cov_augm(X, self.y, estimator=self.estimator)
-        print(" les matrices augmentées sont", covmats_augm)
-        print("elles sont de taille", covmats_augm.shape)
+        covmats_augm, y_augm = self.cov_augm(X,
+                                             self.y,
+                                             estimator=self.estimator)
+        self.y = y_augm
         return covmats_augm
 
     def split_classes(self, X, y):
@@ -178,19 +179,17 @@ class Covariances_augm(BaseEstimator, TransformerMixin):
             list_index = [j for j in range(len_classe)]
             for _ in range(len_classe):
                 X_rand = []
-                y_augm_class = []
                 list_index_rand = np.random.choice(list_index, 5)
                 for index in list_index_rand:
                     X_rand.append(X[index])
                 X_rand = np.array(X_rand)
                 M = mean_covariance(X_rand)
                 X_augm.append(M)
-                y_augm_class.append(i)
+                y_augm.append(i+1)
 
         X_augm = np.array(X_augm)
         y_augm = np.array(y_augm)
         X = np.concatenate((X, X_augm))
         y = np.concatenate((y, y_augm))
-        return X, y
 
-# %%
+        return X, y

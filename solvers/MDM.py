@@ -43,7 +43,7 @@ class Solver(AugmentedBCISolver):
         self.sfreq = sfreq
         self.X = to_numpy(X)
         self.y = y
-        if self.augmentation == "barycenter":
+        if self.augmentation == "Barycenter":
             self.clf = make_pipeline(
                 Covariances_augm(estimator=self.covariances_estimator),
                 MDM(metric=self.MDM_metric))
