@@ -6,10 +6,18 @@ from benchopt import safe_import_context
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     import numpy as np
-    from numpy import concatenate
     from torch import as_tensor
     from skorch.helper import to_numpy
     from braindecode.augmentation import ChannelsDropout, SmoothTimeMask
+
+
+def gen_seed():
+    # Iterator that generates random seeds for reproducibility reasons
+
+    seed = 0
+    while True:
+        yield seed
+        seed += 1
 
 
 def channels_dropout(
@@ -26,8 +34,6 @@ def channels_dropout(
         The labels.
     n_augmentation : int
         Number of augmentation to apply and increase the size of the dataset.
-    seed : int
-        Random seed.
     probability : float
         Probability of applying the tranformation.
     p_drop : float
@@ -43,17 +49,21 @@ def channels_dropout(
 
     """
 
+    seed = gen_seed()
     X_augm = to_numpy(X)
     y_augm = y
     for i in range(n_augmentation):
-        transform = ChannelsDropout(probability=probability)
+        transform = ChannelsDropout(
+                                    probability=probability,
+                                    random_state=next(seed)
+                                    )
         X_tr, _ = transform.operation(
             as_tensor(X).float(), None, p_drop=p_drop
         )
 
         X_tr = X_tr.numpy()
-        X_augm = concatenate((X_augm, X_tr))
-        y_augm = concatenate((y_augm, y))
+        X_augm = np.concatenate((X_augm, X_tr))
+        y_augm = np.concatenate((y_augm, y))
 
     return X_augm, y_augm
 
@@ -66,17 +76,19 @@ def smooth_timemask(
     and concatenate it to the original data.
     """
 
+    seed = gen_seed()
     X_torch = as_tensor(np.array(X)).float()
     y_torch = as_tensor(y).float()
     X_augm = to_numpy(X)
     y_augm = y
 
-    mask_len_samples = int(sfreq * second)
+    mls = int(sfreq * second)
     for i in range(n_augmentation):
 
         transform = SmoothTimeMask(
                                 probability=probability,
-                                mask_len_samples=mask_len_samples,
+                                mask_len_samples=mls,
+                                random_state=next(seed)
                                     )
 
         param_augm = transform.get_augmentation_params(X_torch, y_torch)
@@ -87,7 +99,7 @@ def smooth_timemask(
             X_torch, None, mask_len_samples=mls, mask_start_per_sample=msps
         )
         X_tr = X_tr.numpy()
-        X_augm = concatenate((X_augm, X_tr))
-        y_augm = concatenate((y_augm, y))
+        X_augm = np.concatenate((X_augm, X_tr))
+        y_augm = np.concatenate((y_augm, y))
 
     return X_augm, y_augm

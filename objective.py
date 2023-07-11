@@ -114,6 +114,8 @@ class Objective(BaseObjective):
             self.X_train = to_numpy(self.X_train)
             self.X_test = to_numpy(self.X_test)
 
+        # we compute here the predictions so
+        # that we don't compute it for each score
         y_pred_train = model.predict(self.X_train)
         y_pred_test = model.predict(self.X_test)
 
