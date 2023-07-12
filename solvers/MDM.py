@@ -22,8 +22,7 @@ class Solver(AugmentedBCISolver):
     name = "MDM"
     parameters = {
         "augmentation": [
-            "SmoothTimeMask",
-            "Barycenter"
+            "IdentityTransform",
         ],
         "covariances_estimator": ["oas"],
         "MDM_metric": ["riemann"],

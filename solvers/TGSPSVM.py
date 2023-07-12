@@ -25,8 +25,6 @@ class Solver(AugmentedBCISolver):
     name = "TGSPSVM"
     parameters = {
         "augmentation": [
-            "SmoothTimeMask",
-            "ChannelsDropout",
             "IdentityTransform",
         ],
         "covariances_estimator": ["oas"],

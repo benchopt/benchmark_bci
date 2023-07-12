@@ -20,11 +20,11 @@ with safe_import_context() as import_ctx:
 
 
 class Solver(AugmentedBCISolver):
+    # you can choose for all the solvers a type of augmentation
+    # among IdentityTransform, ChannelsDropout and SmoothTimeMask
     name = "CSPLDA"
     parameters = {
         "augmentation": [
-            "SmoothTimeMask",
-            "ChannelsDropout",
             "IdentityTransform",
         ],
         "n_components": [8],

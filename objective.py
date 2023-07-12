@@ -4,8 +4,7 @@ from benchopt import BaseObjective, safe_import_context
 # - skipping import to speed up autocompletion in CLI.
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
-    from numpy import array
-
+    import numpy as np
     from sklearn.dummy import DummyClassifier
     from sklearn.model_selection import train_test_split
     from sklearn.metrics import balanced_accuracy_score as BAS
@@ -33,7 +32,10 @@ class Objective(BaseObjective):
 
     parameters = {
         'evaluation_process, subject, subject_test, session_test': [
-            ('intra_subject', 1, None, None),
+            ('inter_subject', None, 1, None),
+            ('inter_subject', None, 3, None),
+            ('inter_subject', None, 4, None),
+            ('inter_subject', None, 6, None),
         ],
     }
     # The solvers will train on all the subject except subject_test.
@@ -53,7 +55,7 @@ class Objective(BaseObjective):
 
             dataset = data_split_subject[str(self.subject)]
             X = SliceDataset(dataset, idx=0)
-            y = array(list(SliceDataset(dataset, idx=1)))
+            y = np.array(list(SliceDataset(dataset, idx=1)))
 
             # maybe we need to do here different process for each subjects
 
@@ -101,9 +103,9 @@ class Objective(BaseObjective):
         self.sfreq = sfreq
 
         return dict(
-            X_train=X_train, y_train=y_train,
-            X_test=X_test, y_test=y_test,
-            sfreq=sfreq,
+            X_train=self.X_train, y_train=self.y_train,
+            X_test=self.X_test, y_test=self.y_test,
+            sfreq=self.sfreq,
         )
 
     def compute(self, model):

@@ -15,8 +15,7 @@ with safe_import_context() as import_ctx:
 class Solver(AugmentedBCISolver):
     name = "MOABBPipelines"
     parameters = {
-        "augmentation": ["SmoothTimeMask",
-                         "IdentityTransform"],
+        "augmentation": ["IdentityTransform"],
         "pipeline": [
             "AUGTangSVMGrid",
             "MDM",
