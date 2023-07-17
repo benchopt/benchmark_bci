@@ -127,10 +127,10 @@ def split_windows_train_test(data_subject_test, data_subject_train):
     """
     # Converting the windows dataset into numpy arrays
     X_test = SliceDataset(data_subject_test, idx=0)
-    y_test = array(list(SliceDataset(data_subject_test, idx=1)))
+    y_test = array(list(SliceDataset(data_subject_test, idx=1)))-1
 
     X_train = SliceDataset(data_subject_train, idx=0)
-    y_train = array(list(SliceDataset(data_subject_train, idx=1)))
+    y_train = array(list(SliceDataset(data_subject_train, idx=1)))-1
 
     return {
         "X_train": X_train,

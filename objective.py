@@ -55,7 +55,9 @@ class Objective(BaseObjective):
 
             dataset = data_split_subject[str(self.subject)]
             X = SliceDataset(dataset, idx=0)
-            y = np.array(list(SliceDataset(dataset, idx=1)))
+            y = np.array(list(SliceDataset(dataset, idx=1)))-1
+            # we have to susbtract 1 to the labels for compatibility reasons
+            # with the deep learning solvers
 
             # maybe we need to do here different process for each subjects
 
@@ -64,6 +66,8 @@ class Objective(BaseObjective):
             self.X_test, self.y_test = X_test, y_test
 
         elif self.evaluation_process == 'inter_subject':
+            # the evaluation proccess here is to leave one subject out
+            #  to test on it and train on the rest of the subjects
 
             sujet_test = self.subject_test
             data_subject_test = data_split_subject[str(sujet_test)]
@@ -82,6 +86,8 @@ class Objective(BaseObjective):
             self.y_test = splitted_data['y_test']
 
         elif self.evaluation_process == 'inter_session':
+            # the evaluation proccess here is to leave one session out
+            #  to test on it and train on the rest of the sessions
 
             data_subject = data_split_subject[str(self.subject)]
             data_split_session = data_subject.split('session')

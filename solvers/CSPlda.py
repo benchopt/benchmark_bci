@@ -20,8 +20,17 @@ with safe_import_context() as import_ctx:
 
 
 class Solver(AugmentedBCISolver):
-    # you can choose for all the solvers a type of augmentation
-    # among IdentityTransform, ChannelsDropout and SmoothTimeMask
+    '''
+    You can choose an augmentation parameter from the following list:
+    - IdentityTransform
+    - ChannelsDropout
+    - SmoothTimeMask
+
+    Running the benchmark with -n = n_augmentation
+    you will get a cuvre of solver's score
+    with respect to the number of augmentation which corresponds
+    to how much the dataset has been multiplied.
+    '''
     name = "CSPLDA"
     parameters = {
         "augmentation": [
