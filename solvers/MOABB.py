@@ -1,26 +1,28 @@
 from benchopt import safe_import_context
-
+from benchmark_utils.pipeline import parser_pipelines
+from benchmark_utils.augmented_dataset import (
+    AugmentedBCISolver,
+)
 # Protect the import with `safe_import_context()`. This allows:
 # - skipping import to speed up autocompletion in CLI.
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
-    from skorch.helper import to_numpy
-
-    from benchmark_utils.pipeline import parser_pipelines
-    from benchmark_utils.augmented_dataset import (
-        AugmentedBCISolver,
-    )
+    from skorch.utils import to_numpy
 
 
 class Solver(AugmentedBCISolver):
     name = "MOABBPipelines"
+
+    moabb_url = 'git+https://github.com/bruAristimunha/moabb@develop#egg=moabb'
+    install_cmd = 'pip'
+    requirements = ['skorch',
+                    moabb_url]
+
     parameters = {
-        "augmentation": ["SmoothTimeMask",
-                         "IdentityTransform"],
+        "augmentation": ["Sampler"],
         "pipeline": [
             "AUGTangSVMGrid",
             "MDM",
-            "MDMAug",
             "TangentSpaceSVMGrid",
             "COVCSPLDA",
             "FgMDM",
@@ -33,6 +35,7 @@ class Solver(AugmentedBCISolver):
             "TRCSPLDA",
             "DUMMY",
         ],
+
     }
 
     def set_objective(self, X, y, sfreq):

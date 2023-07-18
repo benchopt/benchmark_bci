@@ -9,7 +9,7 @@ with safe_import_context() as import_ctx:
 
     from numpy import concatenate
     from torch import as_tensor
-    from skorch.helper import to_numpy
+    from skorch.utils import to_numpy
     from braindecode.augmentation import ChannelsDropout, SmoothTimeMask
 
 
