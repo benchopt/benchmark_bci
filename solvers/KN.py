@@ -21,7 +21,7 @@ class Solver(AugmentedBCISolver):
     requirements = ["pyriemann"]
     parameters = {
         "augmentation": [
-            "IdentityTransform",
+            "SmoothTimeMask",
         ],
         "covariances_estimator": ["oas"],
         "KNN_cov_metric": ["euclid"],

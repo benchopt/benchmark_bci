@@ -32,10 +32,8 @@ class Objective(BaseObjective):
 
     parameters = {
         'evaluation_process, subject, subject_test, session_test': [
-            ('inter_subject', None, 1, None),
+            ('intra_subject', 1, None, None),
             ('inter_subject', None, 3, None),
-            ('inter_subject', None, 4, None),
-            ('inter_subject', None, 6, None),
         ],
     }
     # The solvers will train on all the subject except subject_test.
@@ -149,6 +147,8 @@ class Objective(BaseObjective):
         # for `Solver.set_objective`. This defines the
         # benchmark's API for passing the objective to the solver.
         # It is customizable for each benchmark.
+
+        X_train, X_test, y_train, y_test = self.get_split(self.X, self.y)
 
         return dict(
             X=self.X_train,

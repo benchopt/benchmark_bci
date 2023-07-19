@@ -34,7 +34,8 @@ class Solver(AugmentedBCISolver):
     name = "CSPLDA"
     parameters = {
         "augmentation": [
-            "IdentityTransform",
+            "SmoothTimeMask",
+            "ChannelsDropout",
         ],
         "n_components": [8],
     }

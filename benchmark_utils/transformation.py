@@ -13,7 +13,6 @@ with safe_import_context() as import_ctx:
 
 def gen_seed():
     # Iterator that generates random seeds for reproducibility reasons
-
     seed = 0
     while True:
         yield seed
@@ -52,7 +51,7 @@ def channels_dropout(
     seed = gen_seed()
     X_augm = to_numpy(X)
     y_augm = y
-    for i in range(n_augmentation):
+    for _ in range(n_augmentation):
         transform = ChannelsDropout(
                                     probability=probability,
                                     random_state=next(seed)
@@ -76,19 +75,19 @@ def smooth_timemask(
     and concatenate it to the original data.
     """
 
-    seed = gen_seed()
+    seed_generator = gen_seed()
     X_torch = as_tensor(np.array(X)).float()
     y_torch = as_tensor(y).float()
     X_augm = to_numpy(X)
     y_augm = y
 
     mls = int(sfreq * second)
-    for i in range(n_augmentation):
-
+    for _ in range(n_augmentation):
+        seed = next(seed_generator)
         transform = SmoothTimeMask(
                                 probability=probability,
                                 mask_len_samples=mls,
-                                random_state=next(seed)
+                                random_state=seed
                                     )
 
         param_augm = transform.get_augmentation_params(X_torch, y_torch)

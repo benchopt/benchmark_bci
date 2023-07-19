@@ -15,7 +15,7 @@ with safe_import_context() as import_ctx:
         SmoothTimeMask,
     )
     from braindecode.models import ShallowFBCSPNet
-    from numpy import linspace, pi
+    from numpy import linspace
     from skorch.callbacks import LRScheduler
 
 
@@ -107,7 +107,7 @@ class Solver(BaseSolver):
                     phase_noise_magnitude=phase_freq,
                     random_state=seed,
                 )
-                for phase_freq in linspace(0, 2 * pi, 3)
+                for phase_freq in linspace(0, 1, 3)
             ]
         else:
             transforms = [IdentityTransform()]
