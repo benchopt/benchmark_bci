@@ -39,6 +39,8 @@ class AugmentedBCISolver(BaseSolver, ABC):
                 self.X, self.y, n_augmentation=n_iter, sfreq=self.sfreq
             )
         elif self.augmentation == "Sampler":
+            n_samples = [0.1, 0.25, 0.5, 0.7, 1, 2, 5, 7, 10, 20]
+
             X, y = resample(self.X, self.y,
                             n_samples=int(len(self.X) * n_samples[n_iter]),
                             random_state=42)
