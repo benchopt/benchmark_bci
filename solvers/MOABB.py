@@ -13,10 +13,10 @@ with safe_import_context() as import_ctx:
 class Solver(AugmentedBCISolver):
     name = "MOABBPipelines"
 
-    moabb_url = 'git+https://github.com/bruAristimunha/moabb@develop#egg=moabb'
-    install_cmd = 'pip'
+    link = 'pip: git+https://github.com/Neurotechx/moabb@develop#egg=moabb'
+    install_cmd = 'conda'
     requirements = ['skorch',
-                    moabb_url]
+                    link]
 
     parameters = {
         "augmentation": ["Sampler"],
