@@ -52,6 +52,13 @@ Apart from the problem, options can be passed to ``benchopt run``, to restrict t
 
     $ benchopt run benchmark_bci -s MDM -d BNCI -r 1 -n 1
 
+We recomend to use the pre-commit configuration in the repository to ensure that the code is properly formatted before each commit:
+
+.. code-block::
+
+    $ pip install pre-commit
+    $ pre-commit install
+
 
 Use ``benchopt run -h`` for more details about these options, or visit https://benchopt.github.io/api.html.
 
