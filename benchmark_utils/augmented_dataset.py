@@ -28,7 +28,6 @@ class AugmentedBCISolver(BaseSolver, ABC):
         pass
 
     def run(self, n_iter):
-        n_samples = [0.1, 0.25, 0.5, 0.7, 1, 2, 5, 7, 10, 20]
 
         """Run the solver to evaluate it for a given number of iterations."""
         if self.augmentation == "ChannelsDropout":
