@@ -23,6 +23,7 @@ class Objective(BaseObjective):
     intall_cmd = 'conda'
     requirements = [
         'scikit-learn',
+        'pytorch:pytorch',
         'pip:braindecode',
         'pip:git+https://github.com/Neurotechx/moabb@develop#egg=moabb',
     ]
