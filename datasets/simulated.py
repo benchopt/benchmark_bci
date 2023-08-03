@@ -10,17 +10,19 @@ with safe_import_context() as import_ctx:
 
 class Dataset(BaseDataset):
     # Name to select the dataset in the CLI and to display the results.
-    name = "simulated"
-    # List of parameters to generate the datasets. The benchmark will consider
-    # the cross product for each key in the dictionary.
-    # Any parameters 'param' defined here is available as `self.param`.
+    name = "Simulated"
 
     def get_data(self):
-        # The return arguments of this function are passed as keyword arguments
-        # to `Objective.set_data`. This defines the benchmark's
-        # API to pass data. It is customizable for each benchmark.
+        """Returns the data to be passed to Objective.set_data.
+
+        Data
+        ----
+        Dataset: an instance of a braindecode.WindowsDataset
+        sfreq: the sampling frequency of the data.
+        """
 
         dataset_name = "FakeDataset"
+        paradigm_name = "LeftRightImagery"
         data = MOABBDataset(
             dataset_name=dataset_name,
             subject_ids=None,
@@ -30,10 +32,6 @@ class Dataset(BaseDataset):
             },
         )
 
-        dataset, sfreq = windows_data(data, "LeftRightImagery")
+        dataset, sfreq = windows_data(data, paradigm_name)
 
-        self.sfreq = sfreq
-
-        return dict(
-            dataset=dataset, paradigm_name="LeftRightImagery", sfreq=sfreq
-        )
+        return dict(dataset=dataset, sfreq=sfreq)
