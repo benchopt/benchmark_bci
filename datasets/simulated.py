@@ -29,6 +29,7 @@ class Dataset(BaseDataset):
             dataset_kwargs={
                 "event_list": ["left_hand", "right_hand"],
                 "paradigm": "imagery",
+                "n_subjects": 2
             },
         )
 
