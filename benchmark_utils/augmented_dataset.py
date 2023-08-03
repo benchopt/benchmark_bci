@@ -1,13 +1,7 @@
-from benchopt import BaseSolver, safe_import_context
+from benchopt import BaseSolver
 from abc import abstractmethod, ABC
 
-from benchmark_utils.transformation import (
-    channels_dropout,
-    smooth_timemask,
-)
-
-with safe_import_context() as import_ctx:
-    from skorch.helper import to_numpy
+from benchmark_utils.transformation import channels_dropout, smooth_timemask
 
 
 class AugmentedBCISolver(BaseSolver, ABC):
