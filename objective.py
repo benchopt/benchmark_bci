@@ -34,6 +34,8 @@ class Objective(BaseObjective):
         ],
     }
 
+    is_convex = False
+
     # Minimal version of benchopt required to run this benchmark.
     # Bump it up if the benchmark depends on a new feature of benchopt.
     min_benchopt_version = "1.4.1"

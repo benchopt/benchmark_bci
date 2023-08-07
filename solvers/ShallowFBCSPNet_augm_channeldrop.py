@@ -66,10 +66,15 @@ class Solver(BaseSolver):
         n_classes = len(set(y))
         n_channels = X[0].shape[0]
         input_window_samples = X[0].shape[1]
+
+        # For the fakedataset, trials are too small for the model with default
+        # pool_time_lenght=75, use a smaller one.
+        pool_time_length = min(75, input_window_samples // 2)
         model = ShallowFBCSPNet(
             n_channels,
             n_classes,
             input_window_samples=input_window_samples,
+            pool_time_length=pool_time_length,
             final_conv_length="auto",
         )
 
@@ -153,4 +158,4 @@ class Solver(BaseSolver):
             This model should have methods `score` and `predict`, that accept
             braindecode.WindowsDataset as input.
         """
-        return self.clf
+        return dict(model=self.clf)
