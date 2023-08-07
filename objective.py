@@ -1,34 +1,32 @@
 from benchopt import BaseObjective, safe_import_context
 
-# Protect the import with `safe_import_context()`. This allows:
-# - skipping import to speed up autocompletion in CLI.
-# - getting requirements info when all dependencies are not installed.
+
 with safe_import_context() as import_ctx:
     import numpy as np
     from sklearn.dummy import DummyClassifier
+    from sklearn.pipeline import make_pipeline
+    from sklearn.pipeline import FunctionTransformer
+
     from sklearn.model_selection import train_test_split
     from sklearn.metrics import balanced_accuracy_score as BAS
     from sklearn.metrics import accuracy_score
 
     from skorch.helper import SliceDataset, to_numpy
     from benchmark_utils.dataset import split_windows_train_test
-# The benchmark objective must be named `Objective` and
-# inherit from `BaseObjective` for `benchopt` to work properly.
 
 
 class Objective(BaseObjective):
 
     # Name to select the objective in the CLI and to display the results.
-    name = "BCI"
+    name = "Brain-Computer Interface"
 
-    # List of parameters for the objective. The benchmark will consider
-    # the cross product for each key in the dictionary.
-    # All parameters 'p' defined here are available as 'self.p'.
-
-    link = 'pip: git+https://github.com/Neurotechx/moabb@develop#egg=moabb'
     intall_cmd = 'conda'
-    requirements = [link,
-                    'scikit-learn']
+    requirements = [
+        'scikit-learn',
+        'pytorch:pytorch',
+        'pip:braindecode',
+        'pip:git+https://github.com/Neurotechx/moabb@develop#egg=moabb',
+    ]
 
     parameters = {
         'evaluation_process, subject, subject_test, session_test': [
@@ -36,16 +34,21 @@ class Objective(BaseObjective):
             ('inter_subject', None, 3, None),
         ],
     }
-    # The solvers will train on all the subject except subject_test.
-    # It will be the same for the sessions.
+
+    is_convex = False
+
     # Minimal version of benchopt required to run this benchmark.
     # Bump it up if the benchmark depends on a new feature of benchopt.
-    min_benchopt_version = "1.3.2"
+    min_benchopt_version = "1.4.1"
 
-    def set_data(self, dataset, paradigm_name, sfreq):
-        # The keyword arguments of this function are the keys of the dictionary
-        # returned by `Dataset.get_data`. This defines the benchmark's
-        # API to pass data. This is customizable for each benchmark.
+    def set_data(self, dataset, sfreq):
+        """Set the data retrieved from Dataset.get_data.
+
+        Data
+        ----
+        Dataset: an instance of a braindecode.WindowsDataset
+        sfreq: the sampling frequency of the data.
+        """
 
         data_split_subject = dataset.split('subject')
 
@@ -112,13 +115,22 @@ class Objective(BaseObjective):
             sfreq=self.sfreq,
         )
 
-    def compute(self, model):
-        # The arguments of this function are the outputs of the
-        # `Solver.get_result`. This defines the benchmark's API to pass
-        # solvers' result. This is customizable for each benchmark.
-        if not type(model) == 'braindecode.classifier.EEGClassifier':
-            self.X_train = to_numpy(self.X_train)
-            self.X_test = to_numpy(self.X_test)
+    def evaluate_result(self, model):
+        """Compute the evaluation metrics for the benchmark.
+
+        Result
+        ------
+        model: an instance of a fitted model.
+            This model should have methods `score` and `predict`, that accept
+            braindecode.WindowsDataset as input.
+
+        Metrics
+        -------
+        score_test: accuracy on the testing set.
+        score_train: accuracy on the training set.
+        balanced_accuracy: balanced accuracy on the testing set
+        value: error on the testing set.
+        """
 
         # we compute here the predictions so
         # that we don't compute it for each score
@@ -129,24 +141,37 @@ class Objective(BaseObjective):
         score_test = accuracy_score(self.y_test, y_pred_test)
         bl_acc = BAS(self.y_test, y_pred_test)
 
-        # This method can return many metrics in a dictionary. One of these
-        # metrics needs to be `value` for convergence detection purposes.
-        return dict(score_test=score_test,
-                    value=-score_test,
-                    score_train=score_train,
-                    balanced_accuracy=bl_acc)
+        return dict(
+            score_test=score_test,
+            score_train=score_train,
+            balanced_accuracy=bl_acc,
+            value=1-score_test,
+        )
 
-    def get_one_solution(self):
-        # Return one solution. The return value should be an object compatible
-        # with `self.compute`. This is mainly for testing purposes.
-        return DummyClassifier().fit(self.X_train, self.y_train)
+    def get_one_result(self):
+        """Return one dummy result.
+
+        Result
+        ------
+        model: an instance of a fitted model.
+            This model should have methods `score` and `predict`, that accept
+            braindecode.WindowsDataset as input.
+        """
+        clf = make_pipeline(
+            FunctionTransformer(to_numpy),
+            DummyClassifier()
+        )
+        return dict(model=clf.fit(self.X_train, self.y_train))
 
     def get_objective(self):
-        # Define the information to pass to each solver to run the benchmark.
-        # The output of this function are the keyword arguments
-        # for `Solver.set_objective`. This defines the
-        # benchmark's API for passing the objective to the solver.
-        # It is customizable for each benchmark.
+        """Pass the objective information to Solvers.set_objective.
+
+        Objective
+        ---------
+        X: training data for the model
+        y: training labels to train the model.
+        sfreq: sampling frequency to allow filtering the data.
+        """
 
         X_train, X_test, y_train, y_test = self.get_split(self.X, self.y)
 

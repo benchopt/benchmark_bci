@@ -13,22 +13,22 @@ class Dataset(BaseDataset):
 
     # Name to select the dataset in the CLI and to display the results.
     name = "BNCI"
-    parameters = {'paradigm_name': ('MotorImagery', 'LeftRightImagery')}
-    # List of parameters to generate the datasets. The benchmark will consider
-    # the cross product for each key in the dictionary.
-    # Any parameters 'param' defined here is available as `self.param`.
+    parameters = {
+        'paradigm_name': ('MotorImagery', 'LeftRightImagery')
+    }
 
     def get_data(self):
+        """Returns the data to be passed to Objective.set_data.
 
-        # The return arguments of this function are passed as keyword arguments
-        # to `Objective.set_data`. This defines the benchmark's
-        # API to pass data. It is customizable for each benchmark.
+        Data
+        ----
+        Dataset: an instance of a braindecode.WindowsDataset
+        sfreq: the sampling frequency of the data.
+        """
+
         dataset_name = "BNCI2014001"
-        data = MOABBDataset(dataset_name=dataset_name,
-                            subject_ids=None)
+        data = MOABBDataset(dataset_name=dataset_name, subject_ids=None)
 
         dataset, sfreq = windows_data(data, self.paradigm_name)
 
-        return dict(dataset=dataset,
-                    paradigm_name=self.paradigm_name,
-                    sfreq=sfreq)
+        return dict(dataset=dataset, sfreq=sfreq)

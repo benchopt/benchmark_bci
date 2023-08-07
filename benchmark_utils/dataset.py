@@ -108,8 +108,7 @@ def windows_data(
     trial_start_offset_samples = int(trial_start_offset_seconds * sfreq)
 
     # Create windows using braindecode function for this.
-    # It needs parameters to define how
-    # trials should be used.
+    # It needs parameters to define how trials should be used.
     windows_dataset = create_windows_from_events(
         dataset,
         trial_start_offset_samples=trial_start_offset_samples,

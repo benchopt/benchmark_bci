@@ -1,36 +1,40 @@
 from benchopt import safe_import_context
+from benchmark_utils.augmented_dataset import AugmentedBCISolver
 
-# Protect the import with `safe_import_context()`. This allows:
-# - skipping import to speed up autocompletion in CLI.
-# - getting requirements info when all dependencies are not installed.
+
 with safe_import_context() as import_ctx:
     from skorch.helper import to_numpy
+    from sklearn.pipeline import make_pipeline
+    from sklearn.pipeline import FunctionTransformer
 
     from benchmark_utils.pipeline import parser_pipelines
-    from benchmark_utils.augmented_dataset import (
-        AugmentedBCISolver,
-    )
 
 
 class Solver(AugmentedBCISolver):
     name = "MOABBPipelines"
     parameters = {
-        "augmentation": ["SmoothTimeMask"],
         # you can choose here any pipeline form Moabb
         "pipeline": [
             "TangentSpaceLR",
             "DUMMY",
         ],
+        **AugmentedBCISolver.parameters
     }
 
     def set_objective(self, X, y, sfreq):
-        # Define the information received by each solver from the objective.
-        # The arguments of this function are the results of the
-        # `Objective.get_objective`. This defines the benchmark's API for
-        # passing the objective to the solver.
-        # It is customizable for each benchmark.
+        """Set the objective information from Objective.get_objective.
+
+        Objective
+        ---------
+        X: training data for the model
+        y: training labels to train the model.
+        sfreq: sampling frequency to allow filtering the data.
+        """
         self.sfreq = sfreq
-        self.X = to_numpy(X)
+        self.X = X
         self.y = y
 
-        self.clf = parser_pipelines()[self.pipeline]
+        self.clf = make_pipeline(
+            FunctionTransformer(to_numpy),
+            parser_pipelines()[self.pipeline]
+        )
