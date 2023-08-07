@@ -21,9 +21,7 @@ class Dataset(BaseDataset):
 
         dataset_name = "Zhou2016"
         paradigm_name = "LeftRightImagery"
-        data = MOABBDataset(
-            dataset_name=dataset_name, subject_ids=None
-        )
+        data = MOABBDataset(dataset_name=dataset_name, subject_ids=None)
 
         dataset, sfreq = windows_data(data, paradigm_name)
 

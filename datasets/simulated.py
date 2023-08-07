@@ -34,5 +34,6 @@ class Dataset(BaseDataset):
         )
 
         dataset, sfreq = windows_data(data, paradigm_name)
+        dataset = dataset.split([0])['0']
 
         return dict(dataset=dataset, sfreq=sfreq)

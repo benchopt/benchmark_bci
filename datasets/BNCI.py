@@ -27,8 +27,7 @@ class Dataset(BaseDataset):
         """
 
         dataset_name = "BNCI2014001"
-        data = MOABBDataset(dataset_name=dataset_name,
-                            subject_ids=None)
+        data = MOABBDataset(dataset_name=dataset_name, subject_ids=None)
 
         dataset, sfreq = windows_data(data, self.paradigm_name)
 
