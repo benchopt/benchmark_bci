@@ -13,7 +13,7 @@ with safe_import_context() as import_ctx:
         SmoothTimeMask,
     )
     from braindecode.models import ShallowFBCSPNet
-    from numpy import linspace, pi
+    from numpy import linspace
     from skorch.callbacks import LRScheduler
 
 
@@ -33,7 +33,7 @@ class Solver(BaseSolver):
         "lr": [0.0625 * 0.01],
         "weight_decay": [0],
         "batch_size": [64],
-        "n_epochs": [4],
+        "n_epochs": [1],
         "proba": [0.5],
 
     }
@@ -96,7 +96,7 @@ class Solver(BaseSolver):
                     mask_len_samples=int(sfreq * second),
                     random_state=seed,
                 )
-                for second in linspace(0.1, 2, 10)
+                for second in linspace(0.1, 2, 3)
             ]
 
         elif self.augmentation == "ChannelDropout":
@@ -104,17 +104,17 @@ class Solver(BaseSolver):
                 ChannelsDropout(
                     probability=self.proba, p_drop=prob, random_state=seed
                 )
-                for prob in linspace(0, 1, 10)
+                for prob in linspace(0, 1, 3)
             ]
 
         elif self.augmentation == "FTSurrogate":
             transforms = [
                 FTSurrogate(
                     probability=self.proba,
-                    phase_noise_magnitude=prob,
+                    phase_noise_magnitude=phase_freq,
                     random_state=seed,
                 )
-                for prob in linspace(0, 2 * pi, 10)
+                for phase_freq in linspace(0, 1, 3)
             ]
         else:
             transforms = [IdentityTransform()]

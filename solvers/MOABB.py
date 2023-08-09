@@ -13,20 +13,9 @@ with safe_import_context() as import_ctx:
 class Solver(AugmentedBCISolver):
     name = "MOABBPipelines"
     parameters = {
+        # you can choose here any pipeline form Moabb
         "pipeline": [
-            "AUGTangSVMGrid",
-            "MDM",
-            "MDMAug",
-            "TangentSpaceSVMGrid",
-            "COVCSPLDA",
-            "FgMDM",
-            "LogVarianceLDA",
-            "DLCSPautoshLDA",
-            "LogVarianceSVMgrid",
-            "COVCSPSVMGrid",
-            "TSElasticNetGrid",
             "TangentSpaceLR",
-            "TRCSPLDA",
             "DUMMY",
         ],
         **AugmentedBCISolver.parameters

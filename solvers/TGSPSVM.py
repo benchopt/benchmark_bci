@@ -19,6 +19,9 @@ class Solver(AugmentedBCISolver):
 
     name = "TGSPSVM"
     parameters = {
+        "augmentation": [
+            "SmoothTimeMask",
+        ],
         "covariances_estimator": ["oas"],
         "tangentspace_metric": ["riemann"],
         "svm_kernel": ["linear"],

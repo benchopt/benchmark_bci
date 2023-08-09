@@ -2,14 +2,14 @@ from benchopt import BaseObjective, safe_import_context
 
 
 with safe_import_context() as import_ctx:
-    from numpy import array
-
+    import numpy as np
     from sklearn.dummy import DummyClassifier
     from sklearn.pipeline import make_pipeline
     from sklearn.pipeline import FunctionTransformer
 
     from sklearn.model_selection import train_test_split
     from sklearn.metrics import balanced_accuracy_score as BAS
+    from sklearn.metrics import accuracy_score
 
     from skorch.helper import SliceDataset, to_numpy
     from benchmark_utils.dataset import split_windows_train_test
@@ -31,6 +31,7 @@ class Objective(BaseObjective):
     parameters = {
         'evaluation_process, subject, subject_test, session_test': [
             ('intra_subject', 1, None, None),
+            ('inter_subject', None, 3, None),
         ],
     }
 
@@ -55,7 +56,9 @@ class Objective(BaseObjective):
 
             dataset = data_split_subject[str(self.subject)]
             X = SliceDataset(dataset, idx=0)
-            y = array(list(SliceDataset(dataset, idx=1)))
+            y = np.array(list(SliceDataset(dataset, idx=1)))-1
+            # we have to susbtract 1 to the labels for compatibility reasons
+            # with the deep learning solvers
 
             # maybe we need to do here different process for each subjects
 
@@ -64,6 +67,8 @@ class Objective(BaseObjective):
             self.X_test, self.y_test = X_test, y_test
 
         elif self.evaluation_process == 'inter_subject':
+            # the evaluation proccess here is to leave one subject out
+            #  to test on it and train on the rest of the subjects
 
             sujet_test = self.subject_test
             data_subject_test = data_split_subject[str(sujet_test)]
@@ -82,6 +87,8 @@ class Objective(BaseObjective):
             self.y_test = splitted_data['y_test']
 
         elif self.evaluation_process == 'inter_session':
+            # the evaluation proccess here is to leave one session out
+            #  to test on it and train on the rest of the sessions
 
             data_subject = data_split_subject[str(self.subject)]
             data_split_session = data_subject.split('session')
@@ -103,9 +110,9 @@ class Objective(BaseObjective):
         self.sfreq = sfreq
 
         return dict(
-            X_train=X_train, y_train=y_train,
-            X_test=X_test, y_test=y_test,
-            sfreq=sfreq,
+            X_train=self.X_train, y_train=self.y_train,
+            X_test=self.X_test, y_test=self.y_test,
+            sfreq=self.sfreq,
         )
 
     def evaluate_result(self, model):
@@ -125,9 +132,14 @@ class Objective(BaseObjective):
         value: error on the testing set.
         """
 
-        score_train = model.score(self.X_train, self.y_train)
-        score_test = model.score(self.X_test, self.y_test)
-        bl_acc = BAS(self.y_test, model.predict(self.X_test))
+        # we compute here the predictions so
+        # that we don't compute it for each score
+        y_pred_train = model.predict(self.X_train)
+        y_pred_test = model.predict(self.X_test)
+
+        score_train = accuracy_score(self.y_train, y_pred_train)
+        score_test = accuracy_score(self.y_test, y_pred_test)
+        bl_acc = BAS(self.y_test, y_pred_test)
 
         return dict(
             score_test=score_test,
@@ -160,6 +172,8 @@ class Objective(BaseObjective):
         y: training labels to train the model.
         sfreq: sampling frequency to allow filtering the data.
         """
+
+        X_train, X_test, y_train, y_test = self.get_split(self.X, self.y)
 
         return dict(
             X=self.X_train,
