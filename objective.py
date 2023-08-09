@@ -11,7 +11,8 @@ with safe_import_context() as import_ctx:
     from sklearn.model_selection import train_test_split
     from sklearn.metrics import balanced_accuracy_score as BAS
 
-    from skorch.helper import SliceDataset, to_numpy
+    from skorch.helper import SliceDataset
+    from skorch.utils import to_numpy
     from benchmark_utils.dataset import split_windows_train_test
 
 

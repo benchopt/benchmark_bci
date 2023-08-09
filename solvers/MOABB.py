@@ -1,6 +1,6 @@
 from benchopt import safe_import_context
-from benchmark_utils.augmented_dataset import AugmentedBCISolver
 
+from benchmark_utils.augmented_dataset import AugmentedBCISolver
 
 with safe_import_context() as import_ctx:
     from skorch.helper import to_numpy

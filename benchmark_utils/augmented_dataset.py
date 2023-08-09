@@ -1,7 +1,11 @@
-from benchopt import BaseSolver
+from benchopt import BaseSolver, safe_import_context
 from abc import abstractmethod, ABC
-
 from benchmark_utils.transformation import channels_dropout, smooth_timemask
+# Protect the import with `safe_import_context()`. This allows:
+# - skipping import to speed up autocompletion in CLI.
+# - getting requirements info when all dependencies are not installed.
+with safe_import_context() as import_ctx:
+    from sklearn.utils import resample
 
 
 class AugmentedBCISolver(BaseSolver, ABC):
@@ -46,6 +50,12 @@ class AugmentedBCISolver(BaseSolver, ABC):
             X, y = smooth_timemask(
                 self.X, self.y, n_augmentation=n_augmentation, sfreq=self.sfreq
             )
+        elif self.augmentation == "Sampler":
+            samples_list = [0.1, 0.25, 0.5, 0.7, 1, 2, 3, 5, 7, 10, 20]
+            n_samples = int(len(self.X) * samples_list[n_augmentation])
+            X, y = resample(self.X, self.y,
+                            n_samples=n_samples,
+                            random_state=42)
         else:
             X = self.X
             y = self.y
