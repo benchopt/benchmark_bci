@@ -1,8 +1,6 @@
 from benchopt import BaseSolver, safe_import_context
 
-# Protect the import with `safe_import_context()`. This allows:
-# - skipping import to speed up autocompletion in CLI.
-# - getting requirements info when all dependencies are not installed.
+
 with safe_import_context() as import_ctx:
     import torch
     from benchopt.stopping_criterion import SingleRunCriterion
@@ -50,13 +48,17 @@ class Solver(BaseSolver):
     # and input_window_samples
 
     def set_objective(self, X, y, sfreq):
-        # Define the information received by each solver from the objective.
-        # The arguments of this function are the results of the
-        # `Objective.get_objective`. This defines the benchmark's API for
-        # passing the objective to the solver.
-        # It is customizable for each benchmark.
-        # here we want to define à function that get the data X,y from Moabb
-        # and convert it to data accessible for deep learning methodes
+        """Set the objective information from Objective.get_objective.
+
+        Objective
+        ---------
+        X: training data for the model
+        y: training labels to train the model.
+        sfreq: sampling frequency to allow filtering the data.
+        """
+
+        # here we want to define a function that gets the data X,y from Moabb
+        # and converts it to data accessible for deep learning methods
         lr = self.lr
         weight_decay = self.weight_decay
         batch_size = self.batch_size
@@ -64,10 +66,15 @@ class Solver(BaseSolver):
         n_classes = len(set(y))
         n_channels = X[0].shape[0]
         input_window_samples = X[0].shape[1]
+
+        # For the fakedataset, trials are too small for the model with default
+        # pool_time_lenght=75, use a smaller one.
+        pool_time_length = min(75, input_window_samples // 2)
         model = ShallowFBCSPNet(
             n_channels,
             n_classes,
             input_window_samples=input_window_samples,
+            pool_time_length=pool_time_length,
             final_conv_length="auto",
         )
 
@@ -127,8 +134,7 @@ class Solver(BaseSolver):
                 "accuracy",
                 (
                     "lr_scheduler",
-                    LRScheduler("CosineAnnealingLR",
-                                T_max=n_epochs - 1),
+                    LRScheduler("CosineAnnealingLR", T_max=n_epochs - 1),
                 ),
             ],
             device=device,
@@ -144,11 +150,12 @@ class Solver(BaseSolver):
         self.clf.fit(self.X, y=self.y)
 
     def get_result(self):
-        # Return the result from one optimization run.
-        # The outputs of this function are the arguments of `Objective.compute`
-        # This defines the benchmark's API for solvers' results.
-        # it is customizable for each benchmark.
-        return self.clf
+        """Return the model to `Objective.evaluate_result`.
 
-    def warmup_solver(self):
-        pass
+        Result
+        ------
+        model: an instance of a fitted model.
+            This model should have methods `score` and `predict`, that accept
+            braindecode.WindowsDataset as input.
+        """
+        return dict(model=self.clf)
