@@ -85,10 +85,10 @@ def smooth_timemask(
     for _ in range(n_augmentation):
         seed = next(seed_generator)
         transform = SmoothTimeMask(
-                                probability=probability,
-                                mask_len_samples=mls,
-                                random_state=seed
-                                    )
+            probability=probability,
+            mask_len_samples=mls,
+            random_state=rng
+        )
 
         param_augm = transform.get_augmentation_params(X_torch, y_torch)
         mls = param_augm["mask_len_samples"]
