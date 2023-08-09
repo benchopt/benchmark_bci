@@ -9,6 +9,7 @@ with safe_import_context() as import_ctx:
 
     from benchmark_utils.pipeline import parser_pipelines
 
+
 class Solver(AugmentedBCISolver):
     name = "MOABBPipelines"
     parameters = {
