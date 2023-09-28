@@ -32,7 +32,6 @@ class Solver(AugmentedBCISolver):
     parameters = {
         "df": [10],
         "covariances_estimator" : ["scm"],
-        "augmentation" : ["IdentityTransform"],
         **AugmentedBCISolver.parameters
     }
 
