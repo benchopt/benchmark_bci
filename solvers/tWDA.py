@@ -7,10 +7,12 @@ with safe_import_context() as import_ctx:
     from sklearn.pipeline import FunctionTransformer
     from sklearn.base import BaseEstimator, ClassifierMixin, TransformerMixin
     from sklearn.utils.extmath import softmax
-
+    
+    import pyriemann
     from pyriemann.estimation import Covariances
     from pyriemann.utils.base import logm,_matrix_operator,sqrtm
-
+    
+    import joblil
     from joblib import Parallel, delayed
 
     from skorch.helper import to_numpy
@@ -36,7 +38,7 @@ class Solver(AugmentedBCISolver):
     }
 
     install_cmd = "conda"
-    requirements = ["pyriemann"]
+    requirements = ["pyriemann","pip:pymanopt","pip:joblib"]
 
     def set_objective(self, X, y, sfreq):
         """Set the objective information from Objective.get_objective.
@@ -55,12 +57,12 @@ class Solver(AugmentedBCISolver):
         self.clf = make_pipeline(
             FunctionTransformer(to_numpy),
             Covariances(estimator=self.covariances_estimator),
-            tWDA(n=self.n,df=self.df)
+            tWDA_(n=self.n,df=self.df)
         )
         
         
         
-class tWDA(BaseEstimator, ClassifierMixin, TransformerMixin):
+class tWDA_(BaseEstimator, ClassifierMixin, TransformerMixin):
     """Classification by t-Wishart.
     """
     
