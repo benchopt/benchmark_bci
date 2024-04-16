@@ -11,6 +11,8 @@ with safe_import_context() as import_ctx:
 
     from skorch.helper import to_numpy
     from benchmark_utils.splitter import IntraSessionSplitter
+    from benchmark_utils.splitter import InterSessionSplitter
+    from benchmark_utils.splitter import InterSubjectSplitter
 
 
 class Objective(BaseObjective):
@@ -27,8 +29,10 @@ class Objective(BaseObjective):
     ]
 
     parameters = {
-        'evaluation_process, subject, subject_test, session_test': [
-            ('intra_subject', 1, None, None),
+        'evaluation_process': [
+            'intra_session',
+            'inter_sessions',
+            'inter_subjects',
         ],
     }
 
@@ -36,7 +40,7 @@ class Objective(BaseObjective):
 
     # Minimal version of benchopt required to run this benchmark.
     # Bump it up if the benchmark depends on a new feature of benchopt.
-    min_benchopt_version = "1.5"
+    min_benchopt_version = "1.5.2"
 
     def set_data(self, dataset, sfreq):
         """Set the data retrieved from Dataset.get_data.
@@ -50,8 +54,18 @@ class Objective(BaseObjective):
         self.dataset = dataset
         self.sfreq = sfreq
 
-        self.cv = IntraSessionSplitter(n_folds=2)
-        self.metadate_cv = dict(df_meta=dataset.get_metadata())
+        if self.evaluation_process == 'intra_session':
+            self.cv = IntraSessionSplitter(n_folds=2)
+        elif self.evaluation_process == 'inter_sessions':
+            self.cv = InterSessionSplitter()
+        elif self.evaluation_process == 'inter_subjects':
+            self.cv = InterSubjectSplitter(n_folds=2)
+        else:
+            raise ValueError(
+                f"unknown evaluation process '{self.evaluation_process}'"
+            )
+
+        self.cv_metadata = dict(df_meta=dataset.get_metadata())
 
     def evaluate_result(self, model):
         """Compute the evaluation metrics for the benchmark.
@@ -94,7 +108,8 @@ class Objective(BaseObjective):
             FunctionTransformer(to_numpy),
             DummyClassifier()
         )
-        return dict(model=clf.fit(self.X_train, self.y_train))
+        X_train, _, y_train, _ = self.get_split(self.dataset)
+        return dict(model=clf.fit(X_train, y_train))
 
     def split(self, cv_fold, *arrays):
         return cv_fold
