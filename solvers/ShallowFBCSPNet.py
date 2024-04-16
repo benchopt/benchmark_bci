@@ -3,7 +3,6 @@ from benchopt import BaseSolver, safe_import_context
 
 with safe_import_context() as import_ctx:
     import torch
-    from benchopt.stopping_criterion import SingleRunCriterion
     from braindecode import EEGClassifier
     from braindecode.augmentation import (
         AugmentedDataLoader,
@@ -38,14 +37,10 @@ class Solver(BaseSolver):
 
     }
 
-    stopping_criterion = SingleRunCriterion()
-
     install_cmd = "conda"
     requirements = ["pip:torch", "pip:braindecode"]
 
-    # here maybe we need to define for each solvers a other input named
-    # metadata which would be a dictionarry where we could get n_channels
-    # and input_window_samples
+    sampling_strategy = "run_once"
 
     def set_objective(self, X, y, sfreq):
         """Set the objective information from Objective.get_objective.

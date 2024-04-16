@@ -1,5 +1,4 @@
-from benchopt import safe_import_context
-from benchmark_utils.augmented_dataset import AugmentedBCISolver
+from benchopt import safe_import_context, BaseSolver
 
 
 with safe_import_context() as import_ctx:
@@ -15,18 +14,19 @@ with safe_import_context() as import_ctx:
 
 # The benchmark solvers must be named `Solver` and
 # inherit from `AugmentedBCISolver` for `BCI benchmark` to work properly.
-class Solver(AugmentedBCISolver):
+class Solver(BaseSolver):
 
     name = "TGSPSVM"
     parameters = {
         "covariances_estimator": ["oas"],
         "tangentspace_metric": ["riemann"],
         "svm_kernel": ["linear"],
-        **AugmentedBCISolver.parameters,
     }
 
     install_cmd = "conda"
     requirements = ["pyriemann"]
+
+    sampling_strategy = "run_once"
 
     def set_objective(self, X, y, sfreq):
         """Set the objective information from Objective.get_objective.
@@ -47,3 +47,22 @@ class Solver(AugmentedBCISolver):
             TangentSpace(metric=self.tangentspace_metric),
             SVC(kernel=self.svm_kernel),
         )
+
+    def run(self, _):
+        """Run the solver to evaluate it for a given number of augmentation.
+
+        With this dataset, we consider that the performance curve is sampled
+        for various number of augmentation applied to the dataset.
+        """
+        self.clf.fit(self.X, self.y)
+
+    def get_result(self):
+        """Return the model to `Objective.evaluate_result`.
+
+        Result
+        ------
+        model: an instance of a fitted model.
+            This model should have methods `score` and `predict`, that accept
+            braindecode.WindowsDataset as input.
+        """
+        return dict(model=self.clf)

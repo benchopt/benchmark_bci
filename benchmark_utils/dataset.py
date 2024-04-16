@@ -4,13 +4,15 @@ from benchopt import safe_import_context
 # - skipping import to speed up autocompletion in CLI.
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
-    from numpy import multiply, array
-    from skorch.helper import SliceDataset
+    from numpy import multiply
     from braindecode.preprocessing import (
         preprocess,
         Preprocessor,
     )
     from braindecode.preprocessing import create_windows_from_events
+
+    from benchopt.config import get_setting
+    from joblib import Memory
 
 
 def pre_process_windows_dataset(
@@ -93,7 +95,8 @@ def windows_data(
     elif paradigm_name == "MotorImagery":
         mapping = {"left_hand": 1, "right_hand": 2, "feet": 4, "tongue": 3}
 
-    dataset = pre_process_windows_dataset(
+    mem = Memory(get_setting('cache') or "__cache__", verbose=0)
+    dataset = mem.cache(pre_process_windows_dataset)(
         dataset,
         low_cut_hz=low_cut_hz,
         high_cut_hz=high_cut_hz,
@@ -118,22 +121,3 @@ def windows_data(
     )
 
     return windows_dataset, sfreq
-
-
-def split_windows_train_test(data_subject_test, data_subject_train):
-    """
-    Split the window dataset into train and test sets.
-    """
-    # Converting the windows dataset into numpy arrays
-    X_test = SliceDataset(data_subject_test, idx=0)
-    y_test = array(list(SliceDataset(data_subject_test, idx=1)))
-
-    X_train = SliceDataset(data_subject_train, idx=0)
-    y_train = array(list(SliceDataset(data_subject_train, idx=1)))
-
-    return {
-        "X_train": X_train,
-        "y_train": y_train,
-        "X_test": X_test,
-        "y_test": y_test,
-    }
