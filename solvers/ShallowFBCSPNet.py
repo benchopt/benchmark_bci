@@ -37,9 +37,6 @@ class Solver(BaseSolver):
 
     }
 
-    install_cmd = "conda"
-    requirements = ["pip:torch", "pip:braindecode"]
-
     sampling_strategy = "run_once"
 
     def set_objective(self, X, y, sfreq):
