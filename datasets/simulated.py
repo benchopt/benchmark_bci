@@ -12,7 +12,7 @@ _fakedataset_kwargs = {
     "n_runs": 2,
     "n_subjects": 3,
     "paradigm": "imagery",
-    "duration": 3869, # from bnci
+    "duration": 3869,  # from bnci
     "sfreq": 250,
     "event_list": ("left_hand", "right_hand"),
     "channels": ("C5", "C3", "C1"),
