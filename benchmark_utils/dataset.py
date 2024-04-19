@@ -118,6 +118,8 @@ def windows_data(
         trial_stop_offset_samples=0,
         preload=True,
         mapping=mapping,
+        drop_bad_windows=True,
+        drop_last_window=True,
     )
 
     return windows_dataset, sfreq
