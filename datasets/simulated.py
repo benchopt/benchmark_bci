@@ -8,14 +8,15 @@ with safe_import_context() as import_ctx:
     from benchmark_utils import windows_data
 
 _fakedataset_kwargs = {
-    "n_sessions": 2,
+    "n_sessions": 3,
     "n_runs": 2,
     "n_subjects": 3,
     "paradigm": "imagery",
-    "duration": 3869,
+    "duration": 3869, # from bnci
     "sfreq": 250,
     "event_list": ("left_hand", "right_hand"),
     "channels": ("C5", "C3", "C1"),
+    "annotations": True,
 }
 
 
@@ -41,6 +42,5 @@ class Dataset(BaseDataset):
         )
 
         dataset, sfreq = windows_data(data, paradigm_name)
-        dataset = dataset.split([0])['0']
 
         return dict(dataset=dataset, sfreq=sfreq)
