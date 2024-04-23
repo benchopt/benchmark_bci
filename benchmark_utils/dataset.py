@@ -90,10 +90,10 @@ def windows_data(
     # We use two classes from the dataset
     # 1. left-hand vs right-hand motor imagery
     if paradigm_name == "LeftRightImagery":
-        mapping = {"left_hand": 1, "right_hand": 2}
+        mapping = {"left_hand": 0, "right_hand": 1}
 
     elif paradigm_name == "MotorImagery":
-        mapping = {"left_hand": 1, "right_hand": 2, "feet": 4, "tongue": 3}
+        mapping = {"left_hand": 0, "right_hand": 1, "feet": 2, "tongue": 3}
 
     mem = Memory(get_setting('cache') or "__cache__", verbose=0)
     dataset = mem.cache(pre_process_windows_dataset)(

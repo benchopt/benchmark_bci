@@ -71,6 +71,7 @@ class Solver(BaseSolver):
             n_times=n_times,
             pool_time_length=pool_time_length,
             final_conv_length="auto",
+            add_log_softmax=False
         )
 
         cuda = torch.cuda.is_available()
@@ -118,7 +119,7 @@ class Solver(BaseSolver):
             model,
             iterator_train=AugmentedDataLoader,
             iterator_train__transforms=transforms,
-            criterion=torch.nn.NLLLoss,
+            criterion=torch.nn.CrossEntropyLoss,
             optimizer=torch.optim.AdamW,
             train_split=None,
             optimizer__lr=lr,
