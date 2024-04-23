@@ -12,7 +12,7 @@ with safe_import_context() as import_ctx:
         SmoothTimeMask,
     )
     from braindecode.models import ShallowFBCSPNet
-    from numpy import linspace, pi
+    from numpy import linspace
     from skorch.callbacks import LRScheduler
     from skorch.dataset import ValidSplit
 
