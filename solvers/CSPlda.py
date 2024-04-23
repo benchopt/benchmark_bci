@@ -19,9 +19,6 @@ class Solver(BaseSolver):
         "n_components": [8],
     }
 
-    install_cmd = "conda"
-    requirements = ["mne"]
-
     sampling_strategy = 'run_once'
 
     def set_objective(self, X, y, sfreq):
