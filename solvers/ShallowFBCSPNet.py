@@ -135,7 +135,12 @@ class Solver(BaseSolver):
         self.clf = clf
 
         self.X = X
-        self.y = array([label-1 for label in y])
+        have_0_label = any([label == 0 for label in y])
+
+        if have_0_label:
+            self.y = array([label for label in y])
+        else:
+            self.y = array([label-1 for label in y])
 
     def run(self, n_iter):
         # This is the function that is called to evaluate the solver
