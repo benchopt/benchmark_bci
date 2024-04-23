@@ -14,6 +14,7 @@ with safe_import_context() as import_ctx:
     from braindecode.models import ShallowFBCSPNet
     from numpy import linspace, pi
     from skorch.callbacks import LRScheduler
+    from skorch.dataset import ValidSplit
 
 
 # The benchmark solvers must be named `Solver` and
@@ -107,7 +108,7 @@ class Solver(BaseSolver):
                     phase_noise_magnitude=prob,
                     random_state=seed,
                 )
-                for prob in linspace(0, 2 * pi, 10)
+                for prob in linspace(0, 1, 10)
             ]
         else:
             transforms = [IdentityTransform()]
@@ -118,7 +119,7 @@ class Solver(BaseSolver):
             iterator_train__transforms=transforms,
             criterion=torch.nn.CrossEntropyLoss,
             optimizer=torch.optim.AdamW,
-            train_split=None,
+            train_split=ValidSplit(0.2, stratified=True, random_state=seed),
             optimizer__lr=lr,
             max_epochs=n_epochs,
             optimizer__weight_decay=weight_decay,
