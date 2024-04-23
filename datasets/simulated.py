@@ -7,6 +7,8 @@ with safe_import_context() as import_ctx:
     from braindecode.datasets import MOABBDataset
     from benchmark_utils import windows_data
 
+from braindecode.datasets import MOABBDataset
+
 _fakedataset_kwargs = {
     "n_sessions": 3,
     "n_runs": 2,
