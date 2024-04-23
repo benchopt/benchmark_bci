@@ -90,7 +90,7 @@ def windows_data(
     # We use two classes from the dataset
     # 1. left-hand vs right-hand motor imagery
     if paradigm_name == "LeftRightImagery":
-        mapping = {"left_hand": 0, "right_hand": 1}
+        mapping = {"left_hand": 1, "right_hand": 2} # Fix this later
 
     elif paradigm_name == "MotorImagery":
         mapping = {"left_hand": 0, "right_hand": 1, "feet": 2, "tongue": 3}
