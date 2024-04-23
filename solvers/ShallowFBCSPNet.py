@@ -3,6 +3,7 @@ from benchopt import BaseSolver, safe_import_context
 
 with safe_import_context() as import_ctx:
     import torch
+    from numpy import array
     from braindecode import EEGClassifier
     from braindecode.augmentation import (
         AugmentedDataLoader,
@@ -25,10 +26,7 @@ class Solver(BaseSolver):
     name = "ShallowFBCSPNet"
     parameters = {
         "augmentation": (
-            "ChannelsDropout",
-            "SmoothTimeMask",
             "IdentityTransform",
-            "FTSurrogate",
         ),
         "lr": [0.0625 * 0.01],
         "weight_decay": [0],
@@ -137,7 +135,7 @@ class Solver(BaseSolver):
         self.clf = clf
 
         self.X = X
-        self.y = y
+        self.y = array([label-1 for label in y])
 
     def run(self, n_iter):
         # This is the function that is called to evaluate the solver
