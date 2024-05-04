@@ -25,7 +25,7 @@ class Objective(BaseObjective):
         'pip:scikit-learn',
         'pytorch:pytorch',
         'pip:git+https://github.com/Neurotechx/moabb@develop#egg=moabb',
-        'pip:git+braindecode',
+        'pip:braindecode',
     ]
 
     parameters = {
