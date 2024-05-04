@@ -3,7 +3,6 @@ from benchopt import BaseSolver, safe_import_context
 
 with safe_import_context() as import_ctx:
     import torch
-    from numpy import array
     from braindecode import EEGClassifier
     from braindecode.augmentation import (
         AugmentedDataLoader,
