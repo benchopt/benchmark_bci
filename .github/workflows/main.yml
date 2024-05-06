@@ -16,12 +16,11 @@ on:
 
 jobs:
   benchopt_dev:
-    uses: benchopt/template_benchmark/.github/workflows/test_benchmarks.yml@CI_extra_args
+    uses: benchopt/template_benchmark/.github/workflows/test_benchmarks.yml@main
     with:
       benchopt_branch: benchopt@main
-      extra_args: -sx
   benchopt_release:
-    uses: benchopt/template_benchmark/.github/workflows/test_benchmarks.yml@CI_extra_args
+    uses: benchopt/template_benchmark/.github/workflows/test_benchmarks.yml@main
     with:
       benchopt_version: latest
   lint:
