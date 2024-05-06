@@ -46,6 +46,8 @@ class Solver(BaseSolver):
         y: training labels to train the model.
         sfreq: sampling frequency to allow filtering the data.
         """
+        import faulthandler
+        faulthandler.dump_traceback_later(30)
 
         # here we want to define a function that gets the data X,y from Moabb
         # and converts it to data accessible for deep learning methods
