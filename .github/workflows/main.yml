@@ -18,7 +18,7 @@ jobs:
   benchopt_dev:
     uses: benchopt/template_benchmark/.github/workflows/test_benchmarks.yml@main
     with:
-      benchopt_branch: tommoral@ENH_more_robust_version_check
+      benchopt_branch: benchopt@main
   benchopt_release:
     uses: benchopt/template_benchmark/.github/workflows/test_benchmarks.yml@main
     with:
