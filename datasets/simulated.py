@@ -8,6 +8,19 @@ with safe_import_context() as import_ctx:
     from benchmark_utils import windows_data
 
 
+_fakedataset_kwargs = {
+    "n_sessions": 3,
+    "n_runs": 2,
+    "n_subjects": 3,
+    "paradigm": "imagery",
+    "duration": 3869,  # from bnci
+    "sfreq": 250,
+    "event_list": ("left_hand", "right_hand"),
+    "channels": ("C5", "C3", "C1"),
+    "annotations": True,
+}
+
+
 class Dataset(BaseDataset):
     # Name to select the dataset in the CLI and to display the results.
     name = "Simulated"
@@ -26,14 +39,9 @@ class Dataset(BaseDataset):
         data = MOABBDataset(
             dataset_name=dataset_name,
             subject_ids=None,
-            dataset_kwargs={
-                "event_list": ["left_hand", "right_hand"],
-                "paradigm": "imagery",
-                "n_subjects": 2
-            },
+            dataset_kwargs=_fakedataset_kwargs,
         )
 
         dataset, sfreq = windows_data(data, paradigm_name)
-        dataset = dataset.split([0])['0']
 
         return dict(dataset=dataset, sfreq=sfreq)

@@ -26,7 +26,7 @@ class Dataset(BaseDataset):
         sfreq: the sampling frequency of the data.
         """
 
-        dataset_name = "BNCI2014001"
+        dataset_name = "BNCI2014_001"
         data = MOABBDataset(dataset_name=dataset_name, subject_ids=None)
 
         dataset, sfreq = windows_data(data, self.paradigm_name)
