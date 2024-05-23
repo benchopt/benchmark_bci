@@ -24,7 +24,7 @@ class Objective(BaseObjective):
     requirements = [
         'scikit-learn',
         'pytorch:pytorch',
-        'pip:git+wandb',
+        'wandb',
         'pip:git+https://github.com/Neurotechx/moabb@develop#egg=moabb',
         'pip:git+https://github.com/braindecode/braindecode@master#egg=braindecode',
     ]
