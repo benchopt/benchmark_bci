@@ -26,7 +26,7 @@ class Objective(BaseObjective):
         'pytorch:pytorch',
         'wandb',
         'pip:git+https://github.com/Neurotechx/moabb@develop#egg=moabb',
-        'pip:git+https://github.com/braindecode/braindecode@master#egg=braindecode',
+        'pip:git+https://github.com/braindecode/braindecode@master#egg=braindecode', # noqa
     ]
 
     parameters = {
