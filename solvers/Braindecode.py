@@ -4,9 +4,7 @@ from benchopt import BaseSolver, safe_import_context
 with safe_import_context() as import_ctx:
     import torch
     from wandb import init
-    from numpy import unique
     from braindecode import EEGClassifier
-    from skorch.helper import SliceDataset
     from skorch.dataset import ValidSplit
     from skorch.callbacks import LRScheduler, WandbLogger, EarlyStopping
 
@@ -28,6 +26,8 @@ class Solver(BaseSolver):
             "AttentionBaseNet",
             "Labram",
             "SPARCNet",
+            "EEGSimpleConv",
+            "ContraWR",
         ],
         "batch_size": [64],
         "valid_set": [0.2],
@@ -67,6 +67,7 @@ class Solver(BaseSolver):
             module__n_outputs=n_classes,
             module__n_chans=n_chans,
             module__n_times=n_times,
+            module__sfreq=self.sfreq,
             criterion=torch.nn.CrossEntropyLoss,
             optimizer=torch.optim.AdamW,
             optimizer__lr=self.learning_rate,
