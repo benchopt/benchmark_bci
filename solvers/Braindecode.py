@@ -37,12 +37,6 @@ class Solver(BaseSolver):
         "weight_decay": [0]
     }
 
-    requirements = [
-        'scikit-learn',
-        'pytorch:pytorch',
-        'pip:git+https://github.com/Neurotechx/moabb@develop#egg=moabb',
-        'pip:git+https://github.com/braindecode/braindecode@master#egg=braindecode',
-    ]
     sampling_strategy = "run_once"
 
     def set_objective(self, X, y, sfreq):
