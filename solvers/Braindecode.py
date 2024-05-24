@@ -3,10 +3,11 @@ from benchopt import BaseSolver, safe_import_context
 
 with safe_import_context() as import_ctx:
     import torch
-    from wandb import init
+    # from wandb import init
     from braindecode import EEGClassifier
     from skorch.dataset import ValidSplit
-    from skorch.callbacks import LRScheduler, WandbLogger, EarlyStopping
+    from skorch.callbacks import LRScheduler, EarlyStopping
+    # from skorch.callbacks import WandbLogger
 
 
 class Solver(BaseSolver):
@@ -54,10 +55,7 @@ class Solver(BaseSolver):
 
         device = "cuda" if torch.cuda.is_available() else "cpu"
 
-        wandb_run = init(
-            project="benchmark",
-            name=f"{self.model}",
-        )
+        # wandb_run = init(project="benchmark", name=f"{self.model}",)
         n_classes = len(set(y))
         n_chans = X[0].shape[0]
         n_times = X[0].shape[1]
@@ -82,7 +80,7 @@ class Solver(BaseSolver):
             optimizer__weight_decay=self.weight_decay,
             classes=list(range(n_classes)),
             callbacks=[
-                WandbLogger(wandb_run, save_model=True),
+                # WandbLogger(wandb_run, save_model=True),
                 EarlyStopping(
                     monitor="valid_loss",
                     patience=self.patience,
