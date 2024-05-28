@@ -31,8 +31,6 @@ class Objective(BaseObjective):
 
     parameters = {
         'evaluation_process': [
-            'intra_session',
-            'inter_sessions',
             'inter_subjects',
         ],
     }
@@ -60,7 +58,7 @@ class Objective(BaseObjective):
         elif self.evaluation_process == 'inter_sessions':
             self.cv = InterSessionSplitter()
         elif self.evaluation_process == 'inter_subjects':
-            self.cv = InterSubjectSplitter(n_folds=2)
+            self.cv = InterSubjectSplitter(n_folds=5)
         else:
             raise ValueError(
                 f"unknown evaluation process '{self.evaluation_process}'"
