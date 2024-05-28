@@ -3,12 +3,13 @@ from benchopt import BaseSolver, safe_import_context
 
 with safe_import_context() as import_ctx:
     import torch
-    # from wandb import init
+    import wandb
+    from wandb import init
     from braindecode import EEGClassifier
     from skorch.dataset import ValidSplit
-    from skorch.callbacks import LRScheduler, EarlyStopping
-    # from skorch.callbacks import WandbLogger
-
+    from skorch.callbacks import LRScheduler, EarlyStopping, EpochScoring
+    from skorch.callbacks import WandbLogger
+    import time
 
 class Solver(BaseSolver):
     name = "BraindecodeModels"
@@ -32,10 +33,11 @@ class Solver(BaseSolver):
         ],
         "batch_size": [64],
         "valid_set": [0.2],
-        "patience": [10],
-        "max_epochs": [100],
+        "patience": [50],
+        "max_epochs": [150],
         "learning_rate": [0.0625 * 0.01],
-        "weight_decay": [0]
+        "weight_decay": [0],
+        "random_state": [42],
     }
 
     sampling_strategy = "run_once"
@@ -54,11 +56,30 @@ class Solver(BaseSolver):
         self.y = y
 
         device = "cuda" if torch.cuda.is_available() else "cpu"
-
-        # wandb_run = init(project="benchmark", name=f"{self.model}",)
+        wandb.login(key="d4c4b9c56bda8a814e122301ad70b0d38f014728")
+        ts = time.time()
+        wandb_run = init(project="benchmark", name=f"{self.model}-intersubject-{ts}",reinit=True)
         n_classes = len(set(y))
         n_chans = X[0].shape[0]
         n_times = X[0].shape[1]
+        train_bal_acc = EpochScoring(
+            scoring="balanced_accuracy",
+            on_train=True,
+            name="train_bal_acc",
+            lower_is_better=False,
+        )
+        train_acc = EpochScoring(
+            scoring="accuracy",
+            on_train=True,
+            name="train_acc",
+            lower_is_better=False,
+        )
+        valid_bal_acc = EpochScoring(
+            scoring="balanced_accuracy",
+            on_train=False,
+            name="valid_bal_acc",
+            lower_is_better=False,
+        )
 
         self.clf = EEGClassifier(
             module=self.model,
@@ -71,7 +92,7 @@ class Solver(BaseSolver):
             optimizer__lr=self.learning_rate,
             train_split=ValidSplit(cv=self.valid_set,
                                    stratified=True,
-                                   random_state=42),
+                                   random_state=self.random_state),
             # using valid_set for validation
             batch_size=self.batch_size,
             device=device,
@@ -80,7 +101,10 @@ class Solver(BaseSolver):
             optimizer__weight_decay=self.weight_decay,
             classes=list(range(n_classes)),
             callbacks=[
-                # WandbLogger(wandb_run, save_model=True),
+                ("train_acc",train_acc), 
+                ("train_bal_acc", train_bal_acc),
+                ("valid_bal_acc", valid_bal_acc),
+                WandbLogger(wandb_run, save_model=True),
                 EarlyStopping(
                     monitor="valid_loss",
                     patience=self.patience,
@@ -88,6 +112,7 @@ class Solver(BaseSolver):
                 ),
                 LRScheduler("CosineAnnealingLR", T_max=self.max_epochs - 1),
             ],
+            compile=True
         )
 
     def run(self, _):
