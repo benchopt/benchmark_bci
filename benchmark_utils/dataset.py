@@ -13,10 +13,13 @@ with safe_import_context() as import_ctx:
 
     from benchopt.config import get_setting
     from joblib import Memory
+    import mne
+    
+    mne.set_log_level('WARNING')
 
 
 def pre_process_windows_dataset(
-    dataset, low_cut_hz=4.0, high_cut_hz=38.0, factor=1e6, n_jobs=-1
+    dataset, low_cut_hz=4.0, high_cut_hz=38.0, factor=1e6, n_jobs=20
 ):
     """
     Preprocess the window dataset.
@@ -53,7 +56,7 @@ def pre_process_windows_dataset(
             factor=factor,
         ),
         # Bandpass filter
-        Preprocessor("filter", l_freq=low_cut_hz, h_freq=high_cut_hz),
+        Preprocessor("filter", l_freq=low_cut_hz, h_freq=high_cut_hz, verbose=False),
     ]
 
     # Transform the data
@@ -118,8 +121,8 @@ def windows_data(
         trial_stop_offset_samples=0,
         preload=True,
         mapping=mapping,
-        drop_bad_windows=True,
         drop_last_window=True,
+        verbose=False,
     )
 
     return windows_dataset, sfreq
