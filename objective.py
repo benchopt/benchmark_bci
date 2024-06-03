@@ -31,8 +31,6 @@ class Objective(BaseObjective):
 
     parameters = {
         'evaluation_process': [
-            'intra_session',
-            'inter_sessions',
             'inter_subjects',
         ],
     }
@@ -43,7 +41,7 @@ class Objective(BaseObjective):
     # Bump it up if the benchmark depends on a new feature of benchopt.
     min_benchopt_version = "1.5.2"
 
-    def set_data(self, dataset, sfreq):
+    def set_data(self, dataset, sfreq, metadata_info):
         """Set the data retrieved from Dataset.get_data.
 
         Data
@@ -54,20 +52,21 @@ class Objective(BaseObjective):
 
         self.dataset = dataset
         self.sfreq = sfreq
-
+        n_folds = 5
         if self.evaluation_process == 'intra_session':
-            self.cv = IntraSessionSplitter(n_folds=2)
+            self.cv = IntraSessionSplitter(n_folds=n_folds)
         elif self.evaluation_process == 'inter_sessions':
             self.cv = InterSessionSplitter()
         elif self.evaluation_process == 'inter_subjects':
-            self.cv = InterSubjectSplitter(n_folds=5)
+            self.cv = InterSubjectSplitter(n_folds=n_folds)
         else:
             raise ValueError(
                 f"unknown evaluation process '{self.evaluation_process}'"
             )
 
         self.cv_metadata = dict(df_meta=dataset.get_metadata())
-
+        self.metadata_info = dict(evaluation_process=self.evaluation_process,
+                                   dataset=dataset, sfreq=sfreq, n_folds=n_folds)
     def evaluate_result(self, model):
         """Compute the evaluation metrics for the benchmark.
 
@@ -133,4 +132,5 @@ class Objective(BaseObjective):
             X=self.X_train,
             y=self.y_train,
             sfreq=self.sfreq,
+            metadata_info=self.metadata_info,
         )

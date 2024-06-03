@@ -40,7 +40,7 @@ class Solver(BaseSolver):
 
     sampling_strategy = "run_once"
 
-    def set_objective(self, X, y, sfreq):
+    def set_objective(self, X, y, sfreq, metadata_info):
         """Set the objective information from Objective.get_objective.
 
         Objective
@@ -83,7 +83,7 @@ class Solver(BaseSolver):
             # using valid_set for validation
             batch_size=self.batch_size,
             device=device,
-            verbose=False,
+            verbose=True,
             max_epochs=self.max_epochs,
             optimizer__weight_decay=self.weight_decay,
             classes=list(range(n_classes)),
