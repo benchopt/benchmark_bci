@@ -2,7 +2,7 @@ from benchopt import BaseSolver, safe_import_context
 
 
 with safe_import_context() as import_ctx:
-    from skorch.helper import to_numpy
+    from skorch.helper import SliceDataset, to_numpy
     from sklearn.pipeline import make_pipeline
     from sklearn.pipeline import FunctionTransformer
 
@@ -56,6 +56,9 @@ class Solver(BaseSolver):
         With this dataset, we consider that the performance curve is sampled
         for various number of augmentation applied to the dataset.
         """
+        if isinstance(self.y, SliceDataset):
+            self.y = to_numpy(self.y)
+
         self.clf.fit(self.X, self.y)
 
     def get_result(self):
