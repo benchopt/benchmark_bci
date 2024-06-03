@@ -18,9 +18,9 @@ with safe_import_context() as import_ctx:
     from braindecode.datautil import load_concat_dataset
     from benchopt.config import get_setting
     from joblib import Memory
-    import mne
+    from benchmark_utils import turn_off_warnings
+    turn_off_warnings()
 
-    mne.set_log_level("WARNING")
 
 
 def pre_process_windows_dataset(
