@@ -14,8 +14,8 @@ with safe_import_context() as import_ctx:
     from benchopt.config import get_setting
     from joblib import Memory
     import mne
-    
-    mne.set_log_level('WARNING')
+
+    mne.set_log_level("WARNING")
 
 
 def pre_process_windows_dataset(
@@ -56,7 +56,9 @@ def pre_process_windows_dataset(
             factor=factor,
         ),
         # Bandpass filter
-        Preprocessor("filter", l_freq=low_cut_hz, h_freq=high_cut_hz, verbose=False),
+        Preprocessor(
+            "filter", l_freq=low_cut_hz, h_freq=high_cut_hz, verbose=False
+        ),
     ]
 
     # Transform the data
@@ -98,7 +100,7 @@ def windows_data(
     elif paradigm_name == "MotorImagery":
         mapping = {"left_hand": 0, "right_hand": 1, "feet": 2, "tongue": 3}
 
-    mem = Memory(get_setting('cache') or "__cache__", verbose=0)
+    mem = Memory(get_setting("cache") or "__cache__", verbose=0)
     dataset = mem.cache(pre_process_windows_dataset)(
         dataset,
         low_cut_hz=low_cut_hz,
