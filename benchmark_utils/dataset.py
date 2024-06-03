@@ -141,7 +141,7 @@ def detect_if_cluster():
     --------
     mne_path
     """
-    if os.path.exists("/data/"):
+    if os.path.exists("/data/") and os.path.exists("/project/"):
         mne_path = Path("/data/")
     else:
         mne_path = None  # Path.home() / "mne_data/"
