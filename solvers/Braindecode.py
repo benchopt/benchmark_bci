@@ -59,12 +59,12 @@ class Solver(BaseSolver):
         n_times = X[0].shape[1]
         # TODO: get the dataset name from extra_info
         callbacks = get_braindecode_callbacks(
-            dataset_name="BCNI",
+            dataset_name=extra_info["dataset_name"],
             patience=self.patience,
             max_epochs=self.max_epochs,
             model_name=self.model,
-            validation_name=extra_info['evaluation_process'],
-            project_name="benchmark_d",
+            validation_name=extra_info["evaluation_process"],
+            project_name=f"benchmark_{extra_info['paradigm_name']}",
         )
         self.clf = EEGClassifier(
             module=self.model,

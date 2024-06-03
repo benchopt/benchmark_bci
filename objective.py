@@ -44,7 +44,7 @@ class Objective(BaseObjective):
     # Bump it up if the benchmark depends on a new feature of benchopt.
     min_benchopt_version = "1.5.2"
 
-    def set_data(self, dataset, sfreq):
+    def set_data(self, dataset, sfreq, paradigm_name, dataset_name):
         """Set the data retrieved from Dataset.get_data.
 
         Data
@@ -55,6 +55,7 @@ class Objective(BaseObjective):
 
         self.dataset = dataset
         self.sfreq = sfreq
+        self.paradigm_name = paradigm_name
 
         if self.evaluation_process == 'intra_session':
             self.cv = IntraSessionSplitter(n_folds=self.n_folds)
@@ -69,7 +70,9 @@ class Objective(BaseObjective):
 
         self.cv_metadata = dict(df_meta=dataset.get_metadata())
         self.extra_info = dict(evaluation_process=self.evaluation_process,
-                               n_folds=self.n_folds)
+                               n_folds=self.n_folds,
+                               paradigm_name=paradigm_name,
+                               dataset_name=dataset_name)
 
     def evaluate_result(self, model):
         """Compute the evaluation metrics for the benchmark.
