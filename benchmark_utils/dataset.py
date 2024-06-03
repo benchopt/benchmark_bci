@@ -4,13 +4,16 @@ from benchopt import safe_import_context
 # - skipping import to speed up autocompletion in CLI.
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
+    import contextlib
+    import io
+    from pathlib import Path
     from numpy import multiply
     from braindecode.preprocessing import (
         preprocess,
         Preprocessor,
     )
     from braindecode.preprocessing import create_windows_from_events
-
+    from braindecode.datautil import load_concat_dataset
     from benchopt.config import get_setting
     from joblib import Memory
 
@@ -89,6 +92,7 @@ def windows_data(
     # Define mapping of classes to integers
     # We use two classes from the dataset
     # 1. left-hand vs right-hand motor imagery
+
     if paradigm_name == "LeftRightImagery":
         mapping = {"left_hand": 0, "right_hand": 1}  # Fix this later
 
@@ -96,30 +100,49 @@ def windows_data(
         mapping = {"left_hand": 0, "right_hand": 1, "feet": 2, "tongue": 3}
 
     mem = Memory(get_setting('cache') or "__cache__", verbose=0)
-    dataset = mem.cache(pre_process_windows_dataset)(
-        dataset,
-        low_cut_hz=low_cut_hz,
-        high_cut_hz=high_cut_hz,
-        factor=factor,
-        n_jobs=n_jobs,
-    )
 
-    # Extract sampling frequency, check that they are same in all datasets
-    sfreq = dataset.datasets[0].raw.info["sfreq"]
-    assert all([ds.raw.info["sfreq"] == sfreq for ds in dataset.datasets])
-    # Calculate the trial start offset in samples.
-    trial_start_offset_samples = int(trial_start_offset_seconds * sfreq)
+    try:
+        save_path = Path(mem.location) / f"windows_dataset_{paradigm_name}"
+        if not save_path.exists():
+            raise FileNotFoundError
+        # Capturing verbose output
+        f = io.StringIO()
+        # Hacking way to capture verbose output
+        with contextlib.redirect_stdout(f):
+            windows_dataset = load_concat_dataset(str(save_path.resolve()),
+                                                  preload=True, n_jobs=-1)
 
-    # Create windows using braindecode function for this.
-    # It needs parameters to define how trials should be used.
-    windows_dataset = create_windows_from_events(
-        dataset,
-        trial_start_offset_samples=trial_start_offset_samples,
-        trial_stop_offset_samples=0,
-        preload=True,
-        mapping=mapping,
-        drop_bad_windows=True,
-        drop_last_window=True,
-    )
+        sfreq = windows_dataset.datasets[0].windows.info['sfreq']
+    except FileNotFoundError:
+
+        dataset = pre_process_windows_dataset(
+            dataset,
+            low_cut_hz=low_cut_hz,
+            high_cut_hz=high_cut_hz,
+            factor=factor,
+            n_jobs=n_jobs,
+        )
+
+        # Extract sampling frequency, check that they are same in all datasets
+        sfreq = dataset.datasets[0].raw.info["sfreq"]
+        assert all([ds.raw.info["sfreq"] == sfreq for ds in dataset.datasets])
+        # Calculate the trial start offset in samples.
+        trial_start_offset_samples = int(trial_start_offset_seconds * sfreq)
+
+        # Create windows using braindecode function for this.
+        # It needs parameters to define how trials should be used.
+        windows_dataset = create_windows_from_events(
+            dataset,
+            trial_start_offset_samples=trial_start_offset_samples,
+            trial_stop_offset_samples=0,
+            preload=True,
+            mapping=mapping,
+            drop_bad_windows=True,
+            drop_last_window=True,
+        )
+        save_path = Path(mem.location) / f"windows_dataset_{paradigm_name}"
+        if not save_path.exists():
+            save_path.mkdir()
+        windows_dataset.save(str(save_path.resolve()), overwrite=True)
 
     return windows_dataset, sfreq
