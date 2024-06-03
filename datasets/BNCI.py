@@ -9,6 +9,7 @@ with safe_import_context() as import_ctx:
     from benchmark_utils import windows_data, detect_if_cluster
     from moabb.utils import set_download_dir
 
+
 class Dataset(BaseDataset):
 
     # Name to select the dataset in the CLI and to display the results.
