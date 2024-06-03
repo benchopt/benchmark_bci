@@ -28,6 +28,7 @@ def import_wandb_loggers(
             name=name,
             reinit=True,
             group=f"{model_name}",
+            tags=[f"{dataset_name}", f"{model_name}", f"{validation_name}"],
         )
 
         wandb_logger = WandbLogger(wandb_run, save_model=False)
