@@ -3,7 +3,6 @@
 # name `benchmark_utils`, and code defined inside will be importable using
 # the usual import syntax
 from .dataset import windows_data
+from .loggers import turn_off_warnings, get_braindecode_callbacks
 
-__all__ = [
-    "windows_data",
-]
+__all__ = ["windows_data", "turn_off_warnings", "get_braindecode_callbacks"]
