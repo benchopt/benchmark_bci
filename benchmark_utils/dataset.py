@@ -144,7 +144,7 @@ def detect_if_cluster():
     if os.path.exists("/data/"):
         mne_path = Path("/data/")
     else:
-        mne_path = Path.home() / "mne_data/"
+        mne_path = None  # Path.home() / "mne_data/"
     # TODO: Make this for Jean Zay too.
 
     return mne_path

@@ -26,7 +26,9 @@ class Dataset(BaseDataset):
         Dataset: an instance of a braindecode.WindowsDataset
         sfreq: the sampling frequency of the data.
         """
-        set_download_dir(detect_if_cluster())
+        running_cluster = detect_if_cluster()
+        if running_cluster is not None:
+            set_download_dir(running_cluster)
         dataset_name = "BNCI2014_001"
         data = MOABBDataset(dataset_name=dataset_name, subject_ids=None)
 
