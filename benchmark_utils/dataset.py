@@ -22,7 +22,6 @@ with safe_import_context() as import_ctx:
     turn_off_warnings()
 
 
-
 def pre_process_windows_dataset(
     dataset, low_cut_hz=4.0, high_cut_hz=38.0, factor=1e6, n_jobs=20
 ):

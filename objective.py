@@ -70,6 +70,7 @@ class Objective(BaseObjective):
         self.cv_metadata = dict(df_meta=dataset.get_metadata())
         self.extra_info = dict(evaluation_process=self.evaluation_process,
                                n_folds=self.n_folds)
+
     def evaluate_result(self, model):
         """Compute the evaluation metrics for the benchmark.
 
