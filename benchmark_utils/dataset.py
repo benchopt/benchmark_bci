@@ -6,6 +6,7 @@ from benchopt import safe_import_context
 with safe_import_context() as import_ctx:
     import contextlib
     import io
+    import os
     from pathlib import Path
     from pickle import load, dump
     from numpy import multiply
@@ -159,7 +160,6 @@ def windows_data(
         if not save_path.exists():
             save_path.mkdir()
         windows_dataset.save(str(save_path.resolve()), overwrite=True)
-
 
     return windows_dataset, sfreq
 
