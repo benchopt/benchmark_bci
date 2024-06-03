@@ -31,6 +31,8 @@ class Objective(BaseObjective):
 
     parameters = {
         'evaluation_process': [
+            'intra_session',
+            'inter_sessions',
             'inter_subjects',
         ],
     }

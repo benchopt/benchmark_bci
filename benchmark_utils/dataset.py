@@ -127,6 +127,7 @@ def windows_data(
         preload=True,
         mapping=mapping,
         drop_last_window=True,
+        drop_bad_windows=True,
         verbose=False,
     )
 
