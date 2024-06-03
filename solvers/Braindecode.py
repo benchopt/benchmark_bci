@@ -10,6 +10,13 @@ with safe_import_context() as import_ctx:
     from skorch.callbacks import LRScheduler, EarlyStopping, EpochScoring
     from skorch.callbacks import WandbLogger
     import time
+    import os
+    os.environ["WANDB_SILENT"] = "true"
+    import warnings
+    warnings.filterwarnings("ignore")
+
+    import mne 
+    mne.set_log_level("ERROR")
 
 class Solver(BaseSolver):
     name = "BraindecodeModels"
@@ -21,20 +28,18 @@ class Solver(BaseSolver):
             "EEGInceptionMI",
             "EEGITNet",
             "EEGNetv4",
-            "EEGResNet",
             "ShallowFBCSPNet",
             "TIDNet",
             "BIOT",
             "AttentionBaseNet",
             "Labram",
-            "SPARCNet",
             "EEGSimpleConv",
             "ContraWR",
         ],
         "batch_size": [64],
         "valid_set": [0.2],
         "patience": [50],
-        "max_epochs": [150],
+        "max_epochs": [100],
         "learning_rate": [0.0625 * 0.01],
         "weight_decay": [0],
         "random_state": [42],
@@ -58,7 +63,7 @@ class Solver(BaseSolver):
         device = "cuda" if torch.cuda.is_available() else "cpu"
         wandb.login(key="d4c4b9c56bda8a814e122301ad70b0d38f014728")
         ts = time.time()
-        wandb_run = init(project="benchmark", name=f"{self.model}-intersubject-{ts}",reinit=True)
+        wandb_run = init(project="benchmark_c", name=f"{self.model}-intersubject-{ts}",reinit=True, group=f"{self.model}")
         n_classes = len(set(y))
         n_chans = X[0].shape[0]
         n_times = X[0].shape[1]
@@ -96,7 +101,7 @@ class Solver(BaseSolver):
             # using valid_set for validation
             batch_size=self.batch_size,
             device=device,
-            verbose=True,
+            verbose=False,
             max_epochs=self.max_epochs,
             optimizer__weight_decay=self.weight_decay,
             classes=list(range(n_classes)),
@@ -112,7 +117,6 @@ class Solver(BaseSolver):
                 ),
                 LRScheduler("CosineAnnealingLR", T_max=self.max_epochs - 1),
             ],
-            compile=True
         )
 
     def run(self, _):
