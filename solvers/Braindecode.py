@@ -40,7 +40,7 @@ class Solver(BaseSolver):
 
     sampling_strategy = "run_once"
 
-    def set_objective(self, X, y, sfreq, metadata_info):
+    def set_objective(self, X, y, sfreq, extra_info):
         """Set the objective information from Objective.get_objective.
 
         Objective
@@ -57,13 +57,13 @@ class Solver(BaseSolver):
         n_classes = len(set(y))
         n_chans = X[0].shape[0]
         n_times = X[0].shape[1]
-
+        # TODO: get the dataset name from extra_info
         callbacks = get_braindecode_callbacks(
+            dataset_name="BCNI",
             patience=self.patience,
             max_epochs=self.max_epochs,
-            dataset_name="BCNI",
             model_name=self.model,
-            validation_name="InterSubject-cv-5",
+            validation_name=extra_info['evaluation_process'],
             project_name="benchmark_d",
         )
         self.clf = EEGClassifier(
