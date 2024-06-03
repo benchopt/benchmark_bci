@@ -4,6 +4,9 @@ from benchopt import safe_import_context
 # - skipping import to speed up autocompletion in CLI.
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
+    import os
+
+    from pathlib import Path
     from numpy import multiply
     from braindecode.preprocessing import (
         preprocess,
@@ -128,3 +131,19 @@ def windows_data(
     )
 
     return windows_dataset, sfreq
+
+
+def detect_if_cluster():
+    """
+    Utility function to detect if the code is running on a cluster or not.
+    Returns:
+    --------
+    mne_path
+    """
+    if os.path.exists("/data/"):
+        mne_path = Path("/data/")
+    else:
+        mne_path = Path.home() / "mne_data/"
+    # TODO: Make this for Jean Zay too.
+
+    return mne_path
