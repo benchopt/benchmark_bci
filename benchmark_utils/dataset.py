@@ -7,6 +7,7 @@ with safe_import_context() as import_ctx:
     import contextlib
     import io
     from pathlib import Path
+    from pickle import load, dump
     from numpy import multiply
     from braindecode.preprocessing import (
         preprocess,
@@ -101,20 +102,26 @@ def windows_data(
 
     mem = Memory(get_setting('cache') or "__cache__", verbose=0)
 
+    save_path = Path(mem.location) / f"windows_dataset_{paradigm_name}"
+    save_obj = Path(mem.location) / f"windows_dataset_{paradigm_name}.pickle"
     try:
-        save_path = Path(mem.location) / f"windows_dataset_{paradigm_name}"
-        if not save_path.exists():
-            raise FileNotFoundError
-        # Capturing verbose output
-        f = io.StringIO()
-        # Hacking way to capture verbose output
-        with contextlib.redirect_stdout(f):
-            windows_dataset = load_concat_dataset(str(save_path.resolve()),
-                                                  preload=True, n_jobs=-1)
+        try:
+            file = open(save_obj, 'rb')
+            windows_dataset = load(file)
+        except Exception:
+            if not save_path.exists():
+                raise FileNotFoundError
+            # Capturing verbose output
+            f = io.StringIO()
+            # Hacking way to capture verbose output
+            with contextlib.redirect_stdout(f):
+                windows_dataset = load_concat_dataset(str(save_path.resolve()),
+                                                      preload=True, n_jobs=-1)
 
         sfreq = windows_dataset.datasets[0].windows.info['sfreq']
+        print(f"Using cached windows dataset {paradigm_name}.")
     except FileNotFoundError:
-
+        print(f"Creating windows dataset {paradigm_name}.")
         dataset = pre_process_windows_dataset(
             dataset,
             low_cut_hz=low_cut_hz,
@@ -140,7 +147,10 @@ def windows_data(
             drop_bad_windows=True,
             drop_last_window=True,
         )
-        save_path = Path(mem.location) / f"windows_dataset_{paradigm_name}"
+        if not save_obj.exists():
+            with open(save_obj, 'wb') as file:
+                dump(windows_dataset, file)
+
         if not save_path.exists():
             save_path.mkdir()
         windows_dataset.save(str(save_path.resolve()), overwrite=True)
