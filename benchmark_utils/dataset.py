@@ -19,7 +19,9 @@ with safe_import_context() as import_ctx:
     from benchopt.config import get_setting
     from joblib import Memory
     from benchmark_utils import turn_off_warnings
+
     turn_off_warnings()
+
 
 def pre_process_windows_dataset(
     dataset, low_cut_hz=4.0, high_cut_hz=38.0, factor=1e6, n_jobs=-1
@@ -59,7 +61,9 @@ def pre_process_windows_dataset(
             factor=factor,
         ),
         # Bandpass filter
-        Preprocessor("filter", l_freq=low_cut_hz, h_freq=high_cut_hz, verbose=False),
+        Preprocessor(
+            "filter", l_freq=low_cut_hz, h_freq=high_cut_hz, verbose=False
+        ),
     ]
 
     # Transform the data
@@ -108,7 +112,9 @@ def windows_data(
     mem = Memory(get_setting("cache") or "__cache__", verbose=0)
 
     save_path = Path(mem.location) / f"{dataset_name}_dataset_{paradigm_name}"
-    save_obj = Path(mem.location) / f"{dataset_name}_dataset_{paradigm_name}.pickle"
+    save_obj = (
+        Path(mem.location) / f"{dataset_name}_dataset_{paradigm_name}.pickle"
+    )
     try:
         try:
             file = open(save_obj, "rb")
