@@ -12,20 +12,21 @@ with safe_import_context() as import_ctx:
 class Solver(BaseSolver):
     name = "MOABBPipelines"
     parameters = {
-        "pipeline":
-            'Aug-Cov-Tang-SVM'
-            'Cov-CSP-LDA_shr'
-            'Cov-CSP-LDA_svd'
-            'Cov-FgMDM'
-            'Cov-MDM'
-            'Cov-MDMAug'
-            'Cov-Tang-LogReg'
-            'Cov-Tang-LogReg_ElNet'
-            'Cov-Tang-SVM'
-            'Cov-TRCSP-LDA'
-            'DUMMY'
-            'LogVar-LDA'
+        "pipeline": [
+            'Aug-Cov-Tang-SVM',
+            'Cov-CSP-LDA_shr',
+            'Cov-CSP-LDA_svd',
+            'Cov-FgMDM',
+            'Cov-MDM',
+            'Cov-MDMAug',
+            'Cov-Tang-LogReg',
+            'Cov-Tang-LogReg_ElNet',
+            'Cov-Tang-SVM',
+            'Cov-TRCSP-LDA',
+            'DUMMY',
+            'LogVar-LDA',
             'LogVar-SVM',
+        ]
     }
 
     sampling_strategy = 'run_once'
