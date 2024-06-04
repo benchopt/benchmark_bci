@@ -59,7 +59,9 @@ def get_hyperparams_from_pipeline(pipeline, trial):
         # Parameters for the covariance matrix
         cov_estimator = ["corr", "cov", "hub", "lwf"]
 
-        cov_estimator = trial.suggest_categorical("cov_estimator", cov_estimator)
+        cov_estimator = trial.suggest_categorical(
+            "cov_estimator", cov_estimator
+        )
 
         # Parameters for the SVC
         svm_C = trial.suggest_float("svm_C", 1e-6, 1e6, log=True)
@@ -89,11 +91,13 @@ def get_hyperparams_from_pipeline(pipeline, trial):
         # COV -> CSP -> LDA
         # Parameters for the covariance matrix
         cov_estimator = ["cov", "hub", "lwf"]
-        cov_estimator = trial.suggest_categorical("cov_estimator", cov_estimator)
+        cov_estimator = trial.suggest_categorical(
+            "cov_estimator", cov_estimator
+        )
 
         # Parameters for the CSP
         nfilter = trial.suggest_int("nfilter", 6, 10)
-        metric = trial.suggest_categorical("metric", ['euclid'])
+        metric = trial.suggest_categorical("metric", ["euclid"])
         log = trial.suggest_categorical("log", [True, False])
 
         param = dict(
