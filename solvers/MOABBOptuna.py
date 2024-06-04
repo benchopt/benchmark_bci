@@ -3,17 +3,21 @@ from benchopt import safe_import_context
 with safe_import_context() as import_ctx:
     from benchmark_utils import OptunaSolver
     from skorch.helper import SliceDataset, to_numpy
-    from sklearn.model_selection import train_test_split
     from sklearn.pipeline import make_pipeline, FunctionTransformer
 
-    from benchmark_utils.pipeline import parser_pipelines, get_hyperparams_from_pipeline
+    from benchmark_utils.pipeline import (
+        parser_pipelines,
+        get_hyperparams_from_pipeline,
+    )
 
 
 class Solver(OptunaSolver):
     name = "MOABBPipelinesOptuna"
     parameters = {
         "pipeline": [
+            "TRCSPLDA",
             "MDM",
+            "TangentSpaceSVMGrid",
         ],
     }
 
