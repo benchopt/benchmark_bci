@@ -38,7 +38,6 @@ class OptunaSolver(BaseSolver):
 
         param = self.sample_parameters(trial)
         params = self.extra_model_params.copy()
-
         params.update(
             {
                 f"pipeline__{step_name}__{p}": v
@@ -46,12 +45,13 @@ class OptunaSolver(BaseSolver):
                 for p, v in step.items()
             }
         )
-
         model = self.clf.set_params(**params)
+        # Do we need to ensure the y stratification????
         cross_score = cross_validate(
             model, self.X, self.y, return_estimator=True
         )
-        trial.set_user_attr("model", cross_score["estimator"])
+        # Check with tomas if this is the right way to do it
+        trial.set_user_attr("model", model.fit(self.X, self.y))
 
         return cross_score["test_score"].mean()
 
@@ -65,8 +65,7 @@ class OptunaSolver(BaseSolver):
         study = optuna.create_study(direction="maximize", sampler=sampler)
         while callback():
             study.optimize(self.objective, n_trials=10)
-            idx_best = study.best_trial.number
-            self.best_model = study.best_trial.user_attrs["model"][idx_best]
+            self.best_model = study.best_trial.user_attrs["model"]
 
     def get_result(self):
         # Return the result from one optimization run.
