@@ -20,20 +20,21 @@ class Objective(BaseObjective):
     # Name to select the objective in the CLI and to display the results.
     name = "Brain-Computer Interface"
 
-    intall_cmd = 'conda'
+    intall_cmd = "conda"
     requirements = [
-        'scikit-learn',
-        'pytorch:pytorch',
-        'pip:git+https://github.com/Neurotechx/moabb@develop#egg=moabb',
-        'pip:braindecode',
+        "scikit-learn",
+        "pytorch:pytorch",
+        "pip:git+https://github.com/Neurotechx/moabb@develop#egg=moabb",
+        "pip:git+https://github.com/braindecode/braindecode@master#egg=braindecode",  # noqa
     ]
 
     parameters = {
-        'evaluation_process': [
-            'intra_session',
-            'inter_sessions',
-            'inter_subjects',
+        "evaluation_process": [
+            "intra_session",
+            "inter_sessions",
+            "inter_subjects",
         ],
+        "n_folds": [5],
     }
 
     is_convex = False
@@ -42,7 +43,7 @@ class Objective(BaseObjective):
     # Bump it up if the benchmark depends on a new feature of benchopt.
     min_benchopt_version = "1.5.2"
 
-    def set_data(self, dataset, sfreq):
+    def set_data(self, dataset, sfreq, paradigm_name, dataset_name):
         """Set the data retrieved from Dataset.get_data.
 
         Data
@@ -54,18 +55,24 @@ class Objective(BaseObjective):
         self.dataset = dataset
         self.sfreq = sfreq
 
-        if self.evaluation_process == 'intra_session':
-            self.cv = IntraSessionSplitter(n_folds=2)
-        elif self.evaluation_process == 'inter_sessions':
+        if self.evaluation_process == "intra_session":
+            self.cv = IntraSessionSplitter(n_folds=self.n_folds)
+        elif self.evaluation_process == "inter_sessions":
             self.cv = InterSessionSplitter()
-        elif self.evaluation_process == 'inter_subjects':
-            self.cv = InterSubjectSplitter(n_folds=2)
+        elif self.evaluation_process == "inter_subjects":
+            self.cv = InterSubjectSplitter(n_folds=self.n_folds)
         else:
             raise ValueError(
                 f"unknown evaluation process '{self.evaluation_process}'"
             )
 
         self.cv_metadata = dict(df_meta=dataset.get_metadata())
+        self.extra_info = dict(
+            evaluation_process=self.evaluation_process,
+            n_folds=self.n_folds,
+            paradigm_name=paradigm_name,
+            dataset_name=dataset_name,
+        )
 
     def evaluate_result(self, model):
         """Compute the evaluation metrics for the benchmark.
@@ -92,7 +99,7 @@ class Objective(BaseObjective):
             score_test=score_test,
             score_train=score_train,
             balanced_accuracy=bl_acc,
-            value=1-score_test,
+            value=1 - score_test,
         )
 
     def get_one_result(self):
@@ -104,10 +111,7 @@ class Objective(BaseObjective):
             This model should have methods `score` and `predict`, that accept
             braindecode.WindowsDataset as input.
         """
-        clf = make_pipeline(
-            FunctionTransformer(to_numpy),
-            DummyClassifier()
-        )
+        clf = make_pipeline(FunctionTransformer(to_numpy), DummyClassifier())
         X_train, _, y_train, _ = self.get_split(self.dataset)
         return dict(model=clf.fit(X_train, y_train))
 
@@ -124,12 +128,12 @@ class Objective(BaseObjective):
         sfreq: sampling frequency to allow filtering the data.
         """
 
-        self.X_train, self.X_test, self.y_train, self.y_test = (
-            self.get_split(self.dataset)
+        self.X_train, self.X_test, self.y_train, self.y_test = self.get_split(
+            self.dataset
         )
 
         return dict(
             X=self.X_train,
             y=self.y_train,
             sfreq=self.sfreq,
-        )
+         )

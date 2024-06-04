@@ -6,6 +6,7 @@ from benchopt import safe_import_context
 with safe_import_context() as import_ctx:
     import contextlib
     import io
+    import os
     from pathlib import Path
     from pickle import load, dump
     from numpy import multiply
@@ -17,6 +18,9 @@ with safe_import_context() as import_ctx:
     from braindecode.datautil import load_concat_dataset
     from benchopt.config import get_setting
     from joblib import Memory
+    from benchmark_utils import turn_off_warnings
+
+    turn_off_warnings()
 
 
 def pre_process_windows_dataset(
@@ -57,7 +61,9 @@ def pre_process_windows_dataset(
             factor=factor,
         ),
         # Bandpass filter
-        Preprocessor("filter", l_freq=low_cut_hz, h_freq=high_cut_hz),
+        Preprocessor(
+            "filter", l_freq=low_cut_hz, h_freq=high_cut_hz, verbose=False
+        ),
     ]
 
     # Transform the data
@@ -69,6 +75,7 @@ def pre_process_windows_dataset(
 def windows_data(
     dataset,
     paradigm_name,
+    dataset_name,
     trial_start_offset_seconds=-0.5,
     low_cut_hz=4.0,
     high_cut_hz=38.0,
@@ -83,6 +90,8 @@ def windows_data(
         Dataset to use.
     paradigm_name: str
         Name of the paradigm to use.
+    dataset_name: str
+        Name of the dataset.
     Returns:
     --------
     windows_dataset: WindowsDataset
@@ -100,13 +109,15 @@ def windows_data(
     elif paradigm_name == "MotorImagery":
         mapping = {"left_hand": 0, "right_hand": 1, "feet": 2, "tongue": 3}
 
-    mem = Memory(get_setting('cache') or "__cache__", verbose=0)
+    mem = Memory(get_setting("cache") or "__cache__", verbose=0)
 
-    save_path = Path(mem.location) / f"windows_dataset_{paradigm_name}"
-    save_obj = Path(mem.location) / f"windows_dataset_{paradigm_name}.pickle"
+    save_path = Path(mem.location) / f"{dataset_name}_dataset_{paradigm_name}"
+    save_obj = (
+        Path(mem.location) / f"{dataset_name}_dataset_{paradigm_name}.pickle"
+    )
     try:
         try:
-            file = open(save_obj, 'rb')
+            file = open(save_obj, "rb")
             windows_dataset = load(file)
         except Exception:
             if not save_path.exists():
@@ -115,10 +126,11 @@ def windows_data(
             f = io.StringIO()
             # Hacking way to capture verbose output
             with contextlib.redirect_stdout(f):
-                windows_dataset = load_concat_dataset(str(save_path.resolve()),
-                                                      preload=True, n_jobs=-1)
+                windows_dataset = load_concat_dataset(
+                    str(save_path.resolve()), preload=False, n_jobs=1
+                )
 
-        sfreq = windows_dataset.datasets[0].windows.info['sfreq']
+        sfreq = windows_dataset.datasets[0].windows.info["sfreq"]
         print(f"Using cached windows dataset {paradigm_name}.")
     except FileNotFoundError:
         print(f"Creating windows dataset {paradigm_name}.")
@@ -148,7 +160,7 @@ def windows_data(
             drop_last_window=True,
         )
         if not save_obj.exists():
-            with open(save_obj, 'wb') as file:
+            with open(save_obj, "wb") as file:
                 dump(windows_dataset, file)
 
         if not save_path.exists():
@@ -156,3 +168,19 @@ def windows_data(
         windows_dataset.save(str(save_path.resolve()), overwrite=True)
 
     return windows_dataset, sfreq
+
+
+def detect_if_cluster():
+    """
+    Utility function to detect if the code is running on a cluster or not.
+    Returns:
+    --------
+    mne_path
+    """
+    if os.path.exists("/data/") and os.path.exists("/project/"):
+        mne_path = Path("/data/")
+    else:
+        mne_path = None  # Path.home() / "mne_data/"
+    # TODO: Make this for Jean Zay too.
+
+    return mne_path
