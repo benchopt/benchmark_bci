@@ -15,19 +15,17 @@ with safe_import_context() as import_ctx:
 class OptunaSolver(BaseSolver):
 
     stopping_criterion = SufficientProgressCriterion(
-        strategy='callback', patience=5
+        strategy="callback", patience=5
     )
 
     params = {
-        'test_size': 0.20,
-        'seed': 42,
+        "test_size": 0.20,
+        "seed": 42,
     }
 
     extra_model_params = {}
 
-    def set_objective(
-            self, X, y, sfreq
-    ):
+    def set_objective(self, X, y, sfreq):
         # Define the information received by each solver from the objective.
         # The arguments of this function are the results of the
         # `Objective.get_objective`. This defines the benchmark's API for
@@ -41,17 +39,21 @@ class OptunaSolver(BaseSolver):
         param = self.sample_parameters(trial)
         params = self.extra_model_params.copy()
 
-        params.update({
-            f"pipeline__{step_name}__{p}": v for step_name, step in param.items()
-            for p, v in step.items()
-        })
+        params.update(
+            {
+                f"pipeline__{step_name}__{p}": v
+                for step_name, step in param.items()
+                for p, v in step.items()
+            }
+        )
+
         model = self.clf.set_params(**params)
         cross_score = cross_validate(
             model, self.X, self.y, return_estimator=True
         )
-        trial.set_user_attr('model', cross_score['estimator'])
+        trial.set_user_attr("model", cross_score["estimator"])
 
-        return cross_score['test_score'].mean()
+        return cross_score["test_score"].mean()
 
     def run(self, callback):
 
@@ -63,7 +65,8 @@ class OptunaSolver(BaseSolver):
         study = optuna.create_study(direction="maximize", sampler=sampler)
         while callback():
             study.optimize(self.objective, n_trials=10)
-            self.best_model = study.best_trial.user_attrs['model']
+            idx_best = study.best_trial.number
+            self.best_model = study.best_trial.user_attrs["model"][idx_best]
 
     def get_result(self):
         # Return the result from one optimization run.
