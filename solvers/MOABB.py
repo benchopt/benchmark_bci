@@ -42,7 +42,6 @@ class Solver(BaseSolver):
         self.sfreq = sfreq
         self.X = X
         self.y = y
-        import pdb; pdb.set_trace()
         self.clf = make_pipeline(
             FunctionTransformer(to_numpy),
             parser_pipelines()[self.pipeline]
