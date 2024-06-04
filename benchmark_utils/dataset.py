@@ -18,7 +18,8 @@ with safe_import_context() as import_ctx:
     from braindecode.datautil import load_concat_dataset
     from benchopt.config import get_setting
     from joblib import Memory
-
+    from benchmark_utils import turn_off_warnings
+    turn_off_warnings()
 
 def pre_process_windows_dataset(
     dataset, low_cut_hz=4.0, high_cut_hz=38.0, factor=1e6, n_jobs=-1
