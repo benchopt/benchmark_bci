@@ -57,7 +57,7 @@ class Solver(BaseSolver):
         n_classes = len(set(y))
         n_chans = X[0].shape[0]
         n_times = X[0].shape[1]
-        # TODO: get the dataset name from extra_info
+
         callbacks = get_braindecode_callbacks(
             dataset_name=extra_info["dataset_name"],
             patience=self.patience,

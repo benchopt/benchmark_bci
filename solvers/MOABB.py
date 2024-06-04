@@ -15,7 +15,6 @@ class Solver(BaseSolver):
         "pipeline": [
             "AUGTangSVMGrid",
             "MDM",
-            "MDMAug",
             "TangentSpaceSVMGrid",
             "COVCSPLDA",
             "FgMDM",
@@ -25,14 +24,13 @@ class Solver(BaseSolver):
             "COVCSPSVMGrid",
             "TSElasticNetGrid",
             "TangentSpaceLR",
-            "TRCSPLDA",
             "DUMMY",
         ],
     }
 
     sampling_strategy = 'run_once'
 
-    def set_objective(self, X, y, sfreq, extra_info):
+    def set_objective(self, X, y, sfreq):
         """Set the objective information from Objective.get_objective.
 
         Objective
