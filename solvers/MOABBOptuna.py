@@ -18,6 +18,8 @@ class Solver(OptunaSolver):
             "TRCSPLDA",
             "MDM",
             "TangentSpaceSVMGrid",
+            "AUGTangSVMGrid",
+            # "COVCSPLDA", #Not working with cross_validation
         ],
     }
 
