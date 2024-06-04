@@ -35,24 +35,18 @@ class OptunaSolver(BaseSolver):
         # `Objective.get_objective`. This defines the benchmark's API for
         # passing the objective to the solver.
         # It is customizable for each benchmark.
-        X, X_val, y, y_val = train_test_split(
-            X_train, y_train, test_size=self.params['test_size'],
-            random_state=self.params['seed'], stratify=y_train
-        )
 
-        self.X_train, self.y_train = X, y
-        self.X_val, self.y_val = X_val, y_val
         self.model = self.get_model()
 
     def objective(self, trial):
-        import pdb; pdb.set_trace()
+
         param = self.sample_parameters(trial)
         params = self.extra_model_params.copy()
+        model_name = self.clf['pipeline'].steps[0][0]
         params.update({
-            f"model__{p}": v for p, v in param.items()
+            f"pipeline__{model_name}__{p}": v for p, v in param.items()
         })
-
-        model = self.model.set_params(**params)
+        model = self.clf.set_params(**params)
         cross_score = cross_validate(
             model, self.X_train, self.y_train, return_estimator=True
         )
@@ -60,15 +54,12 @@ class OptunaSolver(BaseSolver):
 
         return cross_score['test_score'].mean()
 
-    def run(self, callback, _):
-        # This is the function that is called to evaluate the solver.
-        # It runs the algorithm for a given a number of iterations `n_iter`.
-        if isinstance(self.y, SliceDataset):
-            self.y = to_numpy(self.y)
+    def run(self, callback):
 
-        self.clf.fit(self.X, self.y)
-
+        # Creating a sampler to sample the hyperparameters.
         sampler = optuna.samplers.RandomSampler()
+        # Initialize the best model with a dummy classifier, the optuna
+        # need to beat this model.
         self.best_model = DummyClassifier().fit(self.X_train, self.y_train)
         study = optuna.create_study(direction="maximize", sampler=sampler)
         while callback():
