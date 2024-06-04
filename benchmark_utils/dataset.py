@@ -110,6 +110,7 @@ def windows_data(
     save_path = Path(mem.location) / f"windows_dataset_{paradigm_name}"
     save_obj = Path(mem.location) / f"windows_dataset_{paradigm_name}.pickle"
     try:
+        raise FileNotFoundError
         try:
             file = open(save_obj, 'rb')
             windows_dataset = load(file)
@@ -121,7 +122,7 @@ def windows_data(
             # Hacking way to capture verbose output
             with contextlib.redirect_stdout(f):
                 windows_dataset = load_concat_dataset(str(save_path.resolve()),
-                                                      preload=True, n_jobs=-1)
+                                                      preload=True, n_jobs=1)
 
         sfreq = windows_dataset.datasets[0].windows.info['sfreq']
         print(f"Using cached windows dataset {paradigm_name}.")
@@ -152,13 +153,13 @@ def windows_data(
             drop_bad_windows=True,
             drop_last_window=True,
         )
-        if not save_obj.exists():
-            with open(save_obj, 'wb') as file:
-                dump(windows_dataset, file)
+        #if not save_obj.exists():
+        #    with open(save_obj, 'wb') as file:
+        #        dump(windows_dataset, file)
 
-        if not save_path.exists():
-            save_path.mkdir()
-        windows_dataset.save(str(save_path.resolve()), overwrite=True)
+        #if not save_path.exists():
+        #    save_path.mkdir()
+        #windows_dataset.save(str(save_path.resolve()), overwrite=True)
 
     return windows_dataset, sfreq
 
