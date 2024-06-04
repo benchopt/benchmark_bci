@@ -47,6 +47,6 @@ class Dataset(BaseDataset):
         return dict(
             dataset=dataset,
             sfreq=sfreq,
-            paradigm_name=self.paradigm_name,
+            paradigm_name=paradigm_name,
             dataset_name=dataset_name,
         )
