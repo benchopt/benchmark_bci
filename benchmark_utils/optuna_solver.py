@@ -6,11 +6,9 @@ from benchopt.stopping_criterion import SufficientProgressCriterion
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     import optuna
-    from benchmark_utils import AverageClassifier
     from sklearn.model_selection import cross_validate
     from sklearn.dummy import DummyClassifier
-    from sklearn.model_selection import train_test_split
-    from skorch.helper import SliceDataset, to_numpy
+
 
 # The benchmark solvers must be named `Solver` and
 # inherit from `BaseSolver` for `benchopt` to work properly.
@@ -28,7 +26,7 @@ class OptunaSolver(BaseSolver):
     extra_model_params = {}
 
     def set_objective(
-            self, X_train, y_train, sfreq
+            self, X, y, sfreq
     ):
         # Define the information received by each solver from the objective.
         # The arguments of this function are the results of the
@@ -44,12 +42,12 @@ class OptunaSolver(BaseSolver):
         params = self.extra_model_params.copy()
 
         params.update({
-            f"pipeline__{step_name}__{p}": v  for step_name, step in param.items()
+            f"pipeline__{step_name}__{p}": v for step_name, step in param.items()
             for p, v in step.items()
         })
         model = self.clf.set_params(**params)
         cross_score = cross_validate(
-            model, self.X_train, self.y_train, return_estimator=True
+            model, self.X, self.y, return_estimator=True
         )
         trial.set_user_attr('model', cross_score['estimator'])
 
@@ -61,13 +59,11 @@ class OptunaSolver(BaseSolver):
         sampler = optuna.samplers.RandomSampler()
         # Initialize the best model with a dummy classifier, the optuna
         # need to beat this model.
-        self.best_model = DummyClassifier().fit(self.X_train, self.y_train)
+        self.best_model = DummyClassifier().fit(self.X, self.y)
         study = optuna.create_study(direction="maximize", sampler=sampler)
         while callback():
             study.optimize(self.objective, n_trials=10)
-            self.best_model = AverageClassifier(
-                study.best_trial.user_attrs['model']
-            )
+            self.best_model = study.best_trial.user_attrs['model']
 
     def get_result(self):
         # Return the result from one optimization run.
