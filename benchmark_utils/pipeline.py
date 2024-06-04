@@ -48,7 +48,9 @@ def get_hyperparams_from_pipeline(pipeline, trial):
         solver = trial.suggest_categorical("solver", ["eigen"])
 
         param = dict(
-            lineardiscriminantanalysis=dict(shrinkage=shrinkage, solver=solver),
+            lineardiscriminantanalysis=dict(
+                shrinkage=shrinkage, solver=solver
+            ),
             covariances=dict(estimator=estimator),
             trcsp=dict(nfilter=n_filters),
         )
