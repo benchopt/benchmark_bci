@@ -10,7 +10,7 @@ with safe_import_context() as import_ctx:
     from sklearn.model_selection import cross_validate
     from sklearn.dummy import DummyClassifier
     from sklearn.model_selection import train_test_split
-
+    from skorch.helper import SliceDataset, to_numpy
 
 # The benchmark solvers must be named `Solver` and
 # inherit from `BaseSolver` for `benchopt` to work properly.
@@ -45,11 +45,13 @@ class OptunaSolver(BaseSolver):
         self.model = self.get_model()
 
     def objective(self, trial):
+        import pdb; pdb.set_trace()
         param = self.sample_parameters(trial)
         params = self.extra_model_params.copy()
         params.update({
             f"model__{p}": v for p, v in param.items()
         })
+
         model = self.model.set_params(**params)
         cross_score = cross_validate(
             model, self.X_train, self.y_train, return_estimator=True
@@ -58,9 +60,14 @@ class OptunaSolver(BaseSolver):
 
         return cross_score['test_score'].mean()
 
-    def run(self, callback):
+    def run(self, callback, _):
         # This is the function that is called to evaluate the solver.
         # It runs the algorithm for a given a number of iterations `n_iter`.
+        if isinstance(self.y, SliceDataset):
+            self.y = to_numpy(self.y)
+
+        self.clf.fit(self.X, self.y)
+
         sampler = optuna.samplers.RandomSampler()
         self.best_model = DummyClassifier().fit(self.X_train, self.y_train)
         study = optuna.create_study(direction="maximize", sampler=sampler)
@@ -76,10 +83,3 @@ class OptunaSolver(BaseSolver):
         # This defines the benchmark's API for solvers' results.
         # it is customizable for each benchmark.
         return dict(model=self.best_model)
-
-    def get_next(self, n_iter):
-
-        return n_iter + 1
-
-    def warmup_solver(self):
-        pass
