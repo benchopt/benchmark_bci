@@ -36,6 +36,6 @@ def get_hyperparams_from_pipeline(pipeline, trial):
     elif pipeline == 'MDM':
         metric_options = ["riemann", "logeuclid"]
         metric = trial.suggest_categorical('metric', metric_options)
-
-        param = dict(mdm=dict(metric=metric))
+        estimator = trial.suggest_categorical('estimator', ["cov", "lwf"])
+        param = dict(mdm=dict(metric=metric), covariances=dict(estimator=estimator))
         return param
