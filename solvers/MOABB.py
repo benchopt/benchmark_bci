@@ -18,7 +18,7 @@ class Solver(BaseSolver):
             'Cov-CSP-LDA_svd',
             'Cov-FgMDM',
             'Cov-MDM',
-            'Cov-MDMAug',
+            # 'Cov-MDMAug', Not working, contact Chris later
             'Cov-Tang-LogReg',
             'Cov-Tang-LogReg_ElNet',
             'Cov-Tang-SVM',
