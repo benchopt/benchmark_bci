@@ -4,8 +4,10 @@
 # the usual import syntax
 from .dataset import windows_data
 from .average import AverageClassifier
+from .optuna_solver import OptunaSolver
 
 __all__ = [
     "windows_data",
-    "AverageClassifier"
+    "AverageClassifier",
+    "OptunaSolver"
 ]
