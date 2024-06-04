@@ -1,32 +1,27 @@
-from benchopt import safe_import_context, BaseSolver
+from benchopt import BaseSolver, safe_import_context
 
 
 with safe_import_context() as import_ctx:
-    from sklearn.svm import SVC
     from sklearn.pipeline import make_pipeline
     from sklearn.pipeline import FunctionTransformer
 
     from pyriemann.estimation import Covariances
-    from pyriemann.tangentspace import TangentSpace
+    from pyriemann.classification import MDM
 
     from skorch.helper import to_numpy
 
 
-# The benchmark solvers must be named `Solver` and
-# inherit from `AugmentedBCISolver` for `BCI benchmark` to work properly.
 class Solver(BaseSolver):
-
-    name = "TGSPSVM"
+    name = "Cov-MDM"
     parameters = {
         "covariances_estimator": ["oas"],
-        "tangentspace_metric": ["riemann"],
-        "svm_kernel": ["linear"],
+        "MDM_metric": ["riemann"],
     }
 
     install_cmd = "conda"
     requirements = ["pyriemann"]
 
-    sampling_strategy = "run_once"
+    sampling_strategy = 'run_once'
 
     def set_objective(self, X, y, sfreq):
         """Set the objective information from Objective.get_objective.
@@ -44,8 +39,7 @@ class Solver(BaseSolver):
         self.clf = make_pipeline(
             FunctionTransformer(to_numpy),
             Covariances(estimator=self.covariances_estimator),
-            TangentSpace(metric=self.tangentspace_metric),
-            SVC(kernel=self.svm_kernel),
+            MDM(metric=self.MDM_metric)
         )
 
     def run(self, _):

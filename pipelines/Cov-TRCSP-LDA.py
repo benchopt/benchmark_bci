@@ -11,7 +11,7 @@ pipe = make_pipeline(
 
 # this is what will be loaded
 PIPELINE = {
-    "name": "TRCSPLDA",
+    "name": "Cov-TRCSP-LDA",
     "paradigms": ["LeftRightImagery"],
     "pipeline": pipe,
 }

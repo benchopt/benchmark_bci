@@ -109,7 +109,7 @@ pipe = make_pipeline(
 
 # this is what will be loaded
 PIPELINE = {
-    "name": "MDMAug",
+    "name": "Cov-MDMAug",
     "paradigms": ["LeftRightImagery"],
     "pipeline": pipe,
 }

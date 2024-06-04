@@ -2,26 +2,23 @@ from benchopt import BaseSolver, safe_import_context
 
 
 with safe_import_context() as import_ctx:
+    from numpy import double
+
     from sklearn.pipeline import make_pipeline
     from sklearn.pipeline import FunctionTransformer
+    from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 
-    from pyriemann.estimation import Covariances
-    from pyriemann.classification import KNearestNeighbor
+    from mne.decoding import CSP
 
     from skorch.helper import to_numpy
 
 
 class Solver(BaseSolver):
-    name = "K Nearest-Neighbors"
-
-    install_cmd = "conda"
-    requirements = ["pyriemann"]
-
+    name = "CSP-LDA"
     parameters = {
-        "covariances_estimator": ["oas"],
-        "KNN_cov_metric": ["euclid"],
-        "n_neighbors": [7],
+        "n_components": [8],
     }
+
     sampling_strategy = 'run_once'
 
     def set_objective(self, X, y, sfreq):
@@ -33,15 +30,14 @@ class Solver(BaseSolver):
         y: training labels to train the model.
         sfreq: sampling frequency to allow filtering the data.
         """
+
         self.sfreq = sfreq
         self.X = X
-        self.y = to_numpy(y)
-
+        self.y = y
         self.clf = make_pipeline(
-            FunctionTransformer(to_numpy),
-            Covariances(estimator=self.covariances_estimator),
-            KNearestNeighbor(n_neighbors=self.n_neighbors,
-                             metric=self.KNN_cov_metric),
+            FunctionTransformer(lambda X: to_numpy(X).astype(double)),
+            CSP(n_components=self.n_components),
+            LDA(),
         )
 
     def run(self, _):
