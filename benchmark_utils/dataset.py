@@ -58,7 +58,7 @@ def pre_process_windows_dataset(
             factor=factor,
         ),
         # Bandpass filter
-        Preprocessor("filter", l_freq=low_cut_hz, h_freq=high_cut_hz),
+        Preprocessor("filter", l_freq=low_cut_hz, h_freq=high_cut_hz, verbose=False),
     ]
 
     # Transform the data
