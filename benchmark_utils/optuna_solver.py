@@ -42,9 +42,10 @@ class OptunaSolver(BaseSolver):
 
         param = self.sample_parameters(trial)
         params = self.extra_model_params.copy()
-        model_name = self.clf['pipeline'].steps[0][0]
+
         params.update({
-            f"pipeline__{model_name}__{p}": v for p, v in param.items()
+            f"pipeline__{step_name}__{p}": v  for step_name, step in param.items()
+            for p, v in step.items()
         })
         model = self.clf.set_params(**params)
         cross_score = cross_validate(
