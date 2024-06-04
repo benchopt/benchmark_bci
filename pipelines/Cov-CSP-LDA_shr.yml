@@ -1,4 +1,4 @@
-name: COVCSPSVMGrid
+name: Cov-CSP-LDA_shr
 
 paradigms:
   - LeftRightImagery
@@ -19,24 +19,8 @@ pipeline:
     parameters:
       nfilter: 6
 
-  - name: SVC
-    from: sklearn.svm
+  - name: LinearDiscriminantAnalysis
+    from: sklearn.discriminant_analysis
     parameters:
-      kernel: "linear"
-
-param_grid:
-  csp__nfilter:
-    - 2
-    - 3
-    - 4
-    - 5
-    - 6
-    - 7
-    - 8
-  svc__C:
-    - 0.5
-    - 1
-    - 1.5
-  svc__kernel:
-    - "rbf"
-    - "linear"
+      solver: lsqr
+      shrinkage: auto

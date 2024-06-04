@@ -1,4 +1,4 @@
-name: LogVarianceSVMgrid
+name: LogVar-SVM
 
 paradigms:
   - LeftRightImagery

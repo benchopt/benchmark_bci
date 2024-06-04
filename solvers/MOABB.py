@@ -13,19 +13,20 @@ class Solver(BaseSolver):
     name = "MOABBPipelines"
     parameters = {
         "pipeline": [
-            "AUGTangSVMGrid",
-            "MDM",
-            "TangentSpaceSVMGrid",
-            "COVCSPLDA",
-            "FgMDM",
-            "LogVarianceLDA",
-            "DLCSPautoshLDA",
-            "LogVarianceSVMgrid",
-            "COVCSPSVMGrid",
-            "TSElasticNetGrid",
-            "TangentSpaceLR",
-            "DUMMY",
-        ],
+            'Aug-Cov-Tang-SVM',
+            'Cov-CSP-LDA_shr',
+            'Cov-CSP-LDA_svd',
+            'Cov-FgMDM',
+            'Cov-MDM',
+            # 'Cov-MDMAug', Not working, contact Chris later
+            'Cov-Tang-LogReg',
+            'Cov-Tang-LogReg_ElNet',
+            'Cov-Tang-SVM',
+            'Cov-TRCSP-LDA',
+            'DUMMY',
+            'LogVar-LDA',
+            'LogVar-SVM',
+        ]
     }
 
     sampling_strategy = 'run_once'
@@ -42,7 +43,6 @@ class Solver(BaseSolver):
         self.sfreq = sfreq
         self.X = X
         self.y = y
-
         self.clf = make_pipeline(
             FunctionTransformer(to_numpy),
             parser_pipelines()[self.pipeline]
