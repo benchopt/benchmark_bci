@@ -6,6 +6,7 @@ from benchopt.stopping_criterion import SufficientProgressCriterion
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     import optuna
+    from sklearn.base import clone
     from sklearn.model_selection import cross_validate
     from sklearn.dummy import DummyClassifier
 
@@ -45,12 +46,12 @@ class OptunaSolver(BaseSolver):
                 for p, v in step.items()
             }
         )
-        model = self.clf.set_params(**params)
+        model = clone(self.clf).set_params(**params)
         # Do we need to ensure the y stratification????
         cross_score = cross_validate(
             model, self.X, self.y, return_estimator=True
         )
-        # Check with tomas if this is the right way to do it
+
         trial.set_user_attr("model", model.fit(self.X, self.y))
 
         return cross_score["test_score"].mean()
