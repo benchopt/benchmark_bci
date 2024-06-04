@@ -15,11 +15,19 @@ class Solver(OptunaSolver):
     name = "MOABBPipelinesOptuna"
     parameters = {
         "pipeline": [
-            "TRCSPLDA",
-            "MDM",
-            "TangentSpaceSVMGrid",
-            "AUGTangSVMGrid",
-            # "COVCSPLDA", #Not working with cross_validation
+            'Aug-Cov-Tang-SVM',
+            'Cov-CSP-LDA_shr',
+            'Cov-CSP-LDA_svd',
+            'Cov-FgMDM',
+            'Cov-MDM',
+            # 'Cov-MDMAug', Not working, contact Chris later
+            'Cov-Tang-LogReg',
+            'Cov-Tang-LogReg_ElNet',
+            'Cov-Tang-SVM',
+            'Cov-TRCSP-LDA',
+            'DUMMY',
+            'LogVar-LDA',
+            'LogVar-SVM',
         ],
     }
 
