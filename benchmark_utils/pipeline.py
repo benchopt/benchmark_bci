@@ -31,7 +31,11 @@ def get_hyperparams_from_pipeline(pipeline, trial):
         strategy_options = ["most_frequent", "prior", "stratified",
                             "uniform"]
         strategy = trial.suggest_categorical('strategy', strategy_options)
+        param = dict(dummyclassifer=dict(strategy=strategy))
+        return param
+    elif pipeline == 'MDM':
+        metric_options = ["riemann", "logeuclid"]
+        metric = trial.suggest_categorical('metric', metric_options)
 
-        return dict(
-            strategy=strategy,
-        )
+        param = dict(mdm=dict(metric=metric))
+        return param
