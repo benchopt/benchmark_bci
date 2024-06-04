@@ -16,8 +16,8 @@ class Solver(OptunaSolver):
     parameters = {
         "pipeline": [
             'Aug-Cov-Tang-SVM',
-            'Cov-CSP-LDA_shr',
-            'Cov-CSP-LDA_svd',
+            # 'Cov-CSP-LDA_shr', Not working, fix this later
+            # 'Cov-CSP-LDA_svd', Not working, fix this later
             'Cov-FgMDM',
             'Cov-MDM',
             # 'Cov-MDMAug', Not working, contact Chris later
