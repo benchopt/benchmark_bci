@@ -5,9 +5,11 @@
 from .dataset import windows_data
 from .average import AverageClassifier
 from .optuna_solver import OptunaSolver
+from .pipeline import get_hyperparams_from_pipeline
 
 __all__ = [
     "windows_data",
     "AverageClassifier",
-    "OptunaSolver"
+    "OptunaSolver",
+    "get_hyperparams_from_pipeline",
 ]

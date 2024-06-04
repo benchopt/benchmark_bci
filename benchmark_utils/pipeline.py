@@ -21,3 +21,17 @@ def parser_pipelines(dir_path="pipelines", filtering_paradigm=None):
         if any(par in filtering_paradigm for par in pipeline["paradigms"]):
             pipelines.update({pipeline["name"]: pipeline["pipeline"]})
     return pipelines
+
+
+def get_hyperparams_from_pipeline(pipeline, trial):
+    """
+    Get the parameters from a pipeline.
+    """
+    if pipeline == 'DUMMY':
+        strategy_options = ["most_frequent", "prior", "stratified",
+                            "uniform"]
+        strategy = trial.suggest_categorical('strategy', strategy_options)
+
+        return dict(
+            strategy=strategy,
+        )
