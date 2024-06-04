@@ -3,17 +3,17 @@ from benchopt import safe_import_context
 with safe_import_context() as import_ctx:
     from benchmark_utils import OptunaSolver
     from skorch.helper import SliceDataset, to_numpy
-    from sklearn.pipeline import make_pipeline
-    from sklearn.pipeline import FunctionTransformer
+    from sklearn.model_selection import train_test_split
+    from sklearn.pipeline import make_pipeline, FunctionTransformer
 
-    from benchmark_utils.pipeline import parser_pipelines
+    from benchmark_utils.pipeline import parser_pipelines, get_hyperparams_from_pipeline
 
 
 class Solver(OptunaSolver):
     name = "MOABBPipelinesOptuna"
     parameters = {
         "pipeline": [
-            "DUMMY",
+            "MDM",
         ],
     }
 
@@ -29,34 +29,23 @@ class Solver(OptunaSolver):
         self.sfreq = sfreq
         self.X = X
         self.y = y
+        if isinstance(self.y, SliceDataset):
+            self.y = to_numpy(self.y)
 
         self.clf = make_pipeline(
             FunctionTransformer(to_numpy),
             parser_pipelines()[self.pipeline]
         )
+        X_train, X_val, y_train, y_val = train_test_split(
+            X, self.y, test_size=self.params['test_size'],
+            random_state=self.params['seed'], stratify=self.y
+        )
 
-    def get_model(self):
-        return self.clf
-
-    def get_result(self):
-        """Return the model to `Objective.evaluate_result`.
-
-        Result
-        ------
-        model: an instance of a fitted model.
-            This model should have methods `score` and `predict`, that accept
-            braindecode.WindowsDataset as input.
-        """
-        return dict(model=self.clf)
+        self.X_train, self.y_train = X_train, y_train
+        self.X_val, self.y_val = X_val, y_val
 
     def get_model(self):
         return self.clf
 
     def sample_parameters(self, trial):
-        strategy_options = ["most_frequent", "prior", "stratified",
-                            "uniform", "constant"]
-        strategy_parameters = trial.suggest_categorical('strategy', strategy_options)
-
-        return dict(
-            strategy_parameters=strategy_parameters,
-        )
+        return get_hyperparams_from_pipeline(self.pipeline, trial)
