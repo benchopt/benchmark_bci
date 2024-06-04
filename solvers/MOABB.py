@@ -15,7 +15,6 @@ class Solver(BaseSolver):
         "pipeline": [
             "AUGTangSVMGrid",
             "MDM",
-            "MDMAug",
             "TangentSpaceSVMGrid",
             "COVCSPLDA",
             "FgMDM",
@@ -25,7 +24,6 @@ class Solver(BaseSolver):
             "COVCSPSVMGrid",
             "TSElasticNetGrid",
             "TangentSpaceLR",
-            "TRCSPLDA",
             "DUMMY",
         ],
     }
