@@ -89,11 +89,10 @@ def get_parameters_for_layer(name, trial):
         return fgmdm
     if name == "LOGREG":
         # Optuna parameters for the Logistic Regression
-        penalty = trial.suggest_categorical("penalty", ["l1", "l2"])
+        penalty = trial.suggest_categorical("penalty", ["l2"])
         C = trial.suggest_float("C", 1e-6, 1e6, log=True)
-        solver = trial.suggest_categorical("solver", ["lbfgs", "liblinear"])
-        max_iter = trial.suggest_int("max_iter", 100, 1000)
-        logreg = dict(penalty=penalty, C=C, solver=solver, max_iter=max_iter)
+        solver = trial.suggest_categorical("solver", ["lbfgs", "saga"])
+        logreg = dict(penalty=penalty, C=C, solver=solver)
         return logreg
     if name == "LogReg_ElNet".upper():
         l1_ratio = trial.suggest_float("l1_ratio", 0.2, 0.75)
