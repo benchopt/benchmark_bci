@@ -104,7 +104,7 @@ def get_hyperparams_from_pipeline(pipeline, trial):
     """
     Get the parameters from a pipeline.
     """
-    option_valid = [
+    _ = [
         "Aug-Cov-Tang-SVM",  # ok
         "Cov-CSP-LDA_shr",  # talk with Thomas
         "Cov-CSP-LDA_svd",  # talk with Thomas
