@@ -36,13 +36,6 @@ class Solver(OptunaSolver):
             FunctionTransformer(to_numpy),
             parser_pipelines()[self.pipeline]
         )
-        X_train, X_val, y_train, y_val = train_test_split(
-            X, self.y, test_size=self.params['test_size'],
-            random_state=self.params['seed'], stratify=self.y
-        )
-
-        self.X_train, self.y_train = X_train, y_train
-        self.X_val, self.y_val = X_val, y_val
 
     def get_model(self):
         return self.clf
