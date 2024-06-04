@@ -1,4 +1,4 @@
-name: DLCSPautoshLDA
+name: Cov-CSP-LDA_svd
 
 paradigms:
   - LeftRightImagery
@@ -22,5 +22,4 @@ pipeline:
   - name: LinearDiscriminantAnalysis
     from: sklearn.discriminant_analysis
     parameters:
-      solver: lsqr
-      shrinkage: auto
+      solver: svd
