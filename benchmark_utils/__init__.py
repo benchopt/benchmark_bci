@@ -3,7 +3,9 @@
 # name `benchmark_utils`, and code defined inside will be importable using
 # the usual import syntax
 from .dataset import windows_data
+from .average import AverageClassifier
 
 __all__ = [
     "windows_data",
+    "AverageClassifier"
 ]
