@@ -37,7 +37,8 @@ def fetch_layer_params(name, trial) -> dict:
     Returns
     -------
     dict
-        Dictionary of Dictionary with the hyperparameters for the pipeline-layer.
+        Dictionary of Dictionary with the hyperparameters for the
+        pipeline-layer.
     """
     name = name.upper()
     if name == "SVM":
