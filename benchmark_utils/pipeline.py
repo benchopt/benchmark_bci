@@ -121,7 +121,5 @@ def merge_params_from_steps(steps, trial):
     for step in steps:
         param_list.append(fetch_layer_params(step, trial))
 
-    merged_params = {k: v
-                     for params in param_list
-                     for k, v in params.items()}
+    merged_params = {k: v for params in param_list for k, v in params.items()}
     return merged_params
