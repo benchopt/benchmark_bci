@@ -26,6 +26,7 @@ class Objective(BaseObjective):
         "pytorch:pytorch",
         "pip:git+https://github.com/Neurotechx/moabb@develop#egg=moabb",
         "pip:git+https://github.com/braindecode/braindecode@master#egg=braindecode",  # noqa
+        "pip:optuna"
     ]
 
     parameters = {

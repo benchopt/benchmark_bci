@@ -6,8 +6,8 @@ from benchopt import BaseDataset, safe_import_context
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     from braindecode.datasets import MOABBDataset
-    from benchmark_utils import windows_data, detect_if_cluster
     from moabb.utils import set_download_dir
+    from benchmark_utils import windows_data, detect_if_cluster
 
 
 class Dataset(BaseDataset):
@@ -29,6 +29,7 @@ class Dataset(BaseDataset):
         running_cluster = detect_if_cluster()
         if running_cluster is not None:
             set_download_dir(running_cluster)
+
         dataset_name = "BNCI2014_001"
         data = MOABBDataset(dataset_name=dataset_name, subject_ids=None)
 
