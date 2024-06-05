@@ -21,4 +21,3 @@ def parser_pipelines(dir_path="pipelines", filtering_paradigm=None):
         if any(par in filtering_paradigm for par in pipeline["paradigms"]):
             pipelines.update({pipeline["name"]: pipeline["pipeline"]})
     return pipelines
-
