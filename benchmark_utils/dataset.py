@@ -24,7 +24,7 @@ with safe_import_context() as import_ctx:
 
 
 def pre_process_windows_dataset(
-    dataset, low_cut_hz=4.0, high_cut_hz=38.0, factor=1e6, n_jobs=20
+    dataset, low_cut_hz=4.0, high_cut_hz=38.0, factor=1e6, n_jobs=-1
 ):
     """
     Preprocess the window dataset.
@@ -126,7 +126,6 @@ def windows_data(
             f = io.StringIO()
             # Hacking way to capture verbose output
             with contextlib.redirect_stdout(f):
-
                 windows_dataset = load_concat_dataset(
                     str(save_path.resolve()), preload=False, n_jobs=1
                 )
@@ -160,7 +159,6 @@ def windows_data(
             drop_bad_windows=True,
             drop_last_window=True,
         )
-
         if not save_obj.exists():
             with open(save_obj, "wb") as file:
                 dump(windows_dataset, file)
