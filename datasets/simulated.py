@@ -42,7 +42,11 @@ class Dataset(BaseDataset):
             dataset_kwargs=_fakedataset_kwargs,
         )
 
-        dataset, sfreq = windows_data(data, paradigm_name)
+        dataset, sfreq = windows_data(data, paradigm_name, dataset_name)
 
-        return dict(dataset=dataset, sfreq=sfreq, paradigm_name=paradigm_name,
-                    dataset_name=dataset_name)
+        return dict(
+            dataset=dataset,
+            sfreq=sfreq,
+            paradigm_name=paradigm_name,
+            dataset_name=dataset_name,
+        )

@@ -19,6 +19,7 @@ with safe_import_context() as import_ctx:
     from benchopt.config import get_setting
     from joblib import Memory
     from benchmark_utils import turn_off_warnings
+
     turn_off_warnings()
 
 
@@ -74,6 +75,7 @@ def pre_process_windows_dataset(
 def windows_data(
     dataset,
     paradigm_name,
+    dataset_name,
     trial_start_offset_seconds=-0.5,
     low_cut_hz=4.0,
     high_cut_hz=38.0,
@@ -88,6 +90,8 @@ def windows_data(
         Dataset to use.
     paradigm_name: str
         Name of the paradigm to use.
+    dataset_name: str
+        Name of the dataset.
     Returns:
     --------
     windows_dataset: WindowsDataset
@@ -105,14 +109,16 @@ def windows_data(
     elif paradigm_name == "MotorImagery":
         mapping = {"left_hand": 0, "right_hand": 1, "feet": 2, "tongue": 3}
 
-    mem = Memory(get_setting('cache') or "__cache__", verbose=0)
+    mem = Memory(get_setting("cache") or "__cache__", verbose=0)
 
-    save_path = Path(mem.location) / f"windows_dataset_{paradigm_name}"
-    save_obj = Path(mem.location) / f"windows_dataset_{paradigm_name}.pickle"
+    save_path = Path(mem.location) / f"{dataset_name}_dataset_{paradigm_name}"
+    save_obj = (
+        Path(mem.location) / f"{dataset_name}_dataset_{paradigm_name}.pickle"
+    )
     try:
         raise FileNotFoundError
         try:
-            file = open(save_obj, 'rb')
+            file = open(save_obj, "rb")
             windows_dataset = load(file)
         except Exception:
             if not save_path.exists():
@@ -121,10 +127,12 @@ def windows_data(
             f = io.StringIO()
             # Hacking way to capture verbose output
             with contextlib.redirect_stdout(f):
-                windows_dataset = load_concat_dataset(str(save_path.resolve()),
-                                                      preload=True, n_jobs=1)
 
-        sfreq = windows_dataset.datasets[0].windows.info['sfreq']
+                windows_dataset = load_concat_dataset(
+                    str(save_path.resolve()), preload=False, n_jobs=1
+                )
+
+        sfreq = windows_dataset.datasets[0].windows.info["sfreq"]
         print(f"Using cached windows dataset {paradigm_name}.")
     except FileNotFoundError:
         print(f"Creating windows dataset {paradigm_name}.")
@@ -153,9 +161,10 @@ def windows_data(
             drop_bad_windows=True,
             drop_last_window=True,
         )
-        #if not save_obj.exists():
-        #    with open(save_obj, 'wb') as file:
-        #        dump(windows_dataset, file)
+
+        if not save_obj.exists():
+            with open(save_obj, "wb") as file:
+                dump(windows_dataset, file)
 
         #if not save_path.exists():
         #    save_path.mkdir()

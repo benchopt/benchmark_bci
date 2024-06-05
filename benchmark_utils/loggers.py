@@ -5,7 +5,8 @@ from benchopt import safe_import_context
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     from skorch.callbacks import LRScheduler, EarlyStopping, EpochScoring
-
+    import warnings
+    import mne
 
 def import_wandb_loggers(
     dataset_name=None, model_name=None, validation_name=None, project_name=None
@@ -36,15 +37,6 @@ def import_wandb_loggers(
 
     except ImportError:
         return None
-
-
-def turn_off_warnings():
-    import warnings
-
-    warnings.filterwarnings("ignore")
-    import mne
-
-    mne.set_log_level("ERROR")
 
 
 def get_braindecode_callbacks(
@@ -114,3 +106,9 @@ def get_braindecode_callbacks(
         ]
 
     return callbacks
+
+
+def turn_off_warnings():
+
+    warnings.filterwarnings("ignore")
+    mne.set_log_level("ERROR")
