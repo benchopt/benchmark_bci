@@ -55,7 +55,6 @@ class Objective(BaseObjective):
 
         self.dataset = dataset
         self.sfreq = sfreq
-        self.paradigm_name = paradigm_name
 
         if self.evaluation_process == "intra_session":
             self.cv = IntraSessionSplitter(n_folds=self.n_folds)
@@ -69,7 +68,6 @@ class Objective(BaseObjective):
             )
 
         self.cv_metadata = dict(df_meta=dataset.get_metadata())
-
         self.extra_info = dict(
             evaluation_process=self.evaluation_process,
             n_folds=self.n_folds,
