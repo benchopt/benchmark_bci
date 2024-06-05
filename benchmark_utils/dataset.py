@@ -166,9 +166,9 @@ def windows_data(
             with open(save_obj, "wb") as file:
                 dump(windows_dataset, file)
 
-        #if not save_path.exists():
-        #    save_path.mkdir()
-        #windows_dataset.save(str(save_path.resolve()), overwrite=True)
+        if not save_path.exists():
+            save_path.mkdir()
+        windows_dataset.save(str(save_path.resolve()), overwrite=True)
 
     return windows_dataset, sfreq
 

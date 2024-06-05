@@ -8,6 +8,7 @@ with safe_import_context() as import_ctx:
     import warnings
     import mne
 
+
 def import_wandb_loggers(
     dataset_name=None, model_name=None, validation_name=None, project_name=None
 ):
