@@ -116,7 +116,6 @@ def windows_data(
         Path(mem.location) / f"{dataset_name}_dataset_{paradigm_name}.pickle"
     )
     try:
-        raise FileNotFoundError
         try:
             file = open(save_obj, "rb")
             windows_dataset = load(file)
