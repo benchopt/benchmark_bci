@@ -9,6 +9,7 @@ with safe_import_context() as import_ctx:
     from sklearn.base import clone
     from sklearn.model_selection import cross_validate
     from sklearn.dummy import DummyClassifier
+    from skorch.helper import SliceDataset, to_numpy
 
 
 # The benchmark solvers must be named `Solver` and
@@ -19,35 +20,31 @@ class OptunaSolver(BaseSolver):
         strategy="callback", patience=5
     )
 
-    params = {
-        "test_size": 0.20,
-        "seed": 42,
-    }
-
-    extra_model_params = {}
-
     def set_objective(self, X, y, sfreq):
         # Define the information received by each solver from the objective.
         # The arguments of this function are the results of the
         # `Objective.get_objective`. This defines the benchmark's API for
         # passing the objective to the solver.
         # It is customizable for each benchmark.
+        self.sfreq = sfreq
+        self.X = X
+        self.y = y
+        if isinstance(self.y, SliceDataset):
+            self.y = to_numpy(self.y)
 
         self.model = self.get_model()
 
     def objective(self, trial):
 
         param = self.sample_parameters(trial)
-        params = self.extra_model_params.copy()
-        params.update(
-            {
+        params = {
                 f"pipeline__{step_name}__{p}": v
                 for step_name, step in param.items()
                 for p, v in step.items()
             }
-        )
-        model = clone(self.clf).set_params(**params)
-        # Do we need to ensure the y stratification????
+
+        model = clone(self.model).set_params(**params)
+
         cross_score = cross_validate(
             model, self.X, self.y, return_estimator=True
         )
