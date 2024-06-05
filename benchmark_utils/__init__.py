@@ -5,8 +5,11 @@
 from .dataset import windows_data, detect_if_cluster
 from .loggers import turn_off_warnings
 
+from .optuna_solver import OptunaSolver
+
 __all__ = [
     "windows_data",
+    "OptunaSolver",
     "detect_if_cluster",
     "turn_off_warnings",
 ]
