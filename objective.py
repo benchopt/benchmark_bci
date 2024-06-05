@@ -139,5 +139,5 @@ class Objective(BaseObjective):
             X=self.X_train,
             y=self.y_train,
             sfreq=self.sfreq,
-            extra_info=self.extra_info,
-        )
+            extra_info=self.extra_info
+         )
