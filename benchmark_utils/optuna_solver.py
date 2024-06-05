@@ -38,10 +38,10 @@ class OptunaSolver(BaseSolver):
 
         param = self.sample_parameters(trial)
         params = {
-                f"pipeline__{step_name}__{p}": v
-                for step_name, step in param.items()
-                for p, v in step.items()
-            }
+            f"pipeline__{step_name}__{p}": v
+            for step_name, step in param.items()
+            for p, v in step.items()
+        }
 
         model = clone(self.model).set_params(**params)
 
