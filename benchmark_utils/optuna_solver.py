@@ -20,7 +20,7 @@ class OptunaSolver(BaseSolver):
         strategy="callback", patience=5
     )
 
-    def set_objective(self, X, y, sfreq):
+    def set_objective(self, X, y, sfreq, extra_info):
         # Define the information received by each solver from the objective.
         # The arguments of this function are the results of the
         # `Objective.get_objective`. This defines the benchmark's API for
