@@ -1,4 +1,0 @@
-git+https://github.com/bruAristimunha/braindecode#egg=braindecode
-git+https://github.com/benchopt/benchopt#egg=benchopt
-git+https://github.com/NeuroTechX/moabb#egg=moabb
-wandb
