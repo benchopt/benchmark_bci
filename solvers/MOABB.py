@@ -2,11 +2,15 @@ from benchopt import BaseSolver, safe_import_context
 
 
 with safe_import_context() as import_ctx:
+    from pathlib import Path
     from skorch.helper import SliceDataset, to_numpy
     from sklearn.pipeline import make_pipeline
     from sklearn.pipeline import FunctionTransformer
 
     from benchmark_utils.pipeline import parser_pipelines
+
+# Getting the path base on the file.
+pipeline_folder = str(Path(__file__).parent.parent / 'pipelines')
 
 
 class Solver(BaseSolver):
@@ -31,7 +35,7 @@ class Solver(BaseSolver):
 
     sampling_strategy = 'run_once'
 
-    def set_objective(self, X, y, sfreq):
+    def set_objective(self, X, y, sfreq, extra_info):
         """Set the objective information from Objective.get_objective.
 
         Objective
@@ -45,7 +49,7 @@ class Solver(BaseSolver):
         self.y = y
         self.clf = make_pipeline(
             FunctionTransformer(to_numpy),
-            parser_pipelines()[self.pipeline]
+            parser_pipelines(pipeline_folder)[self.pipeline]
         )
 
     def run(self, _):
