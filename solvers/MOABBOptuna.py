@@ -71,7 +71,7 @@ def fetch_layer_params(name, trial) -> dict:
         )
         cov = dict(estimator=cov_estimator)
         return {"covariances": cov}
-    if name == "COV_reg":
+    if name == "COV_reg".upper():
         # Parameters for the covariance with regularization
         cov_estimator = trial.suggest_categorical(
             "cov_estimator", ["lwf", "oas"]
@@ -125,7 +125,7 @@ def fetch_layer_params(name, trial) -> dict:
         metric = trial.suggest_categorical("metric", ["riemann"])
         tangentspace = dict(metric=metric)
         return {"tangentspace": tangentspace}
-
+    return {}
 
 def get_hyperparams_from_pipeline(pipeline, trial):
     """
