@@ -17,7 +17,7 @@ class Solver(BaseSolver):
     name = "MOABBPipelines"
     parameters = {
         "pipeline": [
-            'Aug-Cov-Tang-SVM',
+            'Aug-Cov_reg-Tang-SVM',
             'Cov-CSP-LDA_shr',
             'Cov-CSP-LDA_svd',
             'Cov-FgMDM',

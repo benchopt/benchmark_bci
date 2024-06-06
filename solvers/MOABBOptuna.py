@@ -14,7 +14,7 @@ class Solver(OptunaSolver):
     name = "MOABBPipelinesOptuna"
     parameters = {
         "pipeline": [
-            'Aug-Cov-Tang-SVM',
+            'Aug-Cov_reg-Tang-SVM',
             # 'Cov-CSP-LDA_shr', Not working, fix this later
             # 'Cov-CSP-LDA_svd', Not working, fix this later
             'Cov-FgMDM',
