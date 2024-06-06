@@ -125,7 +125,7 @@ def fetch_layer_params(name, trial) -> dict:
         metric = trial.suggest_categorical("metric", ["riemann"])
         tangentspace = dict(metric=metric)
         return {"tangentspace": tangentspace}
-    return {}
+    return {} # returning void 
 
 def get_hyperparams_from_pipeline(pipeline, trial):
     """
