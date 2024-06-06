@@ -127,6 +127,7 @@ def fetch_layer_params(name, trial) -> dict:
         return {"tangentspace": tangentspace}
     return {}
 
+
 def get_hyperparams_from_pipeline(pipeline, trial):
     """
     Get the parameters from a pipeline.
