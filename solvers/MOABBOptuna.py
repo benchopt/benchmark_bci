@@ -71,6 +71,13 @@ def fetch_layer_params(name, trial) -> dict:
         )
         cov = dict(estimator=cov_estimator)
         return {"covariances": cov}
+    if name == "COV_reg":
+        # Parameters for the covariance with regularization
+        cov_estimator = trial.suggest_categorical(
+            "cov_estimator", ["lwf", "oas"]
+        )
+        cov = dict(estimator=cov_estimator)
+        return {"covariances": cov}
     if name == "LDA":
         # Parameters for the LDA
         shrinkage = trial.suggest_float("shrinkage", 0, 1)
