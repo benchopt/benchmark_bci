@@ -14,7 +14,7 @@ class Solver(OptunaSolver):
     name = "MOABBPipelinesOptuna"
     parameters = {
         "pipeline": [
-            'Aug-Cov-Tang-SVM',
+            'Aug-Cov_reg-Tang-SVM',
             # 'Cov-CSP-LDA_shr', Not working, fix this later
             # 'Cov-CSP-LDA_svd', Not working, fix this later
             'Cov-FgMDM',
@@ -71,6 +71,13 @@ def fetch_layer_params(name, trial) -> dict:
         )
         cov = dict(estimator=cov_estimator)
         return {"covariances": cov}
+    if name == "COV_reg".upper():
+        # Parameters for the covariance with regularization
+        cov_estimator = trial.suggest_categorical(
+            "cov_estimator", ["lwf", "oas"]
+        )
+        cov = dict(estimator=cov_estimator)
+        return {"covariances": cov}
     if name == "LDA":
         # Parameters for the LDA
         shrinkage = trial.suggest_float("shrinkage", 0, 1)
@@ -118,6 +125,8 @@ def fetch_layer_params(name, trial) -> dict:
         metric = trial.suggest_categorical("metric", ["riemann"])
         tangentspace = dict(metric=metric)
         return {"tangentspace": tangentspace}
+
+    return {}  # returning void
 
 
 def get_hyperparams_from_pipeline(pipeline, trial):
