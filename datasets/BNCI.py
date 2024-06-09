@@ -13,9 +13,13 @@ with safe_import_context() as import_ctx:
 class Dataset(BaseDataset):
 
     # Name to select the dataset in the CLI and to display the results.
-    name = "BNCI"
+    name = "BNCI2014_001"
     parameters = {
-        'paradigm_name': ('MotorImagery', 'LeftRightImagery')
+        "events_labels":
+            [{"left_hand": 0, "right_hand": 1},  # LeftRightImagery
+             {"left_hand": 0, "right_hand": 1,  # MotorImagery
+             "feet": 2, "tongue": 3}],
+        "paradigm_name": "imagery",
     }
 
     def get_data(self):
@@ -30,10 +34,13 @@ class Dataset(BaseDataset):
         if running_cluster is not None:
             set_download_dir(running_cluster)
 
-        dataset_name = "BNCI2014_001"
-        data = MOABBDataset(dataset_name=dataset_name, subject_ids=None)
+        dataset_name = self.name
+        dataset = MOABBDataset(dataset_name=dataset_name, subject_ids=None)
 
-        dataset, sfreq = windows_data(data, self.paradigm_name, dataset_name)
+        dataset, sfreq = windows_data(dataset=dataset,
+                                      dataset_name=self.name,
+                                      events_labels=self.events_labels,
+                                      paradigm_name=self.paradigm_name)
 
         return dict(dataset=dataset, sfreq=sfreq,
                     paradigm_name=self.paradigm_name,

@@ -25,6 +25,11 @@ _fakedataset_kwargs = {
 class Dataset(BaseDataset):
     # Name to select the dataset in the CLI and to display the results.
     name = "Simulated"
+    parameters = {
+        "events_labels":
+            [{"left_hand": 0, "right_hand": 1}],  # LeftRightImagery,
+            "paradigm_name": "imagery",
+    }
 
     def get_data(self):
         """Returns the data to be passed to Objective.set_data.
@@ -39,14 +44,18 @@ class Dataset(BaseDataset):
             set_download_dir(running_cluster)
 
         dataset_name = "FakeDataset"
-        paradigm_name = "LeftRightImagery"
-        data = MOABBDataset(
+        paradigm_name = self.paradigm_name
+
+        dataset = MOABBDataset(
             dataset_name=dataset_name,
             subject_ids=None,
             dataset_kwargs=_fakedataset_kwargs,
         )
 
-        dataset, sfreq = windows_data(data, paradigm_name, dataset_name)
+        dataset, sfreq = windows_data(dataset=dataset,
+                                      dataset_name=self.name,
+                                      events_labels=self.events_labels,
+                                      paradigm_name=self.paradigm_name)
 
         return dict(
             dataset=dataset,
