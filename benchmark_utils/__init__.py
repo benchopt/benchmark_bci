@@ -3,7 +3,7 @@
 # name `benchmark_utils`, and code defined inside will be importable using
 # the usual import syntax
 from .dataset import windows_data, detect_if_cluster
-from .loggers import turn_off_warnings
+from .loggers import turn_off_warnings, get_braindecode_callbacks
 
 from .optuna_solver import OptunaSolver
 
@@ -12,4 +12,5 @@ __all__ = [
     "OptunaSolver",
     "detect_if_cluster",
     "turn_off_warnings",
+    "get_braindecode_callbacks",
 ]
