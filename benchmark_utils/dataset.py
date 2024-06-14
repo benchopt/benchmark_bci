@@ -24,9 +24,9 @@ with safe_import_context() as import_ctx:
 
 
 def rescaling(data, factor=1e6):
-  return multiply(data, factor)
+    return multiply(data, factor)
 
-  
+
 def pre_process_windows_dataset(
     dataset, low_cut_hz=4.0, high_cut_hz=38.0, factor=1e6, n_jobs=-1
 ):
@@ -57,13 +57,12 @@ def pre_process_windows_dataset(
     """
     # Parameters for exponential moving standardization
     preprocessors = [
-        Pick(picks=['eeg']), 
+        Pick(picks=["eeg"]),
         # Keep EEG sensors
-        Preprocessor(rescaling, factor=1e6),  # Convert from V to uV
+        Preprocessor(rescaling, factor=factor),  # Convert from V to uV
         # Bandpass filter
-        Preprocessor(
-            "filter", l_freq=low_cut_hz, h_freq=high_cut_hz, verbose=False
-        ),
+        Preprocessor("filter", l_freq=low_cut_hz,
+                     h_freq=high_cut_hz, verbose=False),
     ]
 
     # Transform the data
@@ -110,11 +109,9 @@ def windows_data(
         mapping = {"left_hand": 0, "right_hand": 1, "feet": 2, "tongue": 3}
 
     mem = Memory(get_setting("cache") or "/project/__cache__", verbose=0)
-
-    save_path = Path(mem.location) / f"{dataset_name}_dataset_{paradigm_name}"
-    save_obj = (
-        Path(mem.location) / f"{dataset_name}_dataset_{paradigm_name}.pickle"
-    )
+    save_name = f"{dataset_name}_dataset_{paradigm_name}"
+    save_path = Path(mem.location) / save_name
+    save_obj = Path(mem.location) / f"{save_name}.pickle"
     try:
         try:
             file = open(save_obj, "rb")
