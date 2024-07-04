@@ -14,7 +14,7 @@ with safe_import_context() as import_ctx:
         preprocess,
         Preprocessor,
     )
-    from braindecode.preprocessing import create_windows_from_events
+    from braindecode.preprocessing import create_windows_from_events, Pick
     from braindecode.datautil import load_concat_dataset
     from benchopt.config import get_setting
     from joblib import Memory
@@ -23,6 +23,10 @@ with safe_import_context() as import_ctx:
     turn_off_warnings()
 
 
+def rescaling(data, factor=1e6):
+  return multiply(data, factor)
+
+  
 def pre_process_windows_dataset(
     dataset, low_cut_hz=4.0, high_cut_hz=38.0, factor=1e6, n_jobs=-1
 ):
@@ -53,13 +57,9 @@ def pre_process_windows_dataset(
     """
     # Parameters for exponential moving standardization
     preprocessors = [
-        Preprocessor("pick_types", eeg=True, meg=False, stim=False),
+        Pick(picks=['eeg']), 
         # Keep EEG sensors
-        Preprocessor(
-            lambda data, factor: multiply(data, factor),
-            # Convert from V to uV
-            factor=factor,
-        ),
+        Preprocessor(rescaling, factor=1e6),  # Convert from V to uV
         # Bandpass filter
         Preprocessor(
             "filter", l_freq=low_cut_hz, h_freq=high_cut_hz, verbose=False
