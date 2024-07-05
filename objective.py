@@ -24,7 +24,7 @@ class Objective(BaseObjective):
     requirements = [
         "scikit-learn",
         "pytorch:pytorch",
-        "pip:git+https://github.com/bruAristimunha/moabb@no-poetry-lock#egg=moabb",
+        "pip:git+https://github.com/bruAristimunha/moabb@no-poetry-lock#egg=moabb",  # noqa
         "pip:git+https://github.com/bruAristimunha/braindecode@increase-moabb-version#egg=braindecode",  # noqa
         "pip:optuna",
     ]
