@@ -24,11 +24,11 @@ with safe_import_context() as import_ctx:
 
 
 def rescaling(data, factor=1e6):
-  return multiply(data, factor)
+    return multiply(data, factor)
 
-  
+
 def pre_process_windows_dataset(
-    dataset, low_cut_hz=4.0, high_cut_hz=38.0, factor=1e6, n_jobs=-1
+        dataset, low_cut_hz=4.0, high_cut_hz=38.0, factor=1e6, n_jobs=-1
 ):
     """
     Preprocess the window dataset.
@@ -57,7 +57,7 @@ def pre_process_windows_dataset(
     """
     # Parameters for exponential moving standardization
     preprocessors = [
-        Pick(picks=['eeg']), 
+        Pick(picks=['eeg']),
         # Keep EEG sensors
         Preprocessor(rescaling, factor=1e6),  # Convert from V to uV
         # Bandpass filter
@@ -73,14 +73,14 @@ def pre_process_windows_dataset(
 
 
 def windows_data(
-    dataset,
-    dataset_name,
-    events_labels,
-    paradigm_name,
-    low_cut_hz=4.0,
-    high_cut_hz=38.0,
-    unit_factor=1e6,
-    n_jobs=-1,
+        dataset,
+        dataset_name,
+        events_labels,
+        paradigm_name,
+        low_cut_hz=4.0,
+        high_cut_hz=38.0,
+        unit_factor=1e6,
+        n_jobs=-1,
 ):
     """Create windows from the dataset.
 
@@ -104,10 +104,11 @@ def windows_data(
     # 1. left-hand vs right-hand motor imagery
 
     mem = Memory(get_setting("cache") or "__cache__", verbose=0)
-
-    save_path = Path(mem.location) / f"{dataset_name}_dataset_{paradigm_name}"
+    filename = f"{dataset_name}_dataset_{paradigm_name}"
+    save_path = Path(mem.location) / filename
     save_obj = (
-        Path(mem.location) / f"{dataset_name}_dataset_{paradigm_name}.pickle"
+            Path(
+                mem.location) / f"{filename}.pickle"
     )
     try:
         try:
