@@ -24,6 +24,21 @@ with safe_import_context() as import_ctx:
 
 
 def rescaling(data, factor=1e6):
+    """
+    Rescale the data by a factor.
+
+    Parameters
+    ----------
+    data: ndarray
+        Data to rescale.
+    factor:
+        Factor to rescale the data by.
+
+    Returns:
+    --------
+    rescaled_data: ndarray
+        Rescaled data.
+    """
     return multiply(data, factor)
 
 
@@ -68,6 +83,7 @@ def pre_process_windows_dataset(
 
     # Transform the data
     preprocess(dataset, preprocessors, n_jobs=n_jobs)
+cp -r session1/ ../../../../../gigadb-datasets/live/pub/10.5524/100001_101000/100542/
 
     return dataset
 
@@ -106,6 +122,7 @@ def windows_data(
     mem = Memory(get_setting("cache") or "__cache__", verbose=0)
     filename = f"{dataset_name}_dataset_{paradigm_name}"
     save_path = Path(mem.location) / filename
+
     save_obj = (
             Path(
                 mem.location) / f"{filename}.pickle"
