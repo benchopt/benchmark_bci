@@ -83,8 +83,6 @@ def pre_process_windows_dataset(
 
     # Transform the data
     preprocess(dataset, preprocessors, n_jobs=n_jobs)
-cp -r session1/ ../../../../../gigadb-datasets/live/pub/10.5524/100001_101000/100542/
-
     return dataset
 
 
