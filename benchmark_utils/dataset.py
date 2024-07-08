@@ -24,9 +24,24 @@ with safe_import_context() as import_ctx:
 
 
 def rescaling(data, factor=1e6):
-  return multiply(data, factor)
+    """
+    Rescale the data by a factor.
 
-  
+    Parameters
+    ----------
+    data: ndarray
+        Data to rescale.
+    factor:
+        Factor to rescale the data by.
+
+    Returns:
+    --------
+    rescaled_data: ndarray
+        Rescaled data.
+    """
+    return multiply(data, factor)
+
+
 def pre_process_windows_dataset(
     dataset, low_cut_hz=4.0, high_cut_hz=38.0, factor=1e6, n_jobs=-1
 ):
@@ -57,7 +72,7 @@ def pre_process_windows_dataset(
     """
     # Parameters for exponential moving standardization
     preprocessors = [
-        Pick(picks=['eeg']), 
+        Pick(picks=['eeg']),
         # Keep EEG sensors
         Preprocessor(rescaling, factor=1e6),  # Convert from V to uV
         # Bandpass filter
@@ -109,7 +124,7 @@ def windows_data(
     elif paradigm_name == "MotorImagery":
         mapping = {"left_hand": 0, "right_hand": 1, "feet": 2, "tongue": 3}
 
-    mem = Memory(get_setting("cache") or "/project/__cache__", verbose=0)
+    mem = Memory(get_setting("cache") or "__cache__", verbose=0)
 
     save_path = Path(mem.location) / f"{dataset_name}_dataset_{paradigm_name}"
     save_obj = (
