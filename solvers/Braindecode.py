@@ -18,7 +18,6 @@ class Solver(BaseSolver):
             "ATCNet",
             "EEGConformer",
             "EEGInceptionERP",
-            "EEGInceptionMI",
             "EEGITNet",
             "EEGNetv4",
             "ShallowFBCSPNet",
@@ -32,7 +31,7 @@ class Solver(BaseSolver):
         "batch_size": [64],
         "valid_set": [0.2],
         "patience": [50],
-        "max_epochs": [100],
+        "max_epochs": [150],
         "learning_rate": [10**-4],
         "weight_decay": [0],
         "random_state": [42],
@@ -64,7 +63,7 @@ class Solver(BaseSolver):
             max_epochs=self.max_epochs,
             model_name=self.model,
             validation_name=extra_info["evaluation_process"],
-            project_name=f"benchmark_{extra_info['paradigm_name']}",
+            project_name=f"benchmark_{extra_info['paradigm_name']}_{extra_info['dataset_name']}"
         )
         self.clf = EEGClassifier(
             module=self.model,
