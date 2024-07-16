@@ -33,8 +33,8 @@ class Objective(BaseObjective):
     parameters = {
         "evaluation_process": [
             "intra_session",
-            "inter_sessions",
-            "inter_subjects",
+            # "inter_sessions",
+            #"inter_subjects",
         ],
         "n_folds": [5],
     }
@@ -96,12 +96,16 @@ class Objective(BaseObjective):
         score_train = model.score(self.X_train, to_numpy(self.y_train))
         score_test = model.score(self.X_test, to_numpy(self.y_test))
         bl_acc = BAS(to_numpy(self.y_test), model.predict(self.X_test))
+        x_train_size = len(self.X_train)
+        x_test_size = len(self.X_test)
 
         return dict(
             score_test=score_test,
             score_train=score_train,
             balanced_accuracy=bl_acc,
             value=1 - score_test,
+            train_size=x_train_size,
+            test_size=x_test_size,
         )
 
     def get_one_result(self):
