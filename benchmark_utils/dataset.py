@@ -114,16 +114,18 @@ def windows_data(
         Sampling frequency of the dataset.
     """
     # Define mapping of classes to integers
-    # We use two classes from the dataset
-    # 1. left-hand vs right-hand motor imagery
 
-    mem = Memory(get_setting("cache") or "__cache__", verbose=0)
+    if detect_if_cluster() is None:
+        base_path = ""
+    else:
+        base_path = "/project/"
+
+    mem = Memory(get_setting("cache") or Path(base_path) / "__cache__", verbose=0)
     filename = f"{dataset_name}_dataset_{paradigm_name}"
     save_path = Path(mem.location) / filename
 
     save_obj = (
-            Path(
-                mem.location) / f"{filename}.pickle"
+            Path(mem.location) / f"{filename}.pickle"
     )
     try:
         try:
@@ -194,6 +196,7 @@ def detect_if_cluster():
     # TODO: Make this for Jean Zay too.
 
     return mne_path
+
 
 
 def extra_time_seconds(dataset_name, sfreq):
