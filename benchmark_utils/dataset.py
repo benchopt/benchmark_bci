@@ -43,7 +43,7 @@ def rescaling(data, factor=1e6):
 
 
 def pre_process_windows_dataset(
-        dataset, low_cut_hz=4.0, high_cut_hz=38.0, factor=1e6, n_jobs=-1
+    dataset, low_cut_hz=4.0, high_cut_hz=38.0, factor=1e6, n_jobs=-1
 ):
     """
     Preprocess the window dataset.
@@ -72,7 +72,7 @@ def pre_process_windows_dataset(
     """
     # Parameters for exponential moving standardization
     preprocessors = [
-        Pick(picks=['eeg']),
+        Pick(picks=["eeg"]),
         # Keep EEG sensors
         Preprocessor(rescaling, factor=1e6),  # Convert from V to uV
         # Bandpass filter
@@ -87,14 +87,14 @@ def pre_process_windows_dataset(
 
 
 def windows_data(
-        dataset,
-        dataset_name,
-        events_labels,
-        paradigm_name,
-        low_cut_hz=4.0,
-        high_cut_hz=38.0,
-        unit_factor=1e6,
-        n_jobs=-1,
+    dataset,
+    dataset_name,
+    events_labels,
+    paradigm_name,
+    low_cut_hz=4.0,
+    high_cut_hz=38.0,
+    unit_factor=1e6,
+    n_jobs=-1,
 ):
     """Create windows from the dataset.
 
@@ -120,13 +120,13 @@ def windows_data(
     else:
         base_path = "/project/"
 
-    mem = Memory(get_setting("cache") or Path(base_path) / "__cache__", verbose=0)
+    mem = Memory(
+        get_setting("cache") or Path(base_path) / "__cache__", verbose=0
+    )
     filename = f"{dataset_name}_dataset_{paradigm_name}"
     save_path = Path(mem.location) / filename
 
-    save_obj = (
-            Path(mem.location) / f"{filename}.pickle"
-    )
+    save_obj = Path(mem.location) / f"{filename}.pickle"
     try:
         try:
             file = open(save_obj, "rb")
@@ -157,8 +157,9 @@ def windows_data(
         sfreq = dataset.datasets[0].raw.info["sfreq"]
         assert all([ds.raw.info["sfreq"] == sfreq for ds in dataset.datasets])
 
-        extra_time_before, extra_time_after = (
-            extra_time_seconds(dataset_name, sfreq))
+        extra_time_before, extra_time_after = extra_time_seconds(
+            dataset_name, sfreq
+        )
 
         mapping_events = _fix_events_labels(events_labels)
         # Create windows using braindecode function for this.
@@ -196,7 +197,6 @@ def detect_if_cluster():
     # TODO: Make this for Jean Zay too.
 
     return mne_path
-
 
 
 def extra_time_seconds(dataset_name, sfreq):

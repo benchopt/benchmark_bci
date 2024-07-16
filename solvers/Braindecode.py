@@ -8,6 +8,7 @@ with safe_import_context() as import_ctx:
     from skorch.dataset import ValidSplit
 
     from benchmark_utils import turn_off_warnings, get_braindecode_callbacks
+
     turn_off_warnings()
 
 
@@ -57,13 +58,17 @@ class Solver(BaseSolver):
         n_chans = X[0].shape[0]
         n_times = X[0].shape[1]
 
+        project_name = (
+            f"bench_{extra_info['paradigm_name']}_{extra_info['dataset_name']}"
+        )
+
         callbacks = get_braindecode_callbacks(
             dataset_name=extra_info["dataset_name"],
             patience=self.patience,
             max_epochs=self.max_epochs,
             model_name=self.model,
             validation_name=extra_info["evaluation_process"],
-            project_name=f"benchmark_{extra_info['paradigm_name']}_{extra_info['dataset_name']}"
+            project_name=project_name
         )
         self.clf = EEGClassifier(
             module=self.model,
@@ -90,8 +95,7 @@ class Solver(BaseSolver):
         )
 
     def run(self, _):
-        """Run the solver to evaluate.
-        """
+        """Run the solver to evaluate."""
         self.clf.fit(self.X, self.y)
 
     def get_result(self):

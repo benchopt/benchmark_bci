@@ -102,7 +102,7 @@ class Dataset(BaseDataset):
         try:
             if running_cluster is not None:
                 set_download_dir(running_cluster)
-        except Exception as e:
+        except Exception:
             pass
 
         if self.dataset_name == "Shin2017A":

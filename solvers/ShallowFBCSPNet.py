@@ -24,15 +24,12 @@ with safe_import_context() as import_ctx:
 class Solver(BaseSolver):
     name = "ShallowFBCSPNet"
     parameters = {
-        "augmentation": (
-            "IdentityTransform",
-        ),
+        "augmentation": ("IdentityTransform",),
         "lr": [0.0625 * 0.01],
         "weight_decay": [0],
         "batch_size": [64],
         "n_epochs": [4],
         "proba": [0.5],
-
     }
 
     sampling_strategy = "run_once"
@@ -66,7 +63,7 @@ class Solver(BaseSolver):
             n_times=n_times,
             pool_time_length=pool_time_length,
             final_conv_length="auto",
-            add_log_softmax=False
+            add_log_softmax=False,
         )
 
         cuda = torch.cuda.is_available()

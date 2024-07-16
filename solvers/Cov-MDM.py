@@ -21,7 +21,7 @@ class Solver(BaseSolver):
     install_cmd = "conda"
     requirements = ["pyriemann"]
 
-    sampling_strategy = 'run_once'
+    sampling_strategy = "run_once"
 
     def set_objective(self, X, y, sfreq, extra_info):
         """Set the objective information from Objective.get_objective.
@@ -39,7 +39,7 @@ class Solver(BaseSolver):
         self.clf = make_pipeline(
             FunctionTransformer(to_numpy),
             Covariances(estimator=self.covariances_estimator),
-            MDM(metric=self.MDM_metric)
+            MDM(metric=self.MDM_metric),
         )
 
     def run(self, _):
