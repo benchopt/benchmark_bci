@@ -1,6 +1,7 @@
 from benchopt import BaseDataset, safe_import_context
 
-
+dataset_list = []
+dataset_list_str = []
 # Protect the import with `safe_import_context()`. This allows:
 # - skipping import to speed up autocompletion in CLI.
 # - getting requirements info when all dependencies are not installed.
@@ -67,9 +68,9 @@ with safe_import_context() as import_ctx:
         BNCI2014_004,  # 10 subject,
         BNCI2015_001,  # 13 subject,
         Cho2017,  # 53 subject,
-        Hinss2021,  # 16 subject,
-        Lee2019_MI,  # 54 subject,
-        PhysionetMI,  # 109 subject,
+        # Hinss2021,  # 16 subject,
+        # Lee2019_MI,  # 54 subject,
+        # PhysionetMI,  # 109 subject,
         Shin2017A,  # 30 subject,
         Weibo2014,  # 10 subject,
     ]
