@@ -8,6 +8,8 @@ dataset_list_str = []
 with safe_import_context() as import_ctx:
     from braindecode.datasets import MOABBDataset
     from moabb.utils import set_download_dir
+    import mne
+
     from benchmark_utils import windows_data, detect_if_cluster
     from moabb.datasets import (
         AlexMI,
@@ -102,7 +104,8 @@ class Dataset(BaseDataset):
         running_cluster = detect_if_cluster()
         try:
             if running_cluster is not None:
-                set_download_dir(running_cluster)
+                if mne.get_config("MNE_DATA") != str(running_cluster):
+                    set_download_dir(running_cluster)
         except Exception:
             pass
 
