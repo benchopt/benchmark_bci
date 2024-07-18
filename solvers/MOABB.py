@@ -10,30 +10,30 @@ with safe_import_context() as import_ctx:
     from benchmark_utils.pipeline import parser_pipelines
 
 # Getting the path base on the file.
-pipeline_folder = str(Path(__file__).parent.parent / 'pipelines')
+pipeline_folder = str(Path(__file__).parent.parent / "pipelines")
 
 
 class Solver(BaseSolver):
     name = "MOABBPipelines"
     parameters = {
         "pipeline": [
-            'Aug-Cov_reg-Tang-SVM',
-            'Cov-CSP-LDA_shr',
-            'Cov-CSP-LDA_svd',
-            'Cov-FgMDM',
-            'Cov-MDM',
+            "Aug-Cov_reg-Tang-SVM",
+            "Cov-CSP-LDA_shr",
+            "Cov-CSP-LDA_svd",
+            "Cov-FgMDM",
+            "Cov-MDM",
             # 'Cov-MDMAug', Not working, contact Chris later
-            'Cov-Tang-LogReg',
-            'Cov-Tang-LogReg_ElNet',
-            'Cov-Tang-SVM',
-            'Cov-TRCSP-LDA',
-            'DUMMY',
-            'LogVar-LDA',
-            'LogVar-SVM',
+            "Cov-Tang-LogReg",
+            "Cov-Tang-LogReg_ElNet",
+            "Cov-Tang-SVM",
+            "Cov-TRCSP-LDA",
+            "DUMMY",
+            "LogVar-LDA",
+            "LogVar-SVM",
         ]
     }
 
-    sampling_strategy = 'run_once'
+    sampling_strategy = "run_once"
 
     def set_objective(self, X, y, sfreq, extra_info):
         """Set the objective information from Objective.get_objective.
@@ -49,7 +49,7 @@ class Solver(BaseSolver):
         self.y = y
         self.clf = make_pipeline(
             FunctionTransformer(to_numpy),
-            parser_pipelines(pipeline_folder)[self.pipeline]
+            parser_pipelines(pipeline_folder)[self.pipeline],
         )
 
     def run(self, _):
