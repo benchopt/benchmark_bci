@@ -128,19 +128,13 @@ def windows_data(
 
     save_obj = Path(mem.location) / f"{filename}.pickle"
     try:
-        try:
-            file = open(save_obj, "rb")
-            windows_dataset = load(file)
-        except Exception:
-            if not save_path.exists():
-                raise FileNotFoundError
-            # Capturing verbose output
-            f = io.StringIO()
-            # Hacking way to capture verbose output
-            with contextlib.redirect_stdout(f):
-                windows_dataset = load_concat_dataset(
-                    str(save_path.resolve()), preload=False, n_jobs=1
-                )
+        # Capturing verbose output
+        f = io.StringIO()
+        # Hacking way to capture verbose output
+        with contextlib.redirect_stdout(f):
+            windows_dataset = load_concat_dataset(
+                str(save_path.resolve()), preload=False, n_jobs=1
+            )
         # Here, we decide that we will gonna use WindowsDataset only
         sfreq = dataset.datasets[0].raw.info["sfreq"]
         print(f"Using cached windows dataset {paradigm_name}.")
@@ -172,9 +166,6 @@ def windows_data(
             mapping=mapping_events,
             drop_last_window=True,
         )
-        if not save_obj.exists():
-            with open(save_obj, "wb") as file:
-                dump(windows_dataset, file)
 
         if not save_path.exists():
             save_path.mkdir()
