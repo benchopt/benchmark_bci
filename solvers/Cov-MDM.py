@@ -18,9 +18,6 @@ class Solver(BaseSolver):
         "MDM_metric": ["riemann"],
     }
 
-    install_cmd = "conda"
-    requirements = ["pyriemann"]
-
     sampling_strategy = "run_once"
 
     def set_objective(self, X, y, sfreq, extra_info):

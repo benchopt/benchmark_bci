@@ -14,9 +14,6 @@ with safe_import_context() as import_ctx:
 class Solver(BaseSolver):
     name = "Cov-KNN"
 
-    install_cmd = "conda"
-    requirements = ["pyriemann"]
-
     parameters = {
         "covariances_estimator": ["oas"],
         "KNN_cov_metric": ["euclid"],
