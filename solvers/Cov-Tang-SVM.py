@@ -23,8 +23,6 @@ class Solver(BaseSolver):
         "svm_kernel": ["linear"],
     }
 
-    install_cmd = "conda"
-    requirements = ["pyriemann"]
 
     sampling_strategy = "run_once"
 

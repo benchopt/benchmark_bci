@@ -19,7 +19,7 @@ class Solver(BaseSolver):
         "n_components": [8],
     }
 
-    sampling_strategy = 'run_once'
+    sampling_strategy = "run_once"
 
     def set_objective(self, X, y, sfreq, extra_info):
         """Set the objective information from Objective.get_objective.

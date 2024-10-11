@@ -36,8 +36,8 @@ class Solver(BaseSolver):
             "Cov-Tang-LogReg_ElNet",
             "Cov-Tang-SVM",
             "Cov-TRCSP-LDA",
-            "DUMMY",
-            "LogVar-LDA",
+            # "DUMMY",
+            # "LogVar-LDA",
             "LogVar-SVM",
         ],
         "n_trials": [50],  # Number of trials to run

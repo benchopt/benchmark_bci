@@ -14,15 +14,12 @@ with safe_import_context() as import_ctx:
 class Solver(BaseSolver):
     name = "Cov-KNN"
 
-    install_cmd = "conda"
-    requirements = ["pyriemann"]
-
     parameters = {
         "covariances_estimator": ["oas"],
         "KNN_cov_metric": ["euclid"],
         "n_neighbors": [7],
     }
-    sampling_strategy = 'run_once'
+    sampling_strategy = "run_once"
 
     def set_objective(self, X, y, sfreq, extra_info):
         """Set the objective information from Objective.get_objective.
@@ -40,8 +37,9 @@ class Solver(BaseSolver):
         self.clf = make_pipeline(
             FunctionTransformer(to_numpy),
             Covariances(estimator=self.covariances_estimator),
-            KNearestNeighbor(n_neighbors=self.n_neighbors,
-                             metric=self.KNN_cov_metric),
+            KNearestNeighbor(
+                n_neighbors=self.n_neighbors, metric=self.KNN_cov_metric
+            ),
         )
 
     def run(self, _):
