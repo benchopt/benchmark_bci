@@ -39,7 +39,7 @@ class Objective(BaseObjective):
         ],
         "n_folds": [5],
         "seed": [2024],
-        "fraction": [0.1]
+        "fraction": [0.1],
     }
 
     is_convex = False
@@ -67,18 +67,26 @@ class Objective(BaseObjective):
         elif self.evaluation_process == "inter_subjects":
             self.cv = InterSubjectSplitter(n_folds=self.n_folds)
         elif self.evaluation_process == "sample_intra_session":
-            self.cv = SamplerMetaSplitter(base_splitter=IntraSessionSplitter(n_folds=self.n_folds),
-                                          random_state=self.seed, fraction=self.fraction)
-        elif self.evaluation_process == "sample_inter_session":
-            self.cv = SamplerMetaSplitter(base_splitter=InterSessionSplitter(),
-                                          random_state=self.seed, fraction=self.fraction)
-        elif self.evaluation_process == "sample_inter_subject":
-            self.cv = SamplerMetaSplitter(base_splitter=InterSubjectSplitter(n_folds=self.n_folds),
-                                          random_state=self.seed, fraction=self.fraction)
-        else:
-            raise ValueError(
-                f"unknown evaluation process '{self.evaluation_process}'"
+            self.cv = SamplerMetaSplitter(
+                base_splitter=IntraSessionSplitter(n_folds=self.n_folds),
+                random_state=self.seed,
+                fraction=self.fraction,
             )
+        elif self.evaluation_process == "sample_inter_session":
+            self.cv = SamplerMetaSplitter(
+                base_splitter=InterSessionSplitter(),
+                random_state=self.seed,
+                fraction=self.fraction,
+            )
+        elif self.evaluation_process == "sample_inter_subject":
+            self.cv = SamplerMetaSplitter(
+                base_splitter=InterSubjectSplitter(n_folds=self.n_folds),
+                random_state=self.seed,
+                fraction=self.fraction,
+            )
+        else:
+            raise ValueError(f"unknown evaluation process '"
+                             f"{self.evaluation_process}'")
 
         self.cv_metadata = dict(df_meta=dataset.get_metadata())
         self.extra_info = dict(
@@ -147,8 +155,6 @@ class Objective(BaseObjective):
         )
 
         return dict(
-            X=self.X_train,
-            y=self.y_train,
-            sfreq=self.sfreq,
-            extra_info=self.extra_info
-         )
+            X=self.X_train, y=self.y_train,
+            sfreq=self.sfreq, extra_info=self.extra_info
+        )
