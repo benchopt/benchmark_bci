@@ -35,6 +35,7 @@ class Objective(BaseObjective):
             "inter_sessions",
             "sample_intra_session",
             "sample_inter_sessions",
+            "sample_inter_subjects",
             "inter_subjects",
         ],
         "n_folds": [5],
