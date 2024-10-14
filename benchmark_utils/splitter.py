@@ -107,12 +107,15 @@ class SamplerMetaSplitter(BaseCrossValidator):
 
         # Validate input parameters
         if self.fraction is not None and self.n_splits is not None:
-            raise ValueError("Specify either 'fraction' or 'n_splits', not both.")
+            raise ValueError(
+                "Specify either 'fraction' or 'n_splits', not both.")
         if self.fraction is None and self.n_splits is None:
-            raise ValueError("Either 'fraction' or 'n_splits' must be provided.")
+            raise ValueError(
+                "Either 'fraction' or 'n_splits' must be provided.")
         if self.fraction is not None:
             if not (0 < self.fraction <= 1):
-                raise ValueError("'fraction' must be between 0 (exclusive) and 1 (inclusive).")
+                raise ValueError(
+                    "'fraction' must be between 0 (exclusive) and 1 (inclusive).")
         if self.n_splits is not None:
             if not isinstance(self.n_splits, int) or self.n_splits <= 0:
                 raise ValueError("'n_splits' must be a positive integer.")
@@ -122,7 +125,8 @@ class SamplerMetaSplitter(BaseCrossValidator):
         total_splits = self.base_splitter.get_n_splits(dataset, df_meta)
 
         if self.fraction is not None:
-            sampled_splits = max(1, int(np.floor(total_splits * self.fraction)))
+            sampled_splits = max(
+                1, int(np.floor(total_splits * self.fraction)))
             return min(sampled_splits, total_splits)
         else:
             return min(self.n_splits, total_splits)
@@ -141,7 +145,8 @@ class SamplerMetaSplitter(BaseCrossValidator):
             n_sample = min(self.n_splits, total_splits)
 
         # Sample unique split indices without replacement
-        sampled_indices = self.random_state.choice(total_splits, size=n_sample, replace=False)
+        sampled_indices = self.random_state.choice(
+            total_splits, size=n_sample, replace=False)
 
         # Yield only the sampled splits
         for idx in sampled_indices:
