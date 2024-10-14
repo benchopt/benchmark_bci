@@ -13,6 +13,7 @@ with safe_import_context() as import_ctx:
     from benchmark_utils.splitter import IntraSessionSplitter
     from benchmark_utils.splitter import InterSessionSplitter
     from benchmark_utils.splitter import InterSubjectSplitter
+    from benchmark_utils.splitter import SamplerMetaSplitter
 
 
 class Objective(BaseObjective):
@@ -32,9 +33,13 @@ class Objective(BaseObjective):
         "evaluation_process": [
             "intra_session",
             "inter_sessions",
+            "sample_intra_session",
+            "sample_inter_sessions",
             "inter_subjects",
         ],
         "n_folds": [5],
+        "seed": [2024],
+        "fraction": [0.1]
     }
 
     is_convex = False
@@ -61,6 +66,15 @@ class Objective(BaseObjective):
             self.cv = InterSessionSplitter()
         elif self.evaluation_process == "inter_subjects":
             self.cv = InterSubjectSplitter(n_folds=self.n_folds)
+        elif self.evaluation_process == "sample_intra_session":
+            self.cv = SamplerMetaSplitter(base_splitter=IntraSessionSplitter(n_folds=self.n_folds),
+                                          random_state=self.seed, fraction=self.fraction)
+        elif self.evaluation_process == "sample_inter_session":
+            self.cv = SamplerMetaSplitter(base_splitter=InterSessionSplitter(),
+                                          random_state=self.seed, fraction=self.fraction)
+        elif self.evaluation_process == "sample_inter_subject":
+            self.cv = SamplerMetaSplitter(base_splitter=InterSubjectSplitter(n_folds=self.n_folds),
+                                          random_state=self.seed, fraction=self.fraction)
         else:
             raise ValueError(
                 f"unknown evaluation process '{self.evaluation_process}'"
