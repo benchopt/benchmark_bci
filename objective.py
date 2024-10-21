@@ -23,7 +23,7 @@ class Objective(BaseObjective):
     intall_cmd = "conda"
     requirements = [
         "pip:git+https://github.com/NeuroTechX/moabb#egg=moabb",  # noqa
-        "pip:git+https://github.com/braindecode/braindecode#egg=braindecode",  # noqa
+        "pip:git+https://github.com/bruAristimunha/braindecode@fbcnet#egg=braindecode",  # noqa
         "pip:optuna",
         "pip:optuna-integration",
     ]
