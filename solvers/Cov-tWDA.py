@@ -24,7 +24,7 @@ with safe_import_context() as import_ctx:
 class Solver(BaseSolver):
     name = "Cov-tWDA"
     parameters = {
-        "dfs": [[10]],
+        "dfs": [None],
         "covariances_estimator": ["scm"],
         **BaseSolver.parameters
     }
@@ -80,7 +80,7 @@ class tWDA(BaseEstimator, ClassifierMixin, TransformerMixin):
     ----------
     n : int
         number of time samples.
-    dfs : list, default=[10]
+    dfs : list, default=None
         degree(s) of freedom of the t- modeling (shape parameters) for
         different classes.
         If None, they are estimated with the kurtosis estimation method
@@ -106,7 +106,7 @@ class tWDA(BaseEstimator, ClassifierMixin, TransformerMixin):
         Proportions for each class.
     """
 
-    def __init__(self, n, dfs=[10], n_jobs=1, rmt=False):
+    def __init__(self, n, dfs=None, n_jobs=1, rmt=False):
         """Init.
         """
         self.n = n
