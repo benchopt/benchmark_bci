@@ -2,15 +2,12 @@
 # the benchmark objective, datasets, and solvers. The folder should have the
 # name `benchmark_utils`, and code defined inside will be importable using
 # the usual import syntax
-
-from .transformation import smooth_timemask, channels_dropout
-from .dataset import windows_data, split_windows_train_test
-from .augmented_dataset import AugmentedBCISolver
+from .dataset import windows_data, detect_if_cluster
+from .loggers import turn_off_warnings, get_braindecode_callbacks
 
 __all__ = [
-    "smooth_timemask",
-    "channels_dropout",
     "windows_data",
-    "split_windows_train_test",
-    "AugmentedBCISolver",
+    "detect_if_cluster",
+    "turn_off_warnings",
+    "get_braindecode_callbacks",
 ]

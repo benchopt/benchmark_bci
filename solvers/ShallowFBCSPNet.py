@@ -3,7 +3,6 @@ from benchopt import BaseSolver, safe_import_context
 
 with safe_import_context() as import_ctx:
     import torch
-    from benchopt.stopping_criterion import SingleRunCriterion
     from braindecode import EEGClassifier
     from braindecode.augmentation import (
         AugmentedDataLoader,
@@ -13,8 +12,9 @@ with safe_import_context() as import_ctx:
         SmoothTimeMask,
     )
     from braindecode.models import ShallowFBCSPNet
-    from numpy import linspace, pi
+    from numpy import linspace
     from skorch.callbacks import LRScheduler
+    from skorch.dataset import ValidSplit
 
 
 # The benchmark solvers must be named `Solver` and
@@ -25,10 +25,7 @@ class Solver(BaseSolver):
     name = "ShallowFBCSPNet"
     parameters = {
         "augmentation": (
-            "ChannelsDropout",
-            "SmoothTimeMask",
             "IdentityTransform",
-            "FTSurrogate",
         ),
         "lr": [0.0625 * 0.01],
         "weight_decay": [0],
@@ -38,16 +35,9 @@ class Solver(BaseSolver):
 
     }
 
-    stopping_criterion = SingleRunCriterion()
+    sampling_strategy = "run_once"
 
-    install_cmd = "conda"
-    requirements = ["pip:torch", "pip:braindecode"]
-
-    # here maybe we need to define for each solvers a other input named
-    # metadata which would be a dictionarry where we could get n_channels
-    # and input_window_samples
-
-    def set_objective(self, X, y, sfreq):
+    def set_objective(self, X, y, sfreq, extra_info):
         """Set the objective information from Objective.get_objective.
 
         Objective
@@ -65,17 +55,18 @@ class Solver(BaseSolver):
         n_epochs = self.n_epochs
         n_classes = len(set(y))
         n_channels = X[0].shape[0]
-        input_window_samples = X[0].shape[1]
+        n_times = X[0].shape[1]
 
         # For the fakedataset, trials are too small for the model with default
         # pool_time_lenght=75, use a smaller one.
-        pool_time_length = min(75, input_window_samples // 2)
+        pool_time_length = min(75, n_times // 2)
         model = ShallowFBCSPNet(
-            n_channels,
-            n_classes,
-            input_window_samples=input_window_samples,
+            n_chans=n_channels,
+            n_outputs=n_classes,
+            n_times=n_times,
             pool_time_length=pool_time_length,
             final_conv_length="auto",
+            add_log_softmax=False
         )
 
         cuda = torch.cuda.is_available()
@@ -114,7 +105,7 @@ class Solver(BaseSolver):
                     phase_noise_magnitude=prob,
                     random_state=seed,
                 )
-                for prob in linspace(0, 2 * pi, 10)
+                for prob in linspace(0, 1, 10)
             ]
         else:
             transforms = [IdentityTransform()]
@@ -123,9 +114,9 @@ class Solver(BaseSolver):
             model,
             iterator_train=AugmentedDataLoader,
             iterator_train__transforms=transforms,
-            criterion=torch.nn.NLLLoss,
+            criterion=torch.nn.CrossEntropyLoss,
             optimizer=torch.optim.AdamW,
-            train_split=None,
+            train_split=ValidSplit(0.2, stratified=True, random_state=seed),
             optimizer__lr=lr,
             max_epochs=n_epochs,
             optimizer__weight_decay=weight_decay,

@@ -1,5 +1,4 @@
-from benchopt import safe_import_context
-from benchmark_utils.augmented_dataset import AugmentedBCISolver
+from benchopt import BaseSolver, safe_import_context
 
 
 with safe_import_context() as import_ctx:
@@ -12,19 +11,20 @@ with safe_import_context() as import_ctx:
     from skorch.helper import to_numpy
 
 
-class Solver(AugmentedBCISolver):
-    name = "K Nearest-Neighbors"
+class Solver(BaseSolver):
+    name = "Cov-KNN"
 
     install_cmd = "conda"
     requirements = ["pyriemann"]
+
     parameters = {
         "covariances_estimator": ["oas"],
         "KNN_cov_metric": ["euclid"],
         "n_neighbors": [7],
-        **AugmentedBCISolver.parameters
     }
+    sampling_strategy = 'run_once'
 
-    def set_objective(self, X, y, sfreq):
+    def set_objective(self, X, y, sfreq, extra_info):
         """Set the objective information from Objective.get_objective.
 
         Objective
@@ -35,7 +35,7 @@ class Solver(AugmentedBCISolver):
         """
         self.sfreq = sfreq
         self.X = X
-        self.y = y
+        self.y = to_numpy(y)
 
         self.clf = make_pipeline(
             FunctionTransformer(to_numpy),
@@ -43,3 +43,22 @@ class Solver(AugmentedBCISolver):
             KNearestNeighbor(n_neighbors=self.n_neighbors,
                              metric=self.KNN_cov_metric),
         )
+
+    def run(self, _):
+        """Run the solver to evaluate it for a given number of augmentation.
+
+        With this dataset, we consider that the performance curve is sampled
+        for various number of augmentation applied to the dataset.
+        """
+        self.clf.fit(self.X, self.y)
+
+    def get_result(self):
+        """Return the model to `Objective.evaluate_result`.
+
+        Result
+        ------
+        model: an instance of a fitted model.
+            This model should have methods `score` and `predict`, that accept
+            braindecode.WindowsDataset as input.
+        """
+        return dict(model=self.clf)

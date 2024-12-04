@@ -1,4 +1,4 @@
-name: AUGTangSVMGrid
+name: Aug-Cov_reg-Tang-SVM
 
 paradigms:
   - LeftRightImagery
