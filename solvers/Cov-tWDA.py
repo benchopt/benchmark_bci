@@ -113,8 +113,8 @@ class tWDA(BaseEstimator, ClassifierMixin, TransformerMixin):
         self.dfs = dfs
         self.n_jobs = n_jobs
         self.rmt = rmt
-        if not(self.dfs is None):
-            assert type(self.dfs) == list, "`dfs` must be a list or None"
+        if not (self.dfs is None):
+            assert type(self.dfs) is list, "`dfs` must be a list or None"
             assert len(self.dfs) > 0, "Empty list for `dfs` "
             for i in range(len(self.dfs)):
                 if self.dfs[i] == 'inf':
