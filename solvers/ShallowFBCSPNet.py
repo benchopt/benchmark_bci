@@ -63,7 +63,6 @@ class Solver(BaseSolver):
             n_times=n_times,
             pool_time_length=pool_time_length,
             final_conv_length="auto",
-            add_log_softmax=False,
         )
 
         cuda = torch.cuda.is_available()
