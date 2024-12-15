@@ -8,8 +8,6 @@ dataset_list_str = []
 with safe_import_context() as import_ctx:
     from braindecode.datasets import MOABBDataset
     from moabb.utils import set_download_dir
-    import mne
-
     from benchmark_utils import windows_data, detect_if_cluster
     from moabb.datasets import (
         AlexMI,
@@ -18,50 +16,9 @@ with safe_import_context() as import_ctx:
         BNCI2014_004,
         BNCI2015_001,
         Cho2017,
-        Hinss2021,
-        Lee2019_MI,
-        PhysionetMI,
         Shin2017A,
         Weibo2014,
     )
-
-    # BI2012,
-    # BI2013a,
-    # BI2014a,
-    # BI2014b,
-    # BI2015a,
-    # BI2015b,
-    # BNCI2014_008,
-    # BNCI2014_009,
-    # BNCI2015_003,
-    # BNCI2015_004,
-    # CastillosBurstVEP100,
-    # CastillosBurstVEP40,
-    # CastillosCVEP100,
-    # CastillosCVEP40,
-    # Cattan2019_PHMD,
-    # Cattan2019_VR,
-    # EPFLP300,
-    # GrosseWentrup2009,
-    # Huebner2017,
-    # Huebner2018,
-    # Kalunga2016,
-    # Lee2019_ERP,
-    # Lee2019_SSVEP,
-    # MAMEM1,
-    # MAMEM2,
-    # MAMEM3,
-    # Nakanishi2015,
-    # Ofner2017,
-    # Rodrigues2017,
-    # Schirrmeister2017,
-    # Shin2017B,
-    # Sosulski2019,
-    # Stieger2021,
-    # Thielen2015,
-    # Thielen2021,
-    # Wang2016,
-    # Zhou2016,
 
     dataset_list = [
         AlexMI,  # 9 Subject,
@@ -70,9 +27,6 @@ with safe_import_context() as import_ctx:
         BNCI2014_004,  # 10 subject,
         BNCI2015_001,  # 13 subject,
         Cho2017,  # 53 subject,
-        # Hinss2021,  # 16 subject,
-        # Lee2019_MI,  # 54 subject,
-        # PhysionetMI,  # 109 subject,
         Shin2017A,  # 30 subject,
         Weibo2014,  # 10 subject,
     ]
@@ -102,12 +56,8 @@ class Dataset(BaseDataset):
         # pytest.skip("This dataset is not yet supported")
 
         running_cluster = detect_if_cluster()
-        try:
-            if running_cluster is not None:
-                if mne.get_config("MNE_DATA") != str(running_cluster):
-                    set_download_dir(running_cluster)
-        except Exception:
-            pass
+        if running_cluster is not None:
+            set_download_dir(running_cluster)
 
         if self.dataset_name == "Shin2017A":
             dataset_kwargs = dict(accept=True)
