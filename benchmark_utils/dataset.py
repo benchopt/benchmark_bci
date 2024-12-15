@@ -8,7 +8,6 @@ with safe_import_context() as import_ctx:
     import io
     import os
     from pathlib import Path
-    from pickle import load, dump
     from numpy import multiply
     from braindecode.preprocessing import (
         preprocess,
