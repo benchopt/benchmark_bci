@@ -126,7 +126,6 @@ def windows_data(
     filename = f"{dataset_name}_dataset_{paradigm_name}"
     save_path = Path(mem.location) / filename
 
-    save_obj = Path(mem.location) / f"{filename}.pickle"
     try:
         # Capturing verbose output
         f = io.StringIO()

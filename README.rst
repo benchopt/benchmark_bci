@@ -28,11 +28,11 @@ are the training data and which are the test data:
   subjects to train the classifier and evaluate the trials from a subject that was not included
   in the training data. This tests the generalization capabilities of the algorithms.
 
-For each of theses paradigms, we can evaluate all combinations of train/test trials, sessions, or subjects.
+For each of these paradigms, we can evaluate all combinations of train/test trials, sessions, or subjects.
 Finally, once the process to obtain test data $\\mathcal D_{test}^i$ from the full data $\\mathcal D$ has
 been defined, the core metric of the benchmark is the balanced accuracy:
 
-$$ \\sum_{\\mathcal D_{test}^i} \\frac{1}{| \\mathcal D_{test}^i|}  \\sum_{(X_i, y_i) \\in \\mathcal D_{test}^i}  p(y_i) 1\\{y_i = f_{\\theta}(X_i)\\}$$ 
+$$ \\sum_{\\mathcal D_{test}^i} \\frac{1}{| \\mathcal D_{test}^i|}  \\sum_{(X_i, y_i) \\in \\mathcal D_{test}^i}  p(y_i) 1\\{y_i = f_{\\theta}(X_i)\\}$$
 
 
 Install

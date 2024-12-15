@@ -72,7 +72,7 @@ class Solver(BaseSolver):
         if cuda:
             torch.backends.cudnn.benchmark = True
 
-        # we need to get the folowing parameter either
+        # we need to get the following parameter either
         # with the inputs of set object or 'manually'
 
         seed = 20200220
