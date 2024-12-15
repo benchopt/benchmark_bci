@@ -23,7 +23,6 @@ class Solver(BaseSolver):
         "svm_kernel": ["linear"],
     }
 
-
     sampling_strategy = "run_once"
 
     def set_objective(self, X, y, sfreq, extra_info):
