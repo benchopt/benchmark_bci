@@ -2,6 +2,7 @@ from benchopt import BaseObjective, safe_import_context
 
 
 with safe_import_context() as import_ctx:
+    from numpy import concatenate, unique
 
     from sklearn.dummy import DummyClassifier
     from sklearn.pipeline import make_pipeline
@@ -31,7 +32,7 @@ class Objective(BaseObjective):
     parameters = {
         "evaluation_process": [
             "intra_session",
-            "inter_sessions",
+            # "inter_sessions",
             "inter_subjects",
         ],
         "n_folds": [5],
@@ -94,12 +95,21 @@ class Objective(BaseObjective):
         score_train = model.score(self.X_train, to_numpy(self.y_train))
         score_test = model.score(self.X_test, to_numpy(self.y_test))
         bl_acc = BAS(to_numpy(self.y_test), model.predict(self.X_test))
+        x_train_size = len(self.X_train)
+        x_test_size = len(self.X_test)
+
+        labels = concatenate([to_numpy(self.y_train), to_numpy(self.y_test)])
+
+        amount_classes = unique(labels).shape[0]
 
         return dict(
             score_test=score_test,
             score_train=score_train,
             balanced_accuracy=bl_acc,
             value=1 - score_test,
+            train_size=x_train_size,
+            test_size=x_test_size,
+            amount_classes=amount_classes,
         )
 
     def get_one_result(self):
@@ -136,5 +146,5 @@ class Objective(BaseObjective):
             X=self.X_train,
             y=self.y_train,
             sfreq=self.sfreq,
-            extra_info=self.extra_info
-         )
+            extra_info=self.extra_info,
+        )
