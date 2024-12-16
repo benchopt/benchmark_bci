@@ -28,7 +28,7 @@ with safe_import_context() as import_ctx:
         BNCI2015_001,  # 13 subject,
         Cho2017,  # 53 subject,
         Shin2017A,  # 30 subject,
-        Weibo2014,  # 10 subject,
+        Weibo2014,  # 10 subject
     ]
 
     dataset_list_str = [obj.__name__ for obj in dataset_list]
