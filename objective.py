@@ -27,6 +27,7 @@ class Objective(BaseObjective):
         "pip:git+https://github.com/braindecode/braindecode#egg=braindecode",  # noqa
         "pip:optuna",
         "pip:optuna-integration",
+        "pip:git+https://github.com/Roche/neuro-green",  # noqa
     ]
 
     parameters = {
@@ -63,9 +64,7 @@ class Objective(BaseObjective):
         elif self.evaluation_process == "inter_subjects":
             self.cv = InterSubjectSplitter(n_folds=self.n_folds)
         else:
-            raise ValueError(
-                f"unknown evaluation process '{self.evaluation_process}'"
-            )
+            raise ValueError(f"unknown evaluation process '{self.evaluation_process}'")
 
         self.cv_metadata = dict(df_meta=dataset.get_metadata())
         self.extra_info = dict(
