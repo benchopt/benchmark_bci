@@ -44,13 +44,7 @@ class Solver(BaseSolver):
         # here we want to define a function that gets the data X,y from Moabb
         # and converts it to data accessible for deep learning methods
         lr = self.lr
-        # n_classes = len(set(y))
-        if extra_info["paradigm_name"] == "LeftRightImagery":
-            n_classes = 2
-        elif extra_info["paradigm_name"] == "MotorImagery":
-            n_classes = 4
-        else:
-            raise ValueError(f"Unknown paradigm {extra_info['paradigm_name']}")
+        n_classes = len(set(y))
 
         n_channels = X[0].shape[0]
 
