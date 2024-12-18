@@ -64,7 +64,9 @@ class Objective(BaseObjective):
         elif self.evaluation_process == "inter_subjects":
             self.cv = InterSubjectSplitter(n_folds=self.n_folds)
         else:
-            raise ValueError(f"unknown evaluation process '{self.evaluation_process}'")
+            raise ValueError(
+                f"unknown evaluation process '{self.evaluation_process}'"
+            )
 
         self.cv_metadata = dict(df_meta=dataset.get_metadata())
         self.extra_info = dict(
