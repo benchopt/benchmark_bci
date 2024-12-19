@@ -27,7 +27,6 @@ class Objective(BaseObjective):
         "pip:git+https://github.com/braindecode/braindecode#egg=braindecode",  # noqa
         "pip:optuna",
         "pip:optuna-integration",
-        "pip:git+https://github.com/Roche/neuro-green",  # noqa
     ]
 
     parameters = {
