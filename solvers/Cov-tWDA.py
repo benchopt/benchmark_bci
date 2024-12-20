@@ -24,7 +24,7 @@ class Solver(BaseSolver):
     }
 
     install_cmd = "conda"
-    requirements = ["pyriemann", "pip::pymanopt"]
+    requirements = ["pyriemann", "pip:pymanopt"]
     sampling_strategy = 'run_once'
 
     def set_objective(self, X, y, sfreq, extra_info):
