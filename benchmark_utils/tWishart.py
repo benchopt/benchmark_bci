@@ -7,13 +7,14 @@ import numpy.linalg as la
 from scipy.linalg import pinvh, sqrtm
 from scipy.linalg.lapack import dtrtri
 from scipy.special import gammaln, betaln
-import os
+# import os
 
-try:
-    import pymanopt
-except ModuleNotFoundError:
-    os.system('pip install pymanopt')
+# try:
+#     import pymanopt
+# except ModuleNotFoundError:
+#     os.system('pip install pymanopt')
 
+import pymanopt
 from pymanopt import Problem
 from pymanopt.optimizers import ConjugateGradient, SteepestDescent
 from pymanopt.manifolds.manifold import RiemannianSubmanifold
