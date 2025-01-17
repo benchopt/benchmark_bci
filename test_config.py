@@ -15,5 +15,6 @@ def check_test_dataset_get_data(benchmark, dataset_class):
 
 
 def check_test_solver_install(solver_class):
-    if "green" in solver_class.name.lower():
-        pytest.skip("Failing install")
+    # if "green" in solver_class.name.lower():
+    #     pytest.skip("Failing install")
+    pass
