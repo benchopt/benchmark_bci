@@ -10,6 +10,19 @@ with safe_import_context() as import_ctx:
 
 
 class Solver(BaseSolver):
+    """Solver based on t-Whishart distributions for the covariant matrices,
+    introduced in:
+
+    I. Ayadi, F. Bouchard, F. Pascal, "t-WDA: A novel Discriminant Analysis
+    applied to EEG classification", EUSIPCO, 2023.
+    https://ieeexplore.ieee.org/document/10289799
+
+    I. Ayadi, F. Bouchard, F. Pascal, "Elliptical Wishart distributions:
+    information geometry, maximum likelihood estimator, performance analysis
+    and statistical learning", preprint, 2024.
+    https://arxiv.org/pdf/2411.02726
+    """
+
     name = "Cov-tWDA"
     parameters = {
         "dfs": [None],
